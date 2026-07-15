@@ -50,7 +50,7 @@ bash deploy/deploy.sh
 > `bash deploy/deploy.sh --provision --db-setup`
 
 ## Hasil
-- App live di **http://76.13.19.247** (atau **http://tanatidung.76.13.19.247.nip.io** —
+- App live di **http://76.13.19.247** (atau **http://tanahtidung.76.13.19.247.nip.io** —
   subdomain gratis via nip.io, tanpa domain).
 - Update berikutnya cukup `bash deploy/deploy.sh` (tanpa flag).
 

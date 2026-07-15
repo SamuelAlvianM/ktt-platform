@@ -137,4 +137,4 @@ pm2 save
 pm2 status
 EOF
 
-log "Selesai! Buka: http://tanatidung.76.13.19.247.nip.io  (KTT/dukcapil di IP mentah tetap jalan)"
+log "Selesai! Buka: http://tanahtidung.76.13.19.247.nip.io  (KTT/dukcapil di IP mentah tetap jalan)"
