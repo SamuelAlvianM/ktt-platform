@@ -1,0 +1,527 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
+:root {
+  --radius: 0.75rem;
+
+  /* Brand colours — KTT: kuning keemasan dominan, navy tua sebagai kontras */
+  --brand-blue:        #1b4b72;
+  --brand-blue-dark:   #12395e;
+  --brand-blue-light:  #2e6da4;
+  --brand-yellow:      #f59e0b;
+  --brand-yellow-dark: #b45309;
+
+  /* Glass effect helpers */
+  --glass-bg:          rgba(255, 253, 245, 0.6);
+  --glass-border:      rgba(255, 255, 255, 0.4);
+  --glass-shadow:      0 8px 32px rgba(217, 119, 6, 0.14);
+
+  --background: oklch(0.98 0.012 90);
+  --foreground: oklch(0.16 0.02 255);
+  --card: oklch(1 0 0 / 0.8);
+  --card-foreground: oklch(0.16 0.02 255);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.16 0.02 255);
+  /* primary = brand golden amber */
+  --primary: oklch(0.63 0.15 55);
+  --primary-foreground: oklch(0.99 0.01 90);
+  /* secondary = soft amber-tinted cream */
+  --secondary: oklch(0.95 0.03 90);
+  --secondary-foreground: oklch(0.32 0.06 250);
+  --muted: oklch(0.95 0.02 90);
+  --muted-foreground: oklch(0.5 0.03 250);
+  /* accent = navy tua (biru ketuaan) */
+  --accent: oklch(0.93 0.025 250);
+  --accent-foreground: oklch(0.32 0.07 250);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.9 0.025 90);
+  --input: oklch(0.93 0.02 90);
+  --ring: oklch(0.7 0.15 70);
+  /* status colours — kept in the same blue-forward palette so pages don't clash */
+  --success: oklch(0.55 0.13 155);
+  --success-foreground: oklch(0.98 0 0);
+  --warning: oklch(0.72 0.15 70);
+  --warning-foreground: oklch(0.2 0.03 70);
+  --info: var(--primary);
+  --info-foreground: var(--primary-foreground);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+
+  /* Carousel fonts – actual values are injected by layout.tsx via className;
+     these are safe fallbacks in case that hasn't fired yet. */
+  --font-cormorant: 'Cormorant Garamond', serif;
+  --font-montserrat: 'Montserrat', sans-serif;
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --success: oklch(0.65 0.13 155);
+  --success-foreground: oklch(0.145 0 0);
+  --warning: oklch(0.75 0.15 70);
+  --warning-foreground: oklch(0.145 0 0);
+  --info: var(--primary);
+  --info-foreground: var(--primary-foreground);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(ellipse at 10% 0%, rgba(245,158,11,0.10) 0%, transparent 55%),
+      radial-gradient(ellipse at 90% 100%, rgba(27,75,114,0.08) 0%, transparent 55%);
+    min-height: 100vh;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   Glass card utility  (use: className="glass-card")
+   ────────────────────────────────────────────────────────── */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-card-blue {
+  background: rgba(245, 158, 11, 0.08);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(252, 211, 77, 0.35);
+  box-shadow: 0 8px 32px rgba(217, 119, 6, 0.10);
+}
+
+.glass-nav {
+  background: linear-gradient(180deg, rgba(250, 176, 20, 0.82) 0%, rgba(217, 119, 6, 0.78) 100%);
+  backdrop-filter: blur(22px) saturate(200%);
+  -webkit-backdrop-filter: blur(22px) saturate(200%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+/* ==========================================================================
+   ElegantCarousel – keyframes & utility classes
+   ========================================================================== */
+
+@keyframes carousel-slide-in-next {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes carousel-slide-out-next {
+  from { transform: translateX(0);     opacity: 1; }
+  to   { transform: translateX(-100%); opacity: 0; }
+}
+
+@keyframes carousel-slide-in-prev {
+  from { transform: translateX(-100%); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+@keyframes carousel-slide-out-prev {
+  from { transform: translateX(0);    opacity: 1; }
+  to   { transform: translateX(100%); opacity: 0; }
+}
+
+@keyframes carousel-scale-image {
+  from { transform: scale(1.2); }
+  to   { transform: scale(1);   }
+}
+
+@keyframes carousel-fade-in-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* --- slide animation classes --------------------------------- */
+.carousel-slide-enter-next {
+  animation: carousel-slide-in-next 0.7s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+.carousel-slide-exit-next {
+  animation: carousel-slide-out-next 0.7s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+.carousel-slide-enter-prev {
+  animation: carousel-slide-in-prev 0.7s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+.carousel-slide-exit-prev {
+  animation: carousel-slide-out-prev 0.7s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+/* --- Ken-Burns scale ----------------------------------------- */
+.carousel-image-scale {
+  animation: carousel-scale-image 1.4s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+/* --- text entrance ------------------------------------------- */
+.carousel-text-enter {
+  animation: carousel-fade-in-up 0.8s cubic-bezier(0.65, 0, 0.35, 1) 0.3s forwards;
+  opacity: 0;
+}
+.carousel-subtitle-enter {
+  animation: carousel-fade-in-up 0.8s cubic-bezier(0.65, 0, 0.35, 1) 0.5s forwards;
+  opacity: 0;
+}
+
+/* --- nav buttons & dots -------------------------------------- */
+.carousel-nav-dot {
+  transition: all 0.3s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.carousel-nav-dot:hover {
+  transform: scale(1.2);
+}
+
+.carousel-nav-button {
+  transition: all 0.3s cubic-bezier(0.65, 0, 0.35, 1);
+  backdrop-filter: blur(10px);
+}
+.carousel-nav-button:hover {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.25);
+}
+.carousel-nav-button:active {
+  transform: scale(0.95);
+}
+
+/* --- typography helpers -------------------------------------- */
+.carousel-font-title {
+  font-family: var(--font-cormorant);
+}
+.carousel-font-subtitle {
+  font-family: var(--font-montserrat);
+}
+
+/* ==========================================================================
+   ProfileTabs — keyframes & utility classes
+   ========================================================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    width: 0;
+  }
+  to {
+    width: 6rem;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-slideIn {
+  animation: slideIn 0.8s ease-out forwards;
+}
+
+.animate-pulse {
+  animation: pulse 4s ease-in-out infinite;
+}
+/* ── Tiptap: placeholder saat editor kosong ── */
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--muted-foreground);
+  opacity: 0.6;
+}
+
+/* ── Leaflet: marker kantor berdenyut ── */
+.office-marker {
+  position: relative;
+  width: 44px;
+  height: 44px;
+}
+.office-marker__pin {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f59e0b, #b45309);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(180, 83, 9, 0.45);
+  z-index: 2;
+}
+.office-marker__pulse {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.5);
+  animation: office-pulse 2s ease-out infinite;
+}
+@keyframes office-pulse {
+  0%   { transform: translate(-50%, -50%) scale(1);   opacity: 0.7; }
+  70%  { transform: translate(-50%, -50%) scale(2.6); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(2.6); opacity: 0; }
+}
+/* Leaflet control cleanup di dalam kartu */
+.leaflet-container { font-family: inherit; }
+
+/* ── Aksesibilitas (accessibility-widget, lihat lib/a11y.ts) ── */
+/* Filter halaman (kontras tinggi / skala abu / invert) dikomposisikan oleh JS
+   menjadi satu var --a11y-filter. Diterapkan di elemen root <html> — bukan
+   <body> — karena filter pada root DIKECUALIKAN dari aturan "membuat containing
+   block untuk keturunan position:fixed", sehingga FAB, toast, & modal tetap
+   melekat di viewport saat halaman di-scroll. Default "none" = tanpa efek. */
+:root {
+  filter: var(--a11y-filter, none);
+}
+html.a11y-contrast a,
+html.a11y-contrast button {
+  text-decoration-thickness: 2px;
+}
+
+/* Saat invert aktif, kembalikan (re-invert) media & peta agar tidak rusak/aneh */
+html.a11y-invert img,
+html.a11y-invert video,
+html.a11y-invert svg image,
+html.a11y-invert .leaflet-container {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* Sorot tautan: garis bawah tebal + latar stabilo agar mudah dikenali */
+html.a11y-underline a {
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 2px !important;
+  background-color: rgba(250, 204, 21, 0.3);
+  outline: 1px solid rgba(180, 83, 9, 0.45);
+  outline-offset: 1px;
+}
+
+/* Spasi teks bertingkat (keterbacaan disleksia / low vision) */
+html.a11y-spacing-1 body *:not(svg):not(path) {
+  letter-spacing: 0.05em !important;
+  word-spacing: 0.1em !important;
+  line-height: 1.7 !important;
+}
+html.a11y-spacing-2 body *:not(svg):not(path) {
+  letter-spacing: 0.1em !important;
+  word-spacing: 0.22em !important;
+  line-height: 2 !important;
+}
+
+/* Font ramah disleksia: sans legible yang sudah dimuat (Montserrat) */
+html.a11y-dyslexia body,
+html.a11y-dyslexia body *:not(svg):not(path) {
+  font-family: var(--font-montserrat), Verdana, Arial, sans-serif !important;
+}
+
+/* Latar terang: paksa skema terang (untuk yang silau di mode gelap) */
+html.a11y-lightbg {
+  color-scheme: light;
+}
+html.a11y-lightbg body {
+  background: #ffffff !important;
+}
+
+/* Kursor besar (SVG inline, hotspot 5,4) */
+html.a11y-cursor,
+html.a11y-cursor * {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 24 24'%3E%3Cpath d='M5.5 3.2 19 12.7l-6.4.9 3.6 6.6-3.1 1.7-3.6-6.6-4 3.2z' fill='%23111' stroke='%23fff' stroke-width='1.4'/%3E%3C/svg%3E")
+      5 4,
+    auto !important;
+}
+
+/* Sorotan blok teks yang sedang dibacakan (mode "Baca Saat Diarahkan") */
+.a11y-tts-hover {
+  outline: 2px solid #d97706 !important;
+  outline-offset: 2px;
+  background-color: rgba(245, 158, 11, 0.12) !important;
+  border-radius: 4px;
+}
+
+/* Garis bantu baca yang mengikuti kursor (elemen dirender widget) */
+.a11y-reading-guide {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 4px;
+  background: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
+  z-index: 68;
+  pointer-events: none;
+}
+
+/* Hentikan seluruh animasi & transisi (vestibular / gangguan fokus) */
+html.a11y-no-motion *,
+html.a11y-no-motion *::before,
+html.a11y-no-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Hormati preferensi reduced-motion bawaan OS */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Fokus keyboard yang selalu jelas (navigasi tanpa mouse) */
+:focus-visible {
+  outline: 3px solid #d97706 !important;
+  outline-offset: 2px;
+}
+
+/* Tautan lompat ke konten utama untuk pengguna screen reader/keyboard */
+.skip-to-content {
+  position: fixed;
+  top: -100px;
+  left: 16px;
+  z-index: 100;
+  background: #1b4b72;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  transition: top 0.15s ease;
+}
+.skip-to-content:focus {
+  top: 12px;
+}

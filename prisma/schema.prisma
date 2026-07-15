@@ -1,0 +1,347 @@
+// Prisma schema — ktt-platform
+// DB: MySQL (cocok untuk cPanel/shared hosting)
+// Tabel `users` direkonstruksi PERSIS dari kolom yang dipakai controller Laravel
+// (RegisterController/LoginController data-2). Tabel lain didesain ulang rapi
+// untuk data yang dikelola aplikasi; tabel master dapduk (kependudukan) bersifat
+// legacy/eksternal dan didekati lewat tabel ringkas di sini.
+
+generator client {
+  provider = "prisma-client-js"
+  // "native" = Windows (dev lokal); target Linux agar engine ikut ter-bundle saat
+  // build lokal untuk deploy ke Ubuntu 22.04 (OpenSSL 3.0).
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// Pengguna portal (warga & operator/admin). Mirror tabel `users` legacy.
+model User {
+  id                Int       @id @default(autoincrement())
+  userId            String    @map("user_id") // = NIK saat warga daftar
+  password          String                     // hash bcrypt (TIDAK simpan plaintext)
+  userlevelId       Int       @default(3) @map("userlevel_id") // 1=superadmin,2=operator,3=warga
+  userFullname      String?   @map("user_fullname")
+  userNik           String?   @map("user_nik")
+  userNokk          String?   @map("user_nokk")
+  userHp            String?   @map("user_hp")
+  userEmail         String?   @map("user_email")
+  activationCode    String?   @map("activation_code")
+  activationCodeUrl String?   @db.Text @map("activation_code_url")
+  activationTime    DateTime? @map("activation_time")
+  forgottenCode     String?   @map("forgotten_code")
+  forgottenTime     DateTime? @map("forgotten_time")
+  loginLast         DateTime? @map("login_last")
+  ipAddress         String?   @map("ip_address")
+  status            Int       @default(0) // 0=belum aktif, 1=aktif
+  ket               String?   @db.Text
+  emailVerifiedAt   DateTime? @map("email_verified_at")
+  rememberToken     String?   @map("remember_token")
+  createdBy         Int?      @map("created_by")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedBy         Int?      @map("updated_by")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  level        UserLevel?    @relation(fields: [userlevelId], references: [id])
+  permohonans  Permohonan[]
+  tikets       Tiket[]       @relation("TiketPembuat")
+  tiketPesan   TiketPesan[]  @relation("TiketPengirim")
+  notifikasi   Notifikasi[]
+
+  @@index([userId])
+  @@index([userNik])
+  @@index([status])
+  @@map("users")
+}
+
+/// Level/role pengguna.
+model UserLevel {
+  id        Int      @id @default(autoincrement())
+  nama      String
+  createdAt DateTime @default(now()) @map("created_at")
+  users     User[]
+
+  @@map("m_userlevels")
+}
+
+/// Master jenis layanan/permohonan (Akta Kelahiran, KK, KTP-el, dst).
+model JenisPermohonan {
+  id          Int          @id @default(autoincrement())
+  kode        String       @unique // mis. AKTA_KELAHIRAN_NIK_ADA
+  nama        String
+  kategori    String       // CAPIL | DAFDUK
+  aktif       Boolean      @default(true)
+  urutan      Int          @default(0)
+  permohonans Permohonan[]
+
+  @@map("m_jenis_permohonan")
+}
+
+/// Pengajuan permohonan layanan oleh warga (menyatukan 17 jenis form).
+model Permohonan {
+  id          Int       @id @default(autoincrement())
+  noregister  String    @unique @map("no_register")
+  userId      Int       @map("user_id")
+  jenisId     Int       @map("jenis_id")
+  status      String    @default("MENUNGGU") // MENUNGGU | DIPROSES | SELESAI | DITOLAK
+  payload     Json?     // field dinamis per jenis permohonan
+  catatan     String?   @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user    User            @relation(fields: [userId], references: [id])
+  jenis   JenisPermohonan @relation(fields: [jenisId], references: [id])
+  berkas  Berkas[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("t_permohonan")
+}
+
+/// Berkas/lampiran bukti yang diunggah pada permohonan.
+model Berkas {
+  id           Int        @id @default(autoincrement())
+  permohonanId Int        @map("permohonan_id")
+  namaFile     String     @map("nama_file")
+  path         String
+  mimeType     String?    @map("mime_type")
+  ukuran       Int?
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  permohonan Permohonan @relation(fields: [permohonanId], references: [id], onDelete: Cascade)
+
+  @@map("t_berkas")
+}
+
+/// Pengaduan masyarakat (mirror t_pengaduanmasyarakat).
+model Pengaduan {
+  id        Int      @id @default(autoincrement())
+  nama      String
+  nik       String?
+  email     String?
+  hp        String?
+  subjek    String?
+  isi       String   @db.Text
+  status    String   @default("BARU") // BARU | DIPROSES | SELESAI
+  balasan   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("t_pengaduanmasyarakat")
+}
+
+/// Kritik & saran / kontak.
+model KritikSaran {
+  id        Int      @id @default(autoincrement())
+  nama      String
+  email     String?
+  hp        String?
+  pesan     String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("t_kritiksaran")
+}
+
+/// Berita / artikel (mirror m_news_posts).
+model News {
+  id        Int      @id @default(autoincrement())
+  judul     String
+  slug      String   @unique
+  kategori  String?
+  ringkasan String?  @db.Text
+  konten    String   @db.LongText
+  gambar    String?
+  penulis   String?
+  publish   Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([publish])
+  @@map("m_news_posts")
+}
+
+/// Galeri (bupati / pelayanan).
+model Gallery {
+  id        Int      @id @default(autoincrement())
+  judul     String
+  kategori  String   @default("PELAYANAN") // BUPATI | PELAYANAN
+  gambar    String
+  deskripsi String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("t_galleries")
+}
+
+/// Produk informasi (Hukum, Persyaratan, SOP, Standar Pelayanan, Dafduk).
+model Produk {
+  id        Int      @id @default(autoincrement())
+  jenis     String   // HUKUM | PERSYARATAN | SOP | STANDAR_PELAYANAN | DAFDUK
+  judul     String
+  konten    String?  @db.LongText
+  file      String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([jenis])
+  @@map("t_produk")
+}
+
+/// Survei Kepuasan Masyarakat — pengajuan.
+model SkmJawaban {
+  id        Int      @id @default(autoincrement())
+  nama      String?
+  umur      Int?
+  jenisKel  String?  @map("jenis_kelamin")
+  pekerjaan String?
+  jawaban   Json     // {pertanyaanId: nilai}
+  saran     String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("t_skm_jawaban")
+}
+
+/// Konten statis editable (visi/misi/motto/maklumat/hero beranda, dst).
+/// Daftar blok + nilai default ada di lib/static-content-registry.ts;
+/// baris di tabel ini meng-override default (upsert dari dashboard).
+model StaticContent {
+  id        Int      @id @default(autoincrement())
+  kunci     String   @unique // mis. "profil.visi-misi"
+  judul     String
+  konten    Json
+  updatedBy Int?     @map("updated_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("t_static_contents")
+}
+
+/// Pustaka media terpusat (gambar/berkas dashboard).
+/// File fisik disimpan di storage/uploads/yyyy/mm (di luar public),
+/// disajikan lewat route /uploads/media/[...path] — user tidak pernah
+/// mengetik URL; semua lewat picker/drag-drop.
+model Media {
+  id         String   @id // uuid v4
+  namaAsli   String   @map("nama_asli")
+  namaFile   String   @map("nama_file") // uuid.ext
+  mimeType   String   @map("mime_type")
+  ukuran     Int
+  lebar      Int?
+  tinggi     Int?
+  path       String   // relatif: yyyy/mm/uuid.ext
+  url        String   // publik: /uploads/media/yyyy/mm/uuid.ext
+  uploadedBy Int?     @map("uploaded_by")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([mimeType])
+  @@map("t_media")
+}
+
+/// Master wilayah (kecamatan & kelurahan) untuk dropdown opt/optx.
+model Wilayah {
+  id       Int       @id @default(autoincrement())
+  kode     String    @unique
+  nama     String
+  jenis    String    // KECAMATAN | KELURAHAN
+  parentId Int?      @map("parent_id")
+  parent   Wilayah?  @relation("WilayahHierarki", fields: [parentId], references: [id])
+  children Wilayah[] @relation("WilayahHierarki")
+
+  @@index([jenis])
+  @@map("m_wilayah")
+}
+
+/// Tiket layanan/chat. Warga membuka tiket bantuan ke petugas; staf/admin/OPD
+/// juga berkomunikasi antar mereka lewat tiket (kategori INTERNAL). Tiket dapat
+/// ditutup/dibuka manual, dan tertutup OTOMATIS bila tidak ada aktivitas
+/// selama TIKET_AUTO_CLOSE_DAYS hari (dicek malas di /api/tiket).
+model Tiket {
+  id        Int       @id @default(autoincrement())
+  nomor     String    @unique // TKT<timestamp>
+  userId    Int       @map("user_id") // pembuat tiket
+  subjek    String
+  kategori  String    @default("LAYANAN") // LAYANAN | TEKNIS | INTERNAL
+  status    String    @default("TERBUKA") // TERBUKA | TERTUTUP
+  closedAt  DateTime? @map("closed_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at") // aktivitas terakhir (dasar auto-close)
+
+  user  User         @relation("TiketPembuat", fields: [userId], references: [id])
+  pesan TiketPesan[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("t_tiket")
+}
+
+/// Pesan/balasan di dalam sebuah tiket (chat).
+model TiketPesan {
+  id        Int      @id @default(autoincrement())
+  tiketId   Int      @map("tiket_id")
+  userId    Int      @map("user_id") // pengirim
+  isi       String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  tiket Tiket @relation(fields: [tiketId], references: [id], onDelete: Cascade)
+  user  User  @relation("TiketPengirim", fields: [userId], references: [id])
+
+  @@index([tiketId])
+  @@map("t_tiket_pesan")
+}
+
+/// Notifikasi in-app untuk warga & petugas (lonceng navbar/dashboard).
+/// `tipe` menentukan ikon/warna di UI. `link` = tujuan saat notif diklik.
+/// Push HP (Web Push) menyusul saat situs pindah HTTPS.
+model Notifikasi {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id") // penerima
+  tipe      String   // PERMOHONAN_STATUS | PERMOHONAN_BARU | PENGADUAN_BARU | KRITIK_BARU
+  judul     String
+  isi       String   @db.Text
+  link      String?  // URL tujuan saat diklik
+  refType   String?  @map("ref_type") // Permohonan | Pengaduan | KritikSaran
+  refId     Int?     @map("ref_id")
+  dibaca    Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, dibaca])
+  @@index([userId, createdAt])
+  @@map("t_notifikasi")
+}
+
+/// Data demografi agregat per wilayah, hasil import Excel Dukcapil (SIAK).
+/// `kategori` = jenis-kelamin/agama/gol-darah/pekerjaan/kk/pendidikan/status-kawin/wajib-ktp.
+/// `data` menyimpan kolom nilai (mis. { L, P, JML } untuk jenis kelamin).
+/// Hierarki via `level` (4=kecamatan, 5=pekon/kelurahan) + `parentKode`.
+model DemografiWilayah {
+  id         Int      @id @default(autoincrement())
+  kategori   String
+  kode       String
+  wilayah    String
+  level      Int      // 4=kecamatan, 5=pekon/kelurahan
+  parentKode String?  @map("parent_kode")
+  data       Json
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@unique([kategori, kode])
+  @@index([kategori, level])
+  @@map("m_demografi_wilayah")
+}
+
+/// Jejak kunjungan situs publik — satu baris per pengunjung (cookie anonim)
+/// per hari. Kartu "Pengunjung" dashboard: online = lastSeen <= 5 menit,
+/// hari ini = baris tanggal hari ini, total = jumlah seluruh hits.
+model Kunjungan {
+  id        Int      @id @default(autoincrement())
+  visitorId String   @map("visitor_id") @db.VarChar(64)
+  tanggal   DateTime @db.Date
+  hits      Int      @default(1) // jumlah tampilan halaman hari itu
+  lastSeen  DateTime @map("last_seen")
+
+  @@unique([visitorId, tanggal])
+  @@index([tanggal])
+  @@index([lastSeen])
+  @@map("t_kunjungan")
+}
