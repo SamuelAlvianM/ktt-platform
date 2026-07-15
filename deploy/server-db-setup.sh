@@ -6,7 +6,7 @@ set -euo pipefail
 # Butuh env: DB_NAME, DB_USER, DB_PASSWORD (di-source dari deploy/.env).
 
 log() { echo -e "\033[0;32m[db]\033[0m $*"; }
-cd "$(dirname "${BASH_SOURCE[0]}")/.."   # → /root/saibatin-platform
+cd "$(dirname "${BASH_SOURCE[0]}")/.."   # → /root/ktt-platform
 set -a; source .env; set +a
 
 : "${DB_NAME:?DB_NAME kosong}"; : "${DB_USER:?DB_USER kosong}"; : "${DB_PASSWORD:?DB_PASSWORD kosong}"

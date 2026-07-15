@@ -1,4 +1,4 @@
-# Deploy saibatin-platform ke VPS (PM2 + Nginx, MySQL)
+# Deploy ktt-platform ke VPS (PM2 + Nginx, MySQL)
 
 Build dilakukan di **lokal**; hanya **output build** (`.next/standalone`) yang dikirim
 ke server — source code tidak diunggah.
@@ -11,16 +11,16 @@ masukkan password root saat diminta):
 cat ~/.ssh/id_ed25519.pub | ssh root@76.13.19.247 "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
 ```
 
-Lalu tambahkan alias ke `~/.ssh/config` (biar bisa `ssh saibatin`):
+Lalu tambahkan alias ke `~/.ssh/config` (biar bisa `ssh tanatidung`):
 
 ```
-Host saibatin
+Host tanatidung
     HostName 76.13.19.247
     User root
     IdentityFile ~/.ssh/id_ed25519
 ```
 
-Uji: `ssh saibatin 'echo ok'` → harus `ok` tanpa password.
+Uji: `ssh tanatidung 'echo ok'` → harus `ok` tanpa password.
 > Alternatif tanpa alias: jalankan deploy dengan `REMOTE=root@76.13.19.247 bash deploy/deploy.sh`.
 
 ## 1. Siapkan env runtime
@@ -50,7 +50,7 @@ bash deploy/deploy.sh
 > `bash deploy/deploy.sh --provision --db-setup`
 
 ## Hasil
-- App live di **http://76.13.19.247** (atau **http://saibatin.76.13.19.247.nip.io** —
+- App live di **http://76.13.19.247** (atau **http://tanatidung.76.13.19.247.nip.io** —
   subdomain gratis via nip.io, tanpa domain).
 - Update berikutnya cukup `bash deploy/deploy.sh` (tanpa flag).
 

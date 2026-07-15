@@ -33,22 +33,22 @@ else
   warn "MySQL tidak terdeteksi aktif — hentikan & cek manual sebelum lanjut."
 fi
 
-# --- Nginx: TAMBAH site saibatin saja. JANGAN hapus default/dukcapil. ---
+# --- Nginx: TAMBAH site tanatidung saja. JANGAN hapus default/dukcapil. ---
 if ! command -v nginx &>/dev/null; then
   warn "Nginx belum ada (aneh untuk server ini) — pasang..."
   apt-get install -y nginx
 fi
-if [[ -f /root/saibatin-platform/deploy/nginx-saibatin.conf ]]; then
-  log "Tambah site Nginx 'saibatin' (host nip.io; site lain tak diubah)..."
-  cp /root/saibatin-platform/deploy/nginx-saibatin.conf /etc/nginx/sites-available/saibatin
-  ln -sf /etc/nginx/sites-available/saibatin /etc/nginx/sites-enabled/saibatin
+if [[ -f /root/ktt-platform/deploy/nginx-tanatidung.conf ]]; then
+  log "Tambah site Nginx 'tanatidung' (host nip.io; site lain tak diubah)..."
+  cp /root/ktt-platform/deploy/nginx-tanatidung.conf /etc/nginx/sites-available/tanatidung
+  ln -sf /etc/nginx/sites-available/tanatidung /etc/nginx/sites-enabled/tanatidung
   # Uji dulu; reload HANYA jika lulus (agar dukcapil tak ikut down).
   if nginx -t; then
     systemctl reload nginx
-    log "Nginx reload OK — dukcapil tetap jalan, saibatin ditambahkan."
+    log "Nginx reload OK — dukcapil tetap jalan, tanatidung ditambahkan."
   else
-    warn "nginx -t GAGAL — batalkan site saibatin agar tidak merusak yang lain."
-    rm -f /etc/nginx/sites-enabled/saibatin
+    warn "nginx -t GAGAL — batalkan site tanatidung agar tidak merusak yang lain."
+    rm -f /etc/nginx/sites-enabled/tanatidung
     exit 1
   fi
 fi
@@ -58,4 +58,4 @@ if command -v ufw &>/dev/null && ufw status | grep -q "Status: active"; then
   ufw allow 80/tcp || true; ufw allow 22/tcp || true
 fi
 
-log "✅ Bootstrap AMAN selesai (Node/PM2 + site saibatin). KTT tidak disentuh."
+log "✅ Bootstrap AMAN selesai (Node/PM2 + site tanatidung). KTT tidak disentuh."

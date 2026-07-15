@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # ---------------------------------------------------------------------------
-# deploy.sh — Build saibatin-platform di LOKAL, kirim .next/standalone ke VPS,
+# deploy.sh — Build ktt-platform di LOKAL, kirim .next/standalone ke VPS,
 # jalankan via PM2 di belakang Nginx. Source TIDAK dikirim (hanya output build).
 #
-# Jalankan dari root saibatin-platform:
+# Jalankan dari root ktt-platform:
 #   bash deploy/deploy.sh                 # build + kirim + restart
 #   bash deploy/deploy.sh --provision     # (sekali) pasang Node/PM2/MySQL/Nginx
 #   bash deploy/deploy.sh --db-setup      # buat DB + push skema + seed (via tunnel)
 #   bash deploy/deploy.sh --skip-build    # pakai build yang sudah ada
 #   REMOTE=root@76.13.19.247 bash deploy/deploy.sh   # tanpa alias SSH
 #
-# Target SSH: alias `saibatin` (di ~/.ssh/config) atau REMOTE=root@IP.
+# Target SSH: alias `tanatidung` (di ~/.ssh/config) atau REMOTE=root@IP.
 # ---------------------------------------------------------------------------
 
-REMOTE="${REMOTE:-saibatin}"
-REMOTE_DIR="/root/saibatin-platform"
+REMOTE="${REMOTE:-tanatidung}"
+REMOTE_DIR="/root/ktt-platform"
 TUNNEL_PORT="${TUNNEL_PORT:-33061}"
 SHARP_VER="0.35.3"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -74,7 +74,7 @@ log "Kirim ecosystem, .env, & skrip server..."
 ssh "$REMOTE" "mkdir -p '$REMOTE_DIR/deploy'"
 scp deploy/ecosystem.config.cjs "$REMOTE:$REMOTE_DIR/"
 scp deploy/.env                 "$REMOTE:$REMOTE_DIR/.env"
-scp deploy/server-bootstrap.sh deploy/server-db-setup.sh deploy/nginx-saibatin.conf "$REMOTE:$REMOTE_DIR/deploy/"
+scp deploy/server-bootstrap.sh deploy/server-db-setup.sh deploy/nginx-tanatidung.conf "$REMOTE:$REMOTE_DIR/deploy/"
 
 # ============================================================ PROVISION (sekali)
 if [[ "$PROVISION" == true ]]; then
@@ -137,4 +137,4 @@ pm2 save
 pm2 status
 EOF
 
-log "Selesai! Buka: http://saibatin.76.13.19.247.nip.io  (KTT/dukcapil di IP mentah tetap jalan)"
+log "Selesai! Buka: http://tanatidung.76.13.19.247.nip.io  (KTT/dukcapil di IP mentah tetap jalan)"

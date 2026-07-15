@@ -1,7 +1,7 @@
-# Prompt: Penyempurnaan Fitur Aksesibilitas / Disabilitas (SAIBATIN)
+# Prompt: Penyempurnaan Fitur Aksesibilitas / Disabilitas (KTT)
 
 > Prompt ini untuk dijalankan di **Claude Code Desktop (Fable)** pada repo
-> `saibatin-platform`. Tujuan: melengkapi fitur aksesibilitas untuk penyandang
+> `ktt-platform`. Tujuan: melengkapi fitur aksesibilitas untuk penyandang
 > disabilitas agar setara dengan widget aksesibilitas situs pemerintah seperti
 > `dpmk.bantulkab.go.id`. Fondasi saat ini sudah benar namun belum lengkap dan
 > belum nyaman — sempurnakan, jangan bongkar ulang arsitektur yang ada.

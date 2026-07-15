@@ -1,4 +1,4 @@
-# SAIBATIN Platform
+# KTT Platform
 
 Portal layanan **Disdukcapil Kabupaten Pesisir Barat** — hasil migrasi dari Laravel 9 (`data-2`) ke **Next.js full-stack**.
 
@@ -16,7 +16,7 @@ Portal layanan **Disdukcapil Kabupaten Pesisir Barat** — hasil migrasi dari La
 npm install
 cp .env.example .env.local      # isi DATABASE_URL & AUTH_SECRET
 
-# Siapkan DB MySQL (buat database "saibatin" lebih dulu), lalu:
+# Siapkan DB MySQL (buat database "tanatidung" lebih dulu), lalu:
 npm run db:push                 # buat tabel dari schema Prisma
 npm run db:seed                 # isi data dummy + akun demo
 npm run dev                     # http://localhost:3000

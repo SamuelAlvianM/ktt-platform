@@ -1,12 +1,12 @@
-// PM2 untuk saibatin-platform (Next.js standalone). Secret dibaca dari
+// PM2 untuk ktt-platform (Next.js standalone). Secret dibaca dari
 // process.env (di-source dari deploy/.env oleh deploy.sh). JANGAN hardcode secret.
 module.exports = {
   apps: [
     {
-      name: 'saibatin',
+      name: 'tanatidung',
       // server.js dihasilkan Next di root .next/standalone (dikirim ke REMOTE_DIR).
       script: 'server.js',
-      cwd: '/root/saibatin-platform',
+      cwd: '/root/ktt-platform',
       instances: 1,
       exec_mode: 'fork',
       env_production: {
