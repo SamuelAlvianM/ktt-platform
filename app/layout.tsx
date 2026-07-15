@@ -29,9 +29,26 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3300",
+  ),
   title: "KTT - Disdukcapil Tana Tidung",
   description:
     "Portal layanan administrasi kependudukan & pencatatan sipil Kabupaten Tana Tidung (KTT).",
+  openGraph: {
+    title: "KTT - Disdukcapil Tana Tidung",
+    description:
+      "Portal layanan administrasi kependudukan & pencatatan sipil Kabupaten Tana Tidung (KTT).",
+    siteName: "Portal KTT",
+    locale: "id_ID",
+    type: "website",
+    images: [{ url: "/og-ktt.png", width: 1200, height: 630, alt: "Logo Disdukcapil Kabupaten Tana Tidung" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "KTT - Disdukcapil Tana Tidung",
+    images: ["/og-ktt.png"],
+  },
 };
 
 export default function RootLayout({
