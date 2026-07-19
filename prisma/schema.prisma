@@ -1,4 +1,4 @@
-// Prisma schema — ktt-platform
+// Prisma schema — sidako-platform
 // DB: MySQL (cocok untuk cPanel/shared hosting)
 // Tabel `users` direkonstruksi PERSIS dari kolom yang dipakai controller Laravel
 // (RegisterController/LoginController data-2). Tabel lain didesain ulang rapi
@@ -88,6 +88,11 @@ model Permohonan {
   status      String    @default("MENUNGGU") // MENUNGGU | DIPROSES | SELESAI | DITOLAK
   payload     Json?     // field dinamis per jenis permohonan
   catatan     String?   @db.Text
+  // Petugas yang terakhir mengubah status (jejak audit). Nama disimpan
+  // denormalized agar tetap terbaca walau akun berubah/dihapus.
+  prosesById   Int?      @map("proses_by")
+  prosesByName String?   @map("proses_by_name")
+  prosesAt     DateTime? @map("proses_at")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
 
@@ -178,10 +183,17 @@ model Gallery {
 model Produk {
   id        Int      @id @default(autoincrement())
   jenis     String   // HUKUM | PERSYARATAN | SOP | STANDAR_PELAYANAN | DAFDUK
-  judul     String
+  /// Judul dokumen. Nama resmi produk hukum bisa sangat panjang (Permendagri
+  /// dengan klausul "perubahan atas ..." menembus 200 karakter), jadi tidak
+  /// muat di varchar(191) bawaan Prisma.
+  judul     String   @db.VarChar(255)
   konten    String?  @db.LongText
   file      String?
+  // Admin pengunggah (bisa >1 admin) — jejak siapa memasukkan dokumen.
+  uploadedBy     Int?     @map("uploaded_by")
+  uploadedByName String?  @map("uploaded_by_name")
   createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@index([jenis])
   @@map("t_produk")
@@ -314,13 +326,13 @@ model Notifikasi {
 /// Data demografi agregat per wilayah, hasil import Excel Dukcapil (SIAK).
 /// `kategori` = jenis-kelamin/agama/gol-darah/pekerjaan/kk/pendidikan/status-kawin/wajib-ktp.
 /// `data` menyimpan kolom nilai (mis. { L, P, JML } untuk jenis kelamin).
-/// Hierarki via `level` (4=kecamatan, 5=pekon/kelurahan) + `parentKode`.
+/// Hierarki via `level` (4=kecamatan, 5=desa/kelurahan) + `parentKode`.
 model DemografiWilayah {
   id         Int      @id @default(autoincrement())
   kategori   String
   kode       String
   wilayah    String
-  level      Int      // 4=kecamatan, 5=pekon/kelurahan
+  level      Int      // 4=kecamatan, 5=desa/kelurahan
   parentKode String?  @map("parent_kode")
   data       Json
   updatedAt  DateTime @updatedAt @map("updated_at")

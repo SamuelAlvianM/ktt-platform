@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { VisitorCount } from "@/components/shared/visitor-count";
 import { Phone, Mail, Clock, MapPin } from "lucide-react";
 
 const grup = {
@@ -29,15 +30,15 @@ export function Footer() {
             <div className="flex items-center gap-3">
               <div className="relative h-11 w-11 flex-shrink-0">
                 <Image
-                  src="/LOGO-dinas_ktt.png"
-                  alt="Logo KTT"
+                  src="/LOGO-dinas_sidako.png"
+                  alt="Logo SIDAKO"
                   fill
                   className="object-contain"
                 />
               </div>
               <div>
                 <span className="text-white font-bold text-lg tracking-wide">
-                  KTT
+                  SIDAKO
                 </span>
                 <p className="text-xs text-slate-400">
                   Disdukcapil Kabupaten Tana Tidung
@@ -124,11 +125,14 @@ export function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-white/10">
+        <div className="container mx-auto px-4 md:px-8 lg:px-16 py-4 flex justify-center border-b border-white/5">
+          <VisitorCount />
+        </div>
         <div className="container mx-auto px-4 md:px-8 lg:px-16 py-5">
           <div className="flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-slate-500">
             <p>
               © {year}{" "}
-              <span className="text-slate-300 font-medium">KTT</span> —
+              <span className="text-slate-300 font-medium">SIDAKO</span> —
               Disdukcapil Kabupaten Tana Tidung
             </p>
             <div className="flex items-center gap-4">

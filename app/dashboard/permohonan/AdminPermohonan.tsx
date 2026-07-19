@@ -5,8 +5,13 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import Link from 'next/link';
-import { Loader2, Search, ClipboardList, X, Clock, CheckCircle2, XCircle, FileText, Eye, Lock, AlertTriangle } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Loader2, Search, ClipboardList, X, Clock, CheckCircle2, XCircle, FileText,
+  Eye, Lock, AlertTriangle, ArrowLeft, Download, User, Phone, Mail,
+} from 'lucide-react';
+import { BerkasGallery, PermohonanJourney } from '@/components/shared/permohonan-detail';
+import { labelField, payloadDataEntries, payloadBerkasEntries } from '@/lib/permohonan-display';
 
 /** Status final — data terkunci, hanya bisa dibuka lewat halaman Master. */
 const FINAL_STATUS = ['SELESAI', 'DITOLAK'];
@@ -24,6 +29,38 @@ interface Item {
   hp: string;
   jumlahBerkas: number;
 }
+
+interface BerkasItem {
+  id: number;
+  namaFile: string;
+  path: string;
+  mimeType: string | null;
+}
+
+interface Detail {
+  id: number;
+  noregister: string;
+  status: string;
+  catatan: string | null;
+  createdAt: string;
+  updatedAt: string;
+  prosesByName?: string | null;
+  prosesAt?: string | null;
+  payload: Record<string, unknown> | null;
+  jenis: { nama: string; kategori: string } | null;
+  user: { userId: string; userFullname: string | null; userHp: string | null; userEmail: string | null } | null;
+  berkas: BerkasItem[];
+}
+
+/** Pilihan alasan penolakan yang lazim; "Lainnya" -> alasan diketik bebas. */
+const ALASAN_TOLAK = [
+  'Berkas tidak lengkap',
+  'Berkas tidak jelas / buram',
+  'Data tidak sesuai dengan dokumen',
+  'NIK / dokumen tidak valid',
+  'Persyaratan belum terpenuhi',
+  'Lainnya',
+];
 
 const STATUS: Record<string, { label: string; cls: string; icon: React.ElementType }> = {
   MENUNGGU: { label: 'Menunggu', cls: 'text-warning bg-warning/10 border-warning/20', icon: Clock },
@@ -45,12 +82,18 @@ function StatusBadge({ status }: { status: string }) {
 
 export function AdminPermohonan() {
   const [items, setItems] = useState<Item[]>([]);
+  const [counts, setCounts] = useState<Record<string, number>>({});
   const [statusFilter, setStatusFilter] = useState('');
   const [q, setQ] = useState('');
   const [loading, setLoading] = useState(true);
+  // Panel detail inline (menggantikan tabel — bukan pindah halaman).
+  const [detail, setDetail] = useState<Detail | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
   const [editing, setEditing] = useState<Item | null>(null);
   const [editStatus, setEditStatus] = useState('');
   const [editCatatan, setEditCatatan] = useState('');
+  // Alasan penolakan terpilih (dropdown). '' = belum pilih; 'Lainnya' = ketik bebas.
+  const [rejectPreset, setRejectPreset] = useState('');
   const [saving, setSaving] = useState(false);
   // Konfirmasi ekstra sebelum status dijadikan final (Selesai/Ditolak).
   const [confirmFinal, setConfirmFinal] = useState(false);
@@ -63,6 +106,7 @@ export function AdminPermohonan() {
     const res = await fetch(`/api/admin/permohonan?${params.toString()}`);
     const json = await res.json();
     setItems(json.data?.items ?? []);
+    if (json.data?.counts) setCounts(json.data.counts);
     setLoading(false);
   }, [statusFilter, q]);
 
@@ -70,10 +114,28 @@ export function AdminPermohonan() {
     load();
   }, [statusFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const openEdit = (it: Item) => {
-    setEditing(it);
+  const openDetail = async (it: Item) => {
+    setDetailLoading(true);
+    setDetail(null);
+    const res = await fetch(`/api/admin/permohonan/${it.id}`);
+    const json = await res.json();
+    setDetailLoading(false);
+    if (json.data?.permohonan) {
+      setDetail(json.data.permohonan);
+    } else {
+      toast.error(json.error?.[0] ?? 'Gagal memuat detail');
+    }
+  };
+
+  const closeDetail = () => {
+    setDetail(null);
+  };
+
+  const openEdit = (it: { id: number; noregister: string; status: string; catatan: string | null; pemohon: string; jenisNama: string }) => {
+    setEditing(it as Item);
     setEditStatus(it.status);
     setEditCatatan(it.catatan ?? '');
+    setRejectPreset('');
     setConfirmFinal(false);
   };
 
@@ -85,6 +147,15 @@ export function AdminPermohonan() {
   /** Klik Simpan: status final butuh konfirmasi ekstra dulu. */
   const save = async () => {
     if (!editing) return;
+    // Penolakan wajib disertai alasan (pilih dari dropdown atau ketik bila "Lainnya").
+    if (editStatus === 'DITOLAK' && !editCatatan.trim()) {
+      toast.error(
+        rejectPreset === 'Lainnya'
+          ? 'Tulis alasan penolakan'
+          : 'Pilih alasan penolakan'
+      );
+      return;
+    }
     if (FINAL_STATUS.includes(editStatus) && !confirmFinal) {
       setConfirmFinal(true);
       return;
@@ -105,114 +176,274 @@ export function AdminPermohonan() {
       setItems((prev) =>
         prev.map((p) => (p.id === editing.id ? { ...p, status: editStatus, catatan: editCatatan } : p))
       );
+      // Detail tetap terbuka — status & catatan ikut diperbarui (mis. agar
+      // tombol Unduh Dokumen langsung muncul saat Selesai).
+      setDetail((prev) =>
+        prev && prev.id === editing.id ? { ...prev, status: editStatus, catatan: editCatatan } : prev
+      );
       setEditing(null);
     }
   };
 
+  const payload: Record<string, unknown> =
+    detail?.payload && typeof detail.payload === 'object' ? (detail.payload as Record<string, unknown>) : {};
+  // Semua isian form (tanpa field berkas/internal), berlabel bahasa manusia.
+  const payloadEntries = payloadDataEntries(payload);
+  // Berkas: gabungan t_berkas + berkas yang hanya tercatat di payload.
+  const berkasPaths = new Set((detail?.berkas ?? []).map((b) => b.path));
+  const berkasView = [
+    ...(detail?.berkas ?? []).map((b) => ({ label: b.namaFile, path: b.path })),
+    ...payloadBerkasEntries(payload).filter((b) => !berkasPaths.has(b.path)),
+  ];
+  const detailFinal = detail ? FINAL_STATUS.includes(detail.status) : false;
+
   return (
     <div className="glass-card rounded-2xl p-5 md:p-6">
-      <div className="flex items-center gap-2 mb-4">
-        <ClipboardList className="h-5 w-5 text-slate-700" />
-        <h2 className="font-semibold text-slate-900">Daftar Permohonan</h2>
-        {!loading && (
-          <span className="ml-auto rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-500">
-            {items.length} data
-          </span>
-        )}
-      </div>
+      {/* ─────────── PANEL DETAIL INLINE ─────────── */}
+      {(detail || detailLoading) ? (
+        <div>
+          <div className="mb-4 flex items-center justify-between gap-2">
+            <Button variant="outline" size="sm" onClick={closeDetail}>
+              <ArrowLeft className="h-4 w-4 mr-1.5" /> Kembali ke tabel
+            </Button>
+            {detail && <StatusBadge status={detail.status} />}
+          </div>
 
-      {/* Filter & search */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-4">
-        <div className="flex flex-wrap gap-1">
-          {[['', 'Semua'], ...STATUS_KEYS.map((k) => [k, STATUS[k].label])].map(([val, label]) => (
-            <button
-              key={val}
-              onClick={() => setStatusFilter(val)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
-                statusFilter === val
-                  ? 'bg-primary text-primary-foreground border-transparent'
-                  : 'bg-white text-slate-600 border-slate-200 hover:border-primary/40'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            load();
-          }}
-          className="flex gap-2 flex-1"
-        >
-          <Input placeholder="Cari no. register / nama / NIK..." value={q} onChange={(e) => setQ(e.target.value)} />
-          <Button type="submit" variant="outline">
-            <Search className="h-4 w-4" />
-          </Button>
-        </form>
-      </div>
+          {detailLoading ? (
+            <div className="flex justify-center py-16">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          ) : detail && (
+            <div className="space-y-4">
+              {/* Header permohonan */}
+              <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+                <h3 className="font-semibold text-slate-900">{detail.jenis?.nama ?? 'Permohonan'}</h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  <span className="font-mono font-semibold">{detail.noregister}</span>
+                  {' '}&middot; {detail.jenis?.kategori ?? '-'}
+                  {' '}&middot; diajukan {new Date(detail.createdAt).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' })}
+                </p>
+              </div>
 
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-        </div>
-      ) : items.length === 0 ? (
-        <div className="text-center py-12 text-sm text-slate-500">Tidak ada permohonan.</div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-slate-500 border-b border-slate-200">
-                <th className="py-2 pr-4 font-medium">No. Register</th>
-                <th className="py-2 pr-4 font-medium">Pemohon</th>
-                <th className="py-2 pr-4 font-medium">Jenis</th>
-                <th className="py-2 pr-4 font-medium">Tanggal</th>
-                <th className="py-2 pr-4 font-medium">Status</th>
-                <th className="py-2 pr-4 font-medium">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((it) => (
-                <tr key={it.id} className="border-b border-slate-100 align-top">
-                  <td className="py-2.5 pr-4 font-mono text-xs">{it.noregister}</td>
-                  <td className="py-2.5 pr-4">
-                    <div>{it.pemohon}</div>
-                    <div className="text-xs text-slate-400 font-mono">{it.pemohonId}</div>
-                  </td>
-                  <td className="py-2.5 pr-4">
-                    <div>{it.jenisNama}</div>
-                    <div className="text-xs text-slate-400">{it.kategori} &middot; {it.jumlahBerkas} berkas</div>
-                  </td>
-                  <td className="py-2.5 pr-4 text-xs text-slate-500">
-                    {new Date(it.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
-                  </td>
-                  <td className="py-2.5 pr-4"><StatusBadge status={it.status} /></td>
-                  <td className="py-2.5 pr-4">
-                    <div className="flex gap-2">
-                      <Link href={`/riwayat/${it.id}`} target="_blank">
-                        <Button size="sm" variant="outline" title="Lihat detail & berkas">
-                          <Eye className="h-3.5 w-3.5" />
-                        </Button>
-                      </Link>
-                      {FINAL_STATUS.includes(it.status) ? (
-                        <span
-                          className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-medium text-slate-400"
-                          title="Permohonan final — buka kunci lewat halaman Master"
-                        >
-                          <Lock className="h-3.5 w-3.5" /> Terkunci
-                        </span>
-                      ) : (
-                        <Button size="sm" variant="outline" onClick={() => openEdit(it)}>
-                          Proses
-                        </Button>
+              {/* Journey status */}
+              <div className="rounded-xl border border-slate-200 p-4">
+                <PermohonanJourney
+                  status={detail.status}
+                  createdAt={detail.createdAt}
+                  prosesAt={detail.prosesAt}
+                  updatedAt={detail.updatedAt}
+                />
+              </div>
+
+              {/* Pemohon */}
+              <div className="rounded-xl border border-slate-200 p-4">
+                <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">Pemohon</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                  <p className="flex items-center gap-2 text-slate-700">
+                    <User className="h-4 w-4 text-slate-400 shrink-0" />
+                    <span>
+                      {detail.user?.userFullname ?? '-'}
+                      <span className="block text-xs font-mono text-slate-400">{detail.user?.userId ?? '-'}</span>
+                    </span>
+                  </p>
+                  <p className="flex items-center gap-2 text-slate-700">
+                    <Phone className="h-4 w-4 text-slate-400 shrink-0" /> {detail.user?.userHp ?? '-'}
+                  </p>
+                  <p className="flex items-center gap-2 text-slate-700 break-all">
+                    <Mail className="h-4 w-4 text-slate-400 shrink-0" /> {detail.user?.userEmail ?? '-'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Data permohonan (payload) */}
+              {payloadEntries.length > 0 && (
+                <div className="rounded-xl border border-slate-200 p-4">
+                  <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">Data Permohonan</h4>
+                  <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                    {payloadEntries.map(([k, v]) => (
+                      <div key={k} className="bg-slate-50/80 rounded-lg px-3 py-2">
+                        <dt className="text-xs text-slate-400">{labelField(k)}</dt>
+                        <dd className="text-sm font-medium text-slate-800 mt-0.5 break-words">{v}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )}
+
+              {/* Berkas lampiran — preview gambar (t_berkas ∪ payload) */}
+              <div className="rounded-xl border border-slate-200 p-4">
+                <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-3">
+                  Berkas Lampiran ({berkasView.length})
+                </h4>
+                <BerkasGallery items={berkasView} />
+              </div>
+
+              {/* Catatan petugas + jejak pemroses */}
+              {(detail.catatan || detail.prosesByName) && (
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  {detail.catatan && (
+                    <>
+                      <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1">Catatan Petugas</h4>
+                      <p className="text-sm text-slate-700">{detail.catatan}</p>
+                    </>
+                  )}
+                  {detail.prosesByName && (
+                    <p className={`flex items-center gap-1.5 text-xs text-slate-500 ${detail.catatan ? 'mt-2 pt-2 border-t border-slate-200' : ''}`}>
+                      <User className="h-3.5 w-3.5 text-slate-400" />
+                      Diproses oleh <b className="text-slate-700">{detail.prosesByName}</b>
+                      {detail.prosesAt && (
+                        <> &middot; {new Date(detail.prosesAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}</>
                       )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Aksi: proses (baca dulu detail di atas, baru proses di sini) */}
+              <div className="flex flex-wrap items-center justify-end gap-2 border-t border-slate-100 pt-4">
+                {detail.status === 'SELESAI' && (
+                  <a href={`/api/permohonan/${detail.id}/pdf`}>
+                    <Button variant="outline" className="border-success/40 text-success hover:bg-success/10 hover:text-success">
+                      <Download className="h-4 w-4 mr-1.5" /> Unduh Dokumen (PDF)
+                    </Button>
+                  </a>
+                )}
+                {detailFinal ? (
+                  <span
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium text-slate-500"
+                    title="Permohonan final — buka kunci lewat halaman Master"
+                  >
+                    <Lock className="h-3.5 w-3.5" /> Permohonan final &amp; terkunci
+                  </span>
+                ) : (
+                  <Button
+                    onClick={() =>
+                      openEdit({
+                        id: detail.id,
+                        noregister: detail.noregister,
+                        status: detail.status,
+                        catatan: detail.catatan,
+                        pemohon: detail.user?.userFullname ?? detail.user?.userId ?? '-',
+                        jenisNama: detail.jenis?.nama ?? '-',
+                      })
+                    }
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    Proses Permohonan
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
+      ) : (
+        <>
+          {/* ─────────── TABEL ─────────── */}
+          <div className="flex items-center gap-2 mb-4">
+            <ClipboardList className="h-5 w-5 text-slate-700" />
+            <h2 className="font-semibold text-slate-900">Daftar Permohonan</h2>
+            {!loading && (
+              <span className="ml-auto rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-500">
+                {items.length} data
+              </span>
+            )}
+          </div>
+
+          {/* Filter & search */}
+          <div className="flex flex-col sm:flex-row gap-3 mb-4">
+            <div className="flex flex-wrap gap-1">
+              {[['', 'Semua'], ...STATUS_KEYS.map((k) => [k, STATUS[k].label])].map(([val, label]) => (
+                <button
+                  key={val}
+                  onClick={() => setStatusFilter(val)}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
+                    statusFilter === val
+                      ? 'bg-primary text-primary-foreground border-transparent'
+                      : 'bg-white text-slate-600 border-slate-200 hover:border-primary/40'
+                  }`}
+                >
+                  {label}
+                  {counts[val] !== undefined && (
+                    <span
+                      className={`ml-1.5 inline-flex items-center justify-center rounded-full px-1.5 text-xs font-semibold ${
+                        statusFilter === val ? 'bg-white/25 text-white' : 'bg-slate-100 text-slate-500'
+                      }`}
+                    >
+                      {counts[val]}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                load();
+              }}
+              className="flex gap-2 flex-1"
+            >
+              <Input placeholder="Cari no. register / nama / NIK..." value={q} onChange={(e) => setQ(e.target.value)} />
+              <Button type="submit" variant="outline">
+                <Search className="h-4 w-4" />
+              </Button>
+            </form>
+          </div>
+
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          ) : items.length === 0 ? (
+            <div className="text-center py-12 text-sm text-slate-500">Tidak ada permohonan.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-slate-500 border-b border-slate-200">
+                    <th className="py-2 pr-4 font-medium">No. Register</th>
+                    <th className="py-2 pr-4 font-medium">Pemohon</th>
+                    <th className="py-2 pr-4 font-medium">Jenis</th>
+                    <th className="py-2 pr-4 font-medium">Tanggal</th>
+                    <th className="py-2 pr-4 font-medium">Status</th>
+                    <th className="py-2 pr-4 font-medium">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((it) => (
+                    <tr key={it.id} className="border-b border-slate-100 align-top">
+                      <td className="py-2.5 pr-4 font-mono text-xs">{it.noregister}</td>
+                      <td className="py-2.5 pr-4">
+                        <div>{it.pemohon}</div>
+                        <div className="text-xs text-slate-400 font-mono">{it.pemohonId}</div>
+                      </td>
+                      <td className="py-2.5 pr-4">
+                        <div>{it.jenisNama}</div>
+                        <div className="text-xs text-slate-400">{it.kategori} &middot; {it.jumlahBerkas} berkas</div>
+                      </td>
+                      <td className="py-2.5 pr-4 text-xs text-slate-500">
+                        {new Date(it.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </td>
+                      <td className="py-2.5 pr-4"><StatusBadge status={it.status} /></td>
+                      <td className="py-2.5 pr-4">
+                        <div className="flex items-center gap-2">
+                          {/* Proses dilakukan dari DETAIL — baca data & berkas dulu. */}
+                          <Button size="sm" variant="outline" onClick={() => openDetail(it)} title="Lihat detail, berkas & proses">
+                            <Eye className="h-3.5 w-3.5 mr-1.5" /> Detail
+                          </Button>
+                          {FINAL_STATUS.includes(it.status) && (
+                            <span className="text-slate-300" title="Permohonan final — buka kunci lewat halaman Master">
+                              <Lock className="h-3.5 w-3.5" />
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
       )}
 
       {/* Modal edit status */}
@@ -248,7 +479,11 @@ export function AdminPermohonan() {
                     <button
                       key={k}
                       type="button"
-                      onClick={() => setEditStatus(k)}
+                      onClick={() => {
+                        setEditStatus(k);
+                        // Keluar dari DITOLAK -> reset pilihan alasan.
+                        if (k !== 'DITOLAK') setRejectPreset('');
+                      }}
                       className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
                         editStatus === k ? STATUS[k].cls : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                       }`}
@@ -259,16 +494,52 @@ export function AdminPermohonan() {
                 </div>
               </div>
 
-              <div>
-                <label className="text-sm font-medium text-slate-700">Catatan Petugas</label>
-                <Textarea
-                  className="mt-1.5"
-                  rows={3}
-                  value={editCatatan}
-                  onChange={(e) => setEditCatatan(e.target.value)}
-                  placeholder="Catatan untuk pemohon (opsional)..."
-                />
-              </div>
+              {editStatus === 'DITOLAK' ? (
+                <div>
+                  <label className="text-sm font-medium text-slate-700">
+                    Alasan Penolakan <span className="text-destructive">*</span>
+                  </label>
+                  <Select
+                    value={rejectPreset}
+                    onValueChange={(v) => {
+                      setRejectPreset(v);
+                      // Preset langsung jadi catatan; "Lainnya" -> kosongkan utk diketik.
+                      setEditCatatan(v === 'Lainnya' ? '' : v);
+                    }}
+                  >
+                    <SelectTrigger className="mt-1.5">
+                      <SelectValue placeholder="Pilih alasan penolakan..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ALASAN_TOLAK.map((a) => (
+                        <SelectItem key={a} value={a}>{a}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {rejectPreset === 'Lainnya' && (
+                    <Textarea
+                      className="mt-2"
+                      rows={3}
+                      value={editCatatan}
+                      onChange={(e) => setEditCatatan(e.target.value)}
+                      placeholder="Tulis alasan penolakan..."
+                      autoFocus
+                    />
+                  )}
+                  <p className="mt-1.5 text-xs text-slate-400">Alasan ini dikirim ke pemohon sebagai catatan.</p>
+                </div>
+              ) : (
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Catatan Petugas</label>
+                  <Textarea
+                    className="mt-1.5"
+                    rows={3}
+                    value={editCatatan}
+                    onChange={(e) => setEditCatatan(e.target.value)}
+                    placeholder="Catatan untuk pemohon (opsional)..."
+                  />
+                </div>
+              )}
 
               <div className="flex justify-end gap-2 pt-2">
                 <Button variant="outline" onClick={closeEdit}>Batal</Button>
@@ -298,7 +569,7 @@ export function AdminPermohonan() {
                   <p className="text-sm leading-relaxed text-slate-600">
                     Setelah status diubah menjadi <b>{STATUS[editStatus]?.label}</b>,
                     permohonan ini <b>terkunci dan tidak dapat diubah lagi</b> —
-                    tombol Proses akan hilang dari tabel. Membuka kunci hanya bisa
+                    tombol Proses akan hilang. Membuka kunci hanya bisa
                     dilakukan lewat <b>halaman Master</b>.
                   </p>
                   <div className="mt-4 flex justify-end gap-2">

@@ -19,7 +19,6 @@ import {
   LayoutDashboard,
   ClipboardList,
   Newspaper,
-  Image as ImageIcon,
   MessageSquare,
   FolderOpen,
   Gauge,
@@ -69,7 +68,6 @@ const GROUPS: MenuGroup[] = [
     items: [
       { href: '/dashboard/konten', label: 'Konten Halaman', icon: FileText },
       { href: '/dashboard/berita', label: 'Berita', icon: Newspaper },
-      { href: '/dashboard/galeri', label: 'Galeri', icon: ImageIcon },
       { href: '/dashboard/media', label: 'Pustaka Media', icon: Images },
       { href: '/dashboard/produk', label: 'Dokumen Publikasi', icon: FolderOpen },
       { href: '/dashboard/demografi', label: 'Data Demografi', icon: BarChart3 },
@@ -102,7 +100,6 @@ const ADMIN_ONLY_GROUPS = new Set(['Konten & Media']);
 const ADMIN_ONLY_HREFS = new Set([
   '/dashboard/konten',
   '/dashboard/berita',
-  '/dashboard/galeri',
   '/dashboard/media',
   '/dashboard/produk',
   '/dashboard/demografi',
@@ -118,7 +115,7 @@ function mobileMainForLevel(level: number): MenuItem[] {
   return MOBILE_MAIN.filter((m) => !ADMIN_ONLY_HREFS.has(m.href));
 }
 
-const COLLAPSE_KEY = 'saibatin-dash-collapsed';
+const COLLAPSE_KEY = 'sidako-dash-collapsed';
 
 function useIsActive() {
   const pathname = usePathname();
@@ -216,11 +213,11 @@ function DesktopSidebar() {
           className="flex min-w-0 flex-1 items-center gap-2.5 rounded-lg p-1 transition-colors hover:bg-slate-100"
         >
           <div className="relative h-8 w-8 flex-shrink-0">
-            <Image src="/LOGO-dinas_ktt.png" alt="Logo KTT" fill className="object-contain" />
+            <Image src="/LOGO-dinas_sidako.png" alt="Logo SIDAKO" fill className="object-contain" />
           </div>
           {!collapsed && (
             <div className="min-w-0">
-              <p className="truncate text-sm font-bold leading-tight text-slate-900">KTT</p>
+              <p className="truncate text-sm font-bold leading-tight text-slate-900">SIDAKO</p>
               <p className="truncate text-[0.68rem] leading-tight text-slate-500">
                 Dashboard Petugas
               </p>
@@ -329,10 +326,10 @@ function MobileTopBar() {
     >
       <Link href="/" title="Kembali ke Beranda" className="flex min-w-0 items-center gap-2.5">
         <div className="relative h-8 w-8 flex-shrink-0">
-          <Image src="/LOGO-dinas_ktt.png" alt="Logo KTT" fill className="object-contain" />
+          <Image src="/LOGO-dinas_sidako.png" alt="Logo SIDAKO" fill className="object-contain" />
         </div>
         <div className="min-w-0">
-          <p className="truncate text-sm font-bold leading-tight text-white">KTT</p>
+          <p className="truncate text-sm font-bold leading-tight text-white">SIDAKO</p>
           <p className="truncate text-[0.68rem] leading-tight text-white/70">{displayName}</p>
         </div>
       </Link>
