@@ -289,8 +289,8 @@ function ServiceCard({ pelayanan }: { pelayanan: PelayananStat }) {
 // ─── Map Card (full width, di bawah) ────────────────────────────────────────────
 
 const WILAYAH = [
-  { label: 'Kecamatan', value: '11', icon: <Building2 className="w-5 h-5" />, chip: 'bg-primary/10 text-primary' },
-  { label: 'Desa / Pekon', value: '118', icon: <Trees className="w-5 h-5" />, chip: 'bg-emerald-50 text-emerald-600' },
+  { label: 'Kecamatan', value: '5', icon: <Building2 className="w-5 h-5" />, chip: 'bg-primary/10 text-primary' },
+  { label: 'Desa / Kelurahan', value: '32', icon: <Trees className="w-5 h-5" />, chip: 'bg-emerald-50 text-emerald-600' },
 ];
 
 function MapCard() {
@@ -452,7 +452,7 @@ export default function StatsGrid() {
         ) : (
           <>
             <MousePointerClick className="h-3.5 w-3.5" />
-            Klik kartu untuk melihat rincian per kecamatan &amp; pekon.
+            Klik kartu untuk melihat rincian per kecamatan &amp; desa.
           </>
         )}
       </p>

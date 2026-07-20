@@ -13,7 +13,6 @@ import {
   ChevronRight,
   Home,
   FileText,
-  Info,
   Building2,
   Newspaper,
   Image as ImageIcon,
@@ -27,6 +26,12 @@ import {
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { navigationItems } from "@/lib/navigation";
+import { useStaticContent } from "@/lib/use-static-content";
+import {
+  gabungNavigasi,
+  KUNCI_NAVIGASI,
+  type MenuTambahan,
+} from "@/lib/navigasi-tambahan";
 import { NotificationBell } from "@/components/shared/notification-bell";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -91,11 +96,11 @@ function DropdownMenu({
         className={cn(
           "relative px-2.5 py-2 text-sm font-medium flex items-center gap-1.5 rounded-md whitespace-nowrap text-white/90",
           "transition-all duration-300 ease-out",
-          "hover:text-yellow-300 hover:bg-white/10",
-          "before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0.5 before:bg-yellow-300",
+          "hover:text-[#12395e] hover:bg-white/10",
+          "before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0.5 before:bg-[#12395e]",
           "before:transition-all before:duration-300 before:ease-out",
           "hover:before:w-[calc(100%-1.25rem)]",
-          isOpen && "text-yellow-300 bg-white/10",
+          isOpen && "text-[#12395e] bg-white/10",
         )}
       >
         {Icon && (
@@ -455,7 +460,7 @@ function MobileMenuItem({
     return (
       <Link
         href={href ?? `/${title.toLowerCase().replace(/\s+/g, "-")}`}
-        className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.925rem] font-medium text-slate-700 transition-colors hover:bg-primary/5 hover:text-primary"
+        className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.925rem] font-medium text-slate-700 transition-colors hover:bg-[#12395e]/5 hover:text-[#12395e]"
         onClick={onClose}
       >
         <MobileItemIcon icon={Icon} />
@@ -473,7 +478,7 @@ function MobileMenuItem({
           "flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-[0.925rem] font-medium transition-colors",
           isExpanded
             ? "bg-primary/5 text-primary"
-            : "text-slate-700 hover:bg-primary/5 hover:text-primary",
+            : "text-slate-700 hover:bg-[#12395e]/5 hover:text-[#12395e]",
         )}
       >
         <span className="flex items-center gap-3">
@@ -510,7 +515,7 @@ function MobileMenuItem({
                       "flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors",
                       expandedSubMenu === item.title
                         ? "text-primary"
-                        : "text-slate-600 hover:bg-primary/5 hover:text-primary",
+                        : "text-slate-600 hover:bg-[#12395e]/5 hover:text-[#12395e]",
                     )}
                   >
                     <span>{item.title}</span>
@@ -535,7 +540,7 @@ function MobileMenuItem({
                         <Link
                           key={subItem.title}
                           href={subItem.href}
-                          className="block rounded-lg px-3 py-1.5 text-[0.83rem] text-slate-500 transition-colors hover:bg-primary/5 hover:text-primary"
+                          className="block rounded-lg px-3 py-1.5 text-[0.83rem] text-slate-500 transition-colors hover:bg-[#12395e]/5 hover:text-[#12395e]"
                           onClick={onClose}
                         >
                           {subItem.title}
@@ -551,7 +556,7 @@ function MobileMenuItem({
               <Link
                 key={item.title}
                 href={item.href}
-                className="block rounded-lg px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-primary/5 hover:text-primary"
+                className="block rounded-lg px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-[#12395e]/5 hover:text-[#12395e]"
                 onClick={onClose}
               >
                 {item.title}
@@ -572,13 +577,12 @@ function MobileMenuItem({
 const navigationIcons: { [key: string]: React.ElementType } = {
   Permohonan: FileText,
   "Pelayanan Online": Building2,
-  Pengaduan: Info,
+  Pengaduan: ShieldAlert,
   Produk: FileText,
   "Media Informasi": Newspaper,
   Gallery: ImageIcon,
   "Hubungi Kami": Phone,
   PPID: Landmark,
-  WBS: ShieldAlert,
 };
 
 // navigationItems dipindah ke lib/navigation.ts (dipakai juga oleh dashboard Konten).
@@ -644,6 +648,11 @@ function AuthArea({
   const isPetugas = (user?.level ?? 3) <= 2;
   const areaHref = isPetugas ? "/dashboard" : "/user/pengajuan";
   const areaLabel = isPetugas ? "Dashboard" : "Pengajuan Saya";
+  // Dropdown akun sengaja dijaga tetap ringkas: petugas → Dashboard, warga/OPD
+  // → Pengajuan Saya, keduanya + Pengaturan Akun. Menu "Ajukan Permohonan"
+  // TIDAK ditaruh di sini karena jalurnya sudah ada di tempat yang tepat:
+  // petugas lewat sidebar dashboard ("Pengajuan Baru"), warga/OPD lewat tombol
+  // di halaman Pengajuan Saya.
 
   // ── Mobile: tersusun vertikal di dalam sheet ──
   if (mobile) {
@@ -765,9 +774,23 @@ export function Navbar() {
   // Akun OPD (level 4): navbar disederhanakan — hanya Permohonan; pengaturan
   // akun tetap lewat dropdown profil.
   const isOpd = isAuthenticated && user?.level === 4;
+
+  // Menu bawaan (lib/navigation.ts) + sub-menu tambahan yang dibuat admin
+  // lewat dashboard. Bawaan tidak pernah tersimpan di DB sehingga tak bisa
+  // terhapus dari editor — lihat lib/navigasi-tambahan.ts.
+  const cmsNav = useStaticContent([KUNCI_NAVIGASI]);
+  const menuTambahan = (cmsNav[KUNCI_NAVIGASI]?.menu ?? []) as MenuTambahan[];
+  const menuGabungan = React.useMemo(
+    () => gabungNavigasi(menuTambahan),
+    // Bandingkan isinya, bukan identitas array — useStaticContent membuat
+    // objek baru tiap fetch sehingga perbandingan referensi selalu meleset.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(menuTambahan)],
+  );
+
   const menuItems = isOpd
     ? [{ title: "Permohonan", href: "/user/pengajuan" } satisfies (typeof navigationItems)[number]]
-    : navigationItems;
+    : menuGabungan;
 
   React.useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
@@ -803,7 +826,7 @@ export function Navbar() {
               )}
             >
               <Image
-                src="/LOGO-dinas_ktt.png"
+                src="/LOGO-dinas_sidako.png"
                 alt="DISDUKCAPIL Logo"
                 fill
                 className="object-contain"
@@ -814,10 +837,10 @@ export function Navbar() {
               <span
                 className={cn(
                   "font-bold text-base leading-tight transition-all duration-300 ease-out text-white",
-                  logoHovered && "text-yellow-300 translate-x-1",
+                  logoHovered && "text-[#12395e] translate-x-1",
                 )}
               >
-                KTT
+                SIDAKO
               </span>
               <span
                 className={cn(
@@ -837,8 +860,8 @@ export function Navbar() {
               className={cn(
                 "relative px-2.5 py-2 text-sm font-medium flex items-center gap-1.5 rounded-md group whitespace-nowrap text-white/90",
                 "transition-all duration-300 ease-out",
-                "hover:text-yellow-300 hover:bg-white/10",
-                "before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0.5 before:bg-yellow-300",
+                "hover:text-[#12395e] hover:bg-white/10",
+                "before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0.5 before:bg-[#12395e]",
                 "before:transition-all before:duration-300 before:ease-out",
                 "hover:before:w-[calc(100%-1.25rem)]",
               )}
@@ -858,8 +881,8 @@ export function Navbar() {
                     className={cn(
                       "relative px-2.5 py-2 text-sm font-medium flex items-center gap-1.5 rounded-md whitespace-nowrap text-white/90",
                       "transition-all duration-300 ease-out",
-                      "hover:text-yellow-300 hover:bg-white/10",
-                      "before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0.5 before:bg-yellow-300",
+                      "hover:text-[#12395e] hover:bg-white/10",
+                      "before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0.5 before:bg-[#12395e]",
                       "before:transition-all before:duration-300 before:ease-out",
                       "hover:before:w-[calc(100%-1.25rem)]",
                     )}
@@ -911,14 +934,14 @@ export function Navbar() {
                 <div className="flex items-center gap-2.5">
                   <div className="relative h-9 w-9">
                     <Image
-                      src="/LOGO-dinas_ktt.png"
-                      alt="Logo KTT"
+                      src="/LOGO-dinas_sidako.png"
+                      alt="Logo SIDAKO"
                       fill
                       className="object-contain"
                     />
                   </div>
                   <div>
-                    <p className="text-sm font-bold leading-tight text-white">KTT</p>
+                    <p className="text-sm font-bold leading-tight text-white">SIDAKO</p>
                     <p className="text-[0.7rem] leading-tight text-white/70">
                       Disdukcapil Kab. Tana Tidung
                     </p>
@@ -941,7 +964,7 @@ export function Navbar() {
                 {!isOpd && (
                   <Link
                     href="/"
-                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.925rem] font-medium text-slate-700 transition-colors hover:bg-primary/5 hover:text-primary"
+                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.925rem] font-medium text-slate-700 transition-colors hover:bg-[#12395e]/5 hover:text-[#12395e]"
                     onClick={() => setMobileOpen(false)}
                   >
                     <MobileItemIcon icon={Home} />

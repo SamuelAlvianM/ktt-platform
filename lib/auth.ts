@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 
-const SESSION_COOKIE = "saibatin_session";
+const SESSION_COOKIE = "sidako_session";
 const secret = new TextEncoder().encode(
   process.env.AUTH_SECRET ?? "dev-secret-ganti-di-produksi-minimal-32-karakter"
 );
@@ -48,6 +48,14 @@ export async function getSession(): Promise<SessionPayload | null> {
   } catch {
     return null;
   }
+}
+
+/**
+ * Staff = superadmin (level 1) atau operator (2). Warga = level 3.
+ * Dipakai untuk membatasi akses berkas permohonan & aksi dashboard.
+ */
+export function isStaff(session: SessionPayload | null): boolean {
+  return session !== null && (session.level === 1 || session.level === 2);
 }
 
 /** Hapus sesi (logout). */

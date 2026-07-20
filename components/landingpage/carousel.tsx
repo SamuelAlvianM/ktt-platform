@@ -18,7 +18,7 @@ export interface CarouselSlide {
   color: string;
 }
 
-// TODO: ganti `image` dengan foto asli KTT/Disdukcapil Tana Tidung —
+// TODO: ganti `image` dengan foto asli SIDAKO/Disdukcapil Tana Tidung —
 // masih placeholder karena akses jaringan ke situs live diblokir pada
 // sesi pengerjaan ini.
 const DEFAULT_SLIDES: CarouselSlide[] = [
@@ -49,7 +49,7 @@ const DEFAULT_SLIDES: CarouselSlide[] = [
   },
   {
     id: 4,
-    title: "KTT",
+    title: "SIDAKO",
     subtitle: "Sistem Administrasi Informasi Berbasis Aplikasi Terintegrasi",
     image:
       "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&h=800&fit=crop",
@@ -221,8 +221,17 @@ export default function ElegantCarousel({
             <div key={slide.id} className={slideClass}>
               {/* Background image */}
               <div className="absolute inset-0 overflow-hidden">
+                {/* Latar buram: mengisi sisa bingkai kalau rasio foto tidak sama
+                    dengan rasio kontainer, jadi tidak muncul bilah kosong. */}
                 <div
-                  className={`w-full h-full bg-cover bg-center ${isActive ? "carousel-image-scale" : ""}`}
+                  className={`absolute inset-0 bg-cover bg-center scale-110 blur-xl opacity-70 ${isActive ? "carousel-image-scale" : ""}`}
+                  style={{ backgroundImage: `url(${slide.image})` }}
+                  aria-hidden
+                />
+                {/* Foto utama: `contain` supaya SELURUH isi foto terlihat —
+                    dulu `cover` sehingga sisi gambar terpotong. */}
+                <div
+                  className="absolute inset-0 bg-contain bg-center bg-no-repeat"
                   style={{ backgroundImage: `url(${slide.image})` }}
                 />
                 {/* Gradient overlay — ringan agar foto terlihat; gelap hanya di

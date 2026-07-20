@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (parsed.rows.length === 0) {
-    return fail(["Tidak ada baris kecamatan/pekon yang terbaca dari file"]);
+    return fail(["Tidak ada baris kecamatan/desa yang terbaca dari file"]);
   }
 
   // Ganti total data kategori ini (import = sumber kebenaran terbaru).
@@ -61,6 +61,6 @@ export async function POST(req: NextRequest) {
 
   return ok(
     { kecamatan: parsed.kecamatan, pekon: parsed.pekon, kolom: parsed.kolom },
-    [`Import berhasil: ${parsed.kecamatan} kecamatan, ${parsed.pekon} pekon`],
+    [`Import berhasil: ${parsed.kecamatan} kecamatan, ${parsed.pekon} desa`],
   );
 }

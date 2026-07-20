@@ -5,7 +5,7 @@ export interface Relasi {
 }
 
 export const relasiTerkait: Relasi[] = [
-  { nama: 'Dinas Kependudukan dan Pencatatan Sipil', logo: '/relasi/dinas.png', href: 'https://tanatidungkab.go.id' },
+  { nama: 'Dinas Kependudukan dan Pencatatan Sipil', logo: '/LOGO-dinas_sidako.png', href: 'https://tanatidungkab.go.id' },
   { nama: 'Kementerian Dalam Negeri', logo: '/relasi/kemendagri.png', href: 'https://kemendagri.go.id' },
   { nama: 'LPSE Tana Tidung', logo: '/relasi/lpse.png', href: 'https://lpse.tanatidungkab.go.id' },
   { nama: 'LAPOR!', logo: '/relasi/lapor.png', href: 'https://www.lapor.go.id' },

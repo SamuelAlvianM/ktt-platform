@@ -28,7 +28,7 @@ function buildPdf(doc: PDFKit.PDFDocument, data: {
   doc.fontSize(13).text("KABUPATEN TANA TIDUNG", { align: "center" });
   doc.moveDown(0.3);
   doc.fontSize(9).font("Helvetica")
-    .text("Portal KTT — Bukti Pengajuan Permohonan Online", { align: "center" });
+    .text("Portal SIDAKO — Bukti Pengajuan Permohonan Online", { align: "center" });
   doc.moveDown(0.5);
   doc.moveTo(doc.x, doc.y).lineTo(555, doc.y).stroke();
   doc.moveDown(1);
@@ -67,7 +67,7 @@ function buildPdf(doc: PDFKit.PDFDocument, data: {
   doc.moveTo(doc.x, doc.y).lineTo(555, doc.y).stroke();
   doc.moveDown(0.5);
   doc.fontSize(8).fillColor("#666")
-    .text("Dokumen ini dicetak dari sistem KTT", { align: "center" })
+    .text("Dokumen ini dicetak dari sistem SIDAKO", { align: "center" })
     .text(`Dicetak pada ${new Date().toLocaleString("id-ID", { dateStyle: "long", timeStyle: "short" })}`, { align: "center" });
 }
 

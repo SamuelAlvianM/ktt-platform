@@ -2,7 +2,7 @@ import type { InfoPageContent } from '@/components/shared/info-page';
 
 /**
  * Konten statis untuk halaman informasi (Produk, PPID, WBS, Hubungi Kami).
- * Diisi placeholder yang relevan untuk Disdukcapil Tana Tidung (KTT)
+ * Diisi placeholder yang relevan untuk Disdukcapil Tana Tidung (SIDAKO)
  * hingga konten asli dari portal lama tersedia untuk dipindahkan.
  */
 export const produkContent: Record<string, InfoPageContent> = {

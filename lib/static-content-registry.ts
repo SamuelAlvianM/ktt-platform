@@ -13,6 +13,7 @@ import {
 } from "@/lib/info-content";
 import type { InfoPageContent } from "@/components/shared/info-page";
 import { KARTU_STATISTIK_KUNCI, DEFAULT_KARTU } from "@/lib/beranda-statistik";
+import { PPID_INFORMASI_GRUP } from "@/lib/ppid-informasi";
 
 export type StaticFieldType =
   | "text"
@@ -332,7 +333,7 @@ STATIC_BLOCKS.push({
   ],
   defaults: {
     intro:
-      "Terima kasih sudah menggunakan aplikasi KTT — Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung.",
+      "Terima kasih sudah menggunakan aplikasi SIDAKO — Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung.",
     umum: [
       "Aplikasi ini merupakan peralihan dari layanan offline (di kantor) Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung.",
       "Pengunduhan dan/atau penggunaan aplikasi ini bebas biaya. Koneksi ke jaringan internet diperlukan untuk dapat menggunakan layanan ini; segala biaya yang timbul atas koneksi perangkat pemohon dengan jaringan internet sepenuhnya ditanggung oleh pemohon.",
@@ -398,13 +399,72 @@ for (const { seksi, label, content } of INFO_SECTIONS) {
   }
 }
 
+// ───────────────────────────────────────────────────────────────────────────
+// PPID — kartu indeks tiap klasifikasi informasi. Ditambah/diubah admin lewat
+// tombol "Tambah menu baru" di halaman indeksnya (components/ppid/tambah-kartu).
+// Nilainya = SELURUH daftar kartu grup (bawaan + tambahan); bila belum pernah
+// disimpan, halaman memakai `defaults` di bawah.
+// ───────────────────────────────────────────────────────────────────────────
+export function ppidKartuKunci(grupSlug: string) {
+  return `ppid.kartu.${grupSlug}`;
+}
+
+for (const grup of PPID_INFORMASI_GRUP) {
+  STATIC_BLOCKS.push({
+    kunci: ppidKartuKunci(grup.slug),
+    judul: `PPID — Kartu ${grup.judulPendek}`,
+    deskripsi: `Judul, deskripsi, ikon, dan warna kartu pada halaman ${grup.judul}.`,
+    fields: [{ name: 'kartu', label: 'Kartu Menu', type: 'items' }],
+    defaults: { kartu: grup.items },
+  });
+}
+
 /** Kunci blok untuk halaman info /<seksi>/<slug>. */
 export function infoBlockKey(seksi: string, slug: string) {
   return `info.${seksi}.${slug}`;
 }
 
+// ───────────────────────────────────────────────────────────────────────────
+// Menu navbar tambahan buatan admin (dashboard → Menu Navigasi).
+// Isinya HANYA tambahan; menu bawaan tetap di lib/navigation.ts sehingga tidak
+// bisa terhapus lewat editor. Lihat lib/navigasi-tambahan.ts.
+// ───────────────────────────────────────────────────────────────────────────
+STATIC_BLOCKS.push({
+  kunci: 'navigasi.tambahan',
+  judul: 'Menu Navigasi — Tambahan',
+  deskripsi: 'Sub-menu dan menu baru yang ditambahkan admin ke navbar publik.',
+  fields: [{ name: 'menu', label: 'Menu Tambahan', type: 'items' }],
+  defaults: { menu: [] },
+});
+
+/**
+ * Halaman yang dibuat lewat editor menu navigasi. Slug-nya baru ada saat
+ * runtime sehingga tidak bisa didaftarkan di muka — bloknya dibentuk saat
+ * diminta. Pola slug dibatasi ketat supaya kunci sembarangan tetap ditolak.
+ */
+function blokHalamanTambahan(kunci: string): StaticBlock | undefined {
+  const awalan = 'halaman.';
+  if (!kunci.startsWith(awalan)) return undefined;
+  const slug = kunci.slice(awalan.length);
+  if (!/^[a-z0-9][a-z0-9-]{0,59}$/.test(slug)) return undefined;
+
+  return {
+    kunci,
+    judul: `Halaman: ${slug}`,
+    deskripsi: 'Isi halaman yang dibuat lewat editor menu navigasi.',
+    fields: [
+      { name: 'title', label: 'Judul Halaman', type: 'text' },
+      { name: 'intro', label: 'Paragraf Pengantar', type: 'textarea' },
+      { name: 'html', label: 'Isi', type: 'richtext' },
+    ],
+    defaults: {},
+  };
+}
+
 export function getStaticBlock(kunci: string): StaticBlock | undefined {
-  return STATIC_BLOCKS.find((b) => b.kunci === kunci);
+  return (
+    STATIC_BLOCKS.find((b) => b.kunci === kunci) ?? blokHalamanTambahan(kunci)
+  );
 }
 
 export function getStaticDefaults(kunci: string): Record<string, unknown> {

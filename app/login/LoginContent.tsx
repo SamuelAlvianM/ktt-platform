@@ -151,7 +151,7 @@ export default function LoginPage() {
           <div className="flex justify-center">
             <div className="relative w-16 h-16 drop-shadow-md">
               <Image
-                src="/LOGO-dinas_ktt.png"
+                src="/LOGO-dinas_sidako.png"
                 alt="Logo Disdukcapil Tana Tidung"
                 fill
                 className="object-contain"
@@ -164,7 +164,7 @@ export default function LoginPage() {
               Selamat Datang
             </CardTitle>
             <CardDescription className="text-sm text-slate-500 mt-1">
-              Portal KTT — Disdukcapil Kab. Tana Tidung
+              Portal SIDAKO — Disdukcapil Kab. Tana Tidung
             </CardDescription>
           </div>
         </CardHeader>
@@ -401,7 +401,7 @@ export default function LoginPage() {
 
       {/* Footer */}
       <div className="absolute bottom-4 left-0 right-0 text-center text-xs text-slate-400">
-        <p>KTT &mdash; Disdukcapil Kabupaten Tana Tidung &copy; 2024</p>
+        <p>SIDAKO &mdash; Disdukcapil Kabupaten Tana Tidung &copy; 2024</p>
       </div>
     </div>
   );

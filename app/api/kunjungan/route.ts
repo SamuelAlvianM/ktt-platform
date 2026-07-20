@@ -8,7 +8,7 @@ import { statsKunjungan, tanggalHariIni } from "@/lib/kunjungan";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const VID_COOKIE = "saibatin_vid";
+const VID_COOKIE = "sidako_vid";
 
 /** Statistik pengunjung: { online, hariIni, total }. */
 export async function GET() {

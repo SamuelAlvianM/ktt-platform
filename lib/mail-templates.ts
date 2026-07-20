@@ -1,12 +1,12 @@
 import { appUrl } from "./mail";
 
 /**
- * Template email HTML bergaya brand KTT (biru #1b4b72 → #d97706).
+ * Template email HTML bergaya brand SIDAKO (biru #1b4b72 → #d97706).
  * Semua template mengembalikan { subject, html } siap kirim via sendMail.
  */
 
 const ORG = "Disdukcapil Kabupaten Tana Tidung";
-const PORTAL = "Portal KTT";
+const PORTAL = "Portal SIDAKO";
 
 function esc(s: string): string {
   return s
@@ -25,7 +25,7 @@ function layout(judul: string, isi: string, cta?: { label: string; url: string }
       <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(27,75,114,.12);">
         <tr>
           <td style="background:linear-gradient(135deg,#b45309 0%,#f59e0b 100%);padding:28px 32px;">
-            <p style="margin:0;color:#ffffff;font-size:20px;font-weight:700;letter-spacing:.5px;">KTT</p>
+            <p style="margin:0;color:#ffffff;font-size:20px;font-weight:700;letter-spacing:.5px;">SIDAKO</p>
             <p style="margin:4px 0 0;color:rgba(255,255,255,.85);font-size:12px;">${ORG}</p>
           </td>
         </tr>
@@ -66,7 +66,7 @@ export interface MailContent {
 /** Konfirmasi pendaftaran diterima — menunggu verifikasi petugas. */
 export function tplRegistrasiDiterima(nama: string): MailContent {
   return {
-    subject: "Pendaftaran Akun KTT Diterima — Menunggu Verifikasi",
+    subject: "Pendaftaran Akun SIDAKO Diterima — Menunggu Verifikasi",
     html: layout(
       "Pendaftaran Anda sudah kami terima",
       `<p>Halo <strong>${esc(nama)}</strong>,</p>
@@ -81,7 +81,7 @@ export function tplRegistrasiDiterima(nama: string): MailContent {
 /** Akun disetujui/diaktifkan — bisa langsung login. */
 export function tplAkunDisetujui(nama: string): MailContent {
   return {
-    subject: "Akun KTT Anda Telah Disetujui ✅",
+    subject: "Akun SIDAKO Anda Telah Disetujui ✅",
     html: layout(
       "Selamat! Akun Anda sudah aktif",
       `<p>Halo <strong>${esc(nama)}</strong>,</p>
@@ -95,7 +95,7 @@ export function tplAkunDisetujui(nama: string): MailContent {
 /** Akun ditolak — beri alasan + ajak mendaftar ulang dengan data diperbaiki. */
 export function tplAkunDitolak(nama: string, alasan?: string): MailContent {
   return {
-    subject: "Pendaftaran Akun KTT Ditolak",
+    subject: "Pendaftaran Akun SIDAKO Ditolak",
     html: layout(
       "Pendaftaran akun Anda belum dapat disetujui",
       `<p>Halo <strong>${esc(nama)}</strong>,</p>
@@ -116,7 +116,7 @@ export function tplAkunDitolak(nama: string, alasan?: string): MailContent {
 /** Tautan reset password. */
 export function tplResetPassword(nama: string, resetUrl: string): MailContent {
   return {
-    subject: "Reset Password Akun KTT",
+    subject: "Reset Password Akun SIDAKO",
     html: layout(
       "Permintaan reset password",
       `<p>Halo <strong>${esc(nama)}</strong>,</p>

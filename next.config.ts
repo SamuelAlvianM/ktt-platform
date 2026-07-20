@@ -11,12 +11,12 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/api/permohonan/[id]/pdf": ["./node_modules/pdfkit/js/data/*.afm"],
   },
-  // Izinkan gambar dari domain backend Laravel (storage publik) bila diperlukan.
+  // Izinkan gambar dari domain resmi Disdukcapil Tana Tidung (storage publik) bila diperlukan.
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "saibatin.pesisirbaratkab.go.id",
+        hostname: "disdukcapil.tanatidungkab.go.id",
       },
     ],
   },

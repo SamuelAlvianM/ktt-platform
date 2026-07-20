@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Footer } from '@/components/shared/footer';
-import { produkContent, ppidContent, wbsContent, hubungiKamiContent } from '@/lib/info-content';
+import { produkContent, ppidContent, hubungiKamiContent } from '@/lib/info-content';
 
 const sections: { title: string; links: { label: string; href: string }[] }[] = [
   {
@@ -40,11 +40,11 @@ const sections: { title: string; links: { label: string; href: string }[] }[] = 
     })),
   },
   {
-    title: 'WBS',
-    links: Object.entries(wbsContent).map(([slug, c]) => ({
-      label: c.title,
-      href: `/wbs/${slug}`,
-    })),
+    title: 'Pengaduan',
+    links: [
+      { label: 'Pengaduan Masyarakat & WBS', href: '/pengaduan' },
+      { label: 'Kritik & Saran', href: '/hubungi-kami/kritik-saran' },
+    ],
   },
   {
     title: 'Hubungi Kami',
@@ -70,7 +70,7 @@ export default function SitemapPage() {
         <h1 className="text-2xl md:text-3xl font-semibold text-slate-900 tracking-tight mb-2">
           Sitemap
         </h1>
-        <p className="text-sm text-slate-500 mb-8">Peta seluruh halaman portal KTT.</p>
+        <p className="text-sm text-slate-500 mb-8">Peta seluruh halaman portal SIDAKO.</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {sections.map((section) => (

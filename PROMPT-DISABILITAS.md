@@ -1,7 +1,7 @@
-# Prompt: Penyempurnaan Fitur Aksesibilitas / Disabilitas (KTT)
+# Prompt: Penyempurnaan Fitur Aksesibilitas / Disabilitas (SIDAKO)
 
 > Prompt ini untuk dijalankan di **Claude Code Desktop (Fable)** pada repo
-> `ktt-platform`. Tujuan: melengkapi fitur aksesibilitas untuk penyandang
+> `sidako-platform`. Tujuan: melengkapi fitur aksesibilitas untuk penyandang
 > disabilitas agar setara dengan widget aksesibilitas situs pemerintah seperti
 > `dpmk.bantulkab.go.id`. Fondasi saat ini sudah benar namun belum lengkap dan
 > belum nyaman — sempurnakan, jangan bongkar ulang arsitektur yang ada.
@@ -86,7 +86,7 @@ Setiap kontrol menampilkan status aktif/nonaktif secara visual (mis. highlight
     `localStorage`.
 
 ### 3. Persistensi & anti-flicker
-- Simpan seluruh preferensi ke `localStorage` (mis. key `saibatin-a11y`) sebagai
+- Simpan seluruh preferensi ke `localStorage` (mis. key `sidako-a11y`) sebagai
   satu objek JSON.
 - Terapkan kelas/atribut ke `<html>` (mis. `data-a11y-*` atau class) **sebelum
   paint** agar tidak ada kedipan (flash). Gunakan inline script kecil di

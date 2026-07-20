@@ -118,8 +118,8 @@ export default function ForgotPasswordPage() {
     <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-xl opacity-40" />
     <div className="relative p-1">
       <Image
-        src="/LOGO-dinas_ktt.png"
-        alt="Logo KTT"
+        src="/LOGO-dinas_sidako.png"
+        alt="Logo SIDAKO"
         width={60}
         height={60}
         className="object-contain drop-shadow-lg"

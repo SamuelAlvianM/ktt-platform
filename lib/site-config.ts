@@ -3,7 +3,7 @@
  * Semua nilai berasal dari NEXT_PUBLIC_* sehingga aman dipakai di client & server.
  */
 export const siteConfig = {
-  name: process.env.NEXT_PUBLIC_APP_NAME ?? "ktt",
+  name: process.env.NEXT_PUBLIC_APP_NAME ?? "sidako",
   url: process.env.NEXT_PUBLIC_APP_URL ?? "https://disdukcapil.tanatidungkab.go.id",
   kode: process.env.NEXT_PUBLIC_APP_KODE ?? "6504",
 
@@ -11,7 +11,7 @@ export const siteConfig = {
   tenant2: process.env.NEXT_PUBLIC_SITE_TENANT2 ?? "dinas dukcapil",
   namaFull: process.env.NEXT_PUBLIC_SITE_NAME_FULLNAME ?? "tana tidung",
   namaNick: process.env.NEXT_PUBLIC_SITE_NAME_NICKNAME ?? "tanatidung",
-  namaFamous: process.env.NEXT_PUBLIC_SITE_NAME_FAMOUS ?? "ktt",
+  namaFamous: process.env.NEXT_PUBLIC_SITE_NAME_FAMOUS ?? "sidako",
   namaKet: process.env.NEXT_PUBLIC_SITE_NAME_KET ?? "pelayanan",
 
   navbarBgColor: process.env.NEXT_PUBLIC_SITE_NAVBAR_BGCOLOR ?? "rgb(217 119 6 / 70%)",

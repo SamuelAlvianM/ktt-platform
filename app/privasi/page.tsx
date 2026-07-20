@@ -5,7 +5,7 @@ export default function PrivasiPage() {
     <InfoPage
       content={{
         title: 'Privasi',
-        description: 'Informasi privasi data pengguna pada portal KTT.',
+        description: 'Informasi privasi data pengguna pada portal SIDAKO.',
         body: [
           'Lihat detail lengkap kebijakan privasi kami pada halaman Kebijakan & Privasi.',
         ],

@@ -126,7 +126,10 @@ export async function POST(
       }
 
       const safeName = `${session.uid}_${Date.now()}${ext}`;
-      const uploadDir = join(process.cwd(), "public", "uploads", layanan);
+      // DI LUAR public/ — berkas permohonan memuat KTP/KK warga. Apa pun di
+      // public/ dilayani Next sebagai aset statis TANPA melewati kontrol akses
+      // di app/uploads/[...path]/route.ts. URL publiknya tetap /uploads/<layanan>/…
+      const uploadDir = join(process.cwd(), "storage", "permohonan", layanan);
       await mkdir(uploadDir, { recursive: true });
       await writeFile(join(uploadDir, safeName), Buffer.from(await file.arrayBuffer()));
 

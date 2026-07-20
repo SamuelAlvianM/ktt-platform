@@ -35,7 +35,7 @@ function addSheet(wb: ExcelJS.Workbook, label: string, rows: DbRow[]) {
     ws.addRow([
       r.kode,
       r.wilayah,
-      r.level === 5 ? "Pekon" : "Kecamatan",
+      r.level === 5 ? "Desa" : "Kecamatan",
       ...kolom.map((k) => d[k] ?? 0),
     ]);
   }
@@ -51,7 +51,7 @@ function addSheet(wb: ExcelJS.Workbook, label: string, rows: DbRow[]) {
  */
 export async function buildDemografiWorkbook(kategori?: string) {
   const wb = new ExcelJS.Workbook();
-  wb.creator = "KTT Disdukcapil Tana Tidung";
+  wb.creator = "SIDAKO Disdukcapil Tana Tidung";
   wb.created = new Date();
 
   const targets = kategori

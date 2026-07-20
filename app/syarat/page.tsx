@@ -5,7 +5,7 @@ export default function SyaratPage() {
     <InfoPage
       content={{
         title: 'Syarat & Ketentuan',
-        description: 'Syarat dan ketentuan penggunaan portal layanan KTT.',
+        description: 'Syarat dan ketentuan penggunaan portal layanan SIDAKO.',
         list: [
           'Pengguna wajib mengisi data yang benar dan sesuai dengan dokumen resmi.',
           'Permohonan dengan data palsu dapat dibatalkan sepihak oleh Disdukcapil.',

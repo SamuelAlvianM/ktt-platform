@@ -1,6 +1,6 @@
-# KTT Platform
+# SIDAKO Platform
 
-Portal layanan **Disdukcapil Kabupaten Pesisir Barat** — hasil migrasi dari Laravel 9 (`data-2`) ke **Next.js full-stack**.
+Portal layanan **SIDAKO — Disdukcapil Kabupaten Tana Tidung** (Kalimantan Utara) — hasil migrasi dari Laravel 9 (`data-2`) ke **Next.js full-stack**.
 
 - **Frontend + Backend menyatu** (Next.js App Router + Route Handlers)
 - **TypeScript** (strict), **Tailwind v4 + shadcn/ui**, **Redux Toolkit**, **framer-motion**
@@ -8,7 +8,7 @@ Portal layanan **Disdukcapil Kabupaten Pesisir Barat** — hasil migrasi dari La
 - **Auth** sendiri: bcrypt + JWT sesi (cookie httpOnly via `jose`)
 - **reCAPTCHA v3** diverifikasi di server
 
-> Gaya & struktur mengikuti benchmark `disdukcapil-ktt-frontend`.
+> Gaya & struktur mengikuti benchmark portal disdukcapil (frontend).
 
 ## Menjalankan (lokal)
 
@@ -19,14 +19,14 @@ cp .env.example .env.local      # isi DATABASE_URL & AUTH_SECRET
 # Siapkan DB MySQL (buat database "tanatidung" lebih dulu), lalu:
 npm run db:push                 # buat tabel dari schema Prisma
 npm run db:seed                 # isi data dummy + akun demo
-npm run dev                     # http://localhost:3000
+npm run dev                     # http://localhost:3300
 ```
 
 ### Akun demo (setelah seed)
 | Peran | user_id (NIK) | password |
 |---|---|---|
 | Admin | `admin` | `admin123` |
-| Warga | `1813010101900001` | `warga123` |
+| Warga | `6504010101900001` | `warga123` |
 
 ## Struktur
 ```
