@@ -44,11 +44,12 @@ model User {
   updatedBy         Int?      @map("updated_by")
   updatedAt         DateTime  @updatedAt @map("updated_at")
 
-  level        UserLevel?    @relation(fields: [userlevelId], references: [id])
-  permohonans  Permohonan[]
-  tikets       Tiket[]       @relation("TiketPembuat")
-  tiketPesan   TiketPesan[]  @relation("TiketPengirim")
-  notifikasi   Notifikasi[]
+  level         UserLevel?     @relation(fields: [userlevelId], references: [id])
+  permohonans   Permohonan[]
+  tikets        Tiket[]        @relation("TiketPembuat")
+  tiketPesan    TiketPesan[]   @relation("TiketPengirim")
+  notifikasi    Notifikasi[]
+  logAktivitas  LogAktivitas[]
 
   @@index([userId])
   @@index([userNik])
@@ -321,6 +322,25 @@ model Notifikasi {
   @@index([userId, dibaca])
   @@index([userId, createdAt])
   @@map("t_notifikasi")
+}
+
+/// Jejak aktivitas petugas/admin (audit ringan): siapa, aksi apa, objek apa,
+/// kapan. Hanya diisi untuk pelaku level 1/2 (petugas). Dilihat admin saja.
+model LogAktivitas {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id") // pelaku (petugas/admin)
+  aksi      String   // BUAT | UBAH | HAPUS | UNGGAH | IMPOR | LAINNYA
+  entitas   String   // Permohonan | Berita | Konten | Akun | Media | ...
+  entitasId String?  @map("entitas_id") // id/kunci objek (opsional)
+  ringkasan String   @db.Text // kalimat siap tampil, mis. "Mengubah status REG… → SELESAI"
+  ip        String?  @map("ip_address")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
+  @@map("t_log_aktivitas")
 }
 
 /// Data demografi agregat per wilayah, hasil import Excel Dukcapil (SIAK).

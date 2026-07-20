@@ -28,6 +28,7 @@ import {
   MessagesSquare,
   Images,
   BarChart3,
+  ScrollText,
   Home,
   LogOut,
   Loader2,
@@ -53,7 +54,7 @@ interface MenuGroup {
 // Menu dashboard dikelompokkan menjadi beberapa kategori besar.
 const GROUPS: MenuGroup[] = [
   {
-    items: [{ href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, exact: true }],
+    items: [{ href: '/dashboard', label: 'Statistik Rekap', icon: LayoutDashboard, exact: true }],
   },
   {
     title: 'Layanan',
@@ -83,13 +84,16 @@ const GROUPS: MenuGroup[] = [
   },
   {
     title: 'Sistem',
-    items: [{ href: '/dashboard/users', label: 'Manajemen Akun', icon: Users }],
+    items: [
+      { href: '/dashboard/users', label: 'Manajemen Akun', icon: Users },
+      { href: '/dashboard/log', label: 'Log Aktivitas', icon: ScrollText },
+    ],
   },
 ];
 
 // Item utama di bottom-bar mobile (sisanya lewat tombol "Menu").
 const MOBILE_MAIN: MenuItem[] = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, exact: true },
+  { href: '/dashboard', label: 'Statistik', icon: LayoutDashboard, exact: true },
   { href: '/dashboard/permohonan', label: 'Permohonan', icon: ClipboardList },
   { href: '/dashboard/konten', label: 'Konten', icon: FileText },
   { href: '/dashboard/pengaduan', label: 'Pengaduan', icon: MessageSquare },
@@ -104,11 +108,16 @@ const ADMIN_ONLY_HREFS = new Set([
   '/dashboard/media',
   '/dashboard/produk',
   '/dashboard/demografi',
+  '/dashboard/log',
 ]);
 
 function groupsForLevel(level: number): MenuGroup[] {
   if (level === 1) return GROUPS;
-  return GROUPS.filter((g) => !ADMIN_ONLY_GROUPS.has(g.title ?? ''));
+  // Selain menyembunyikan grup khusus admin, saring juga item admin yang
+  // menyelinap di grup umum (mis. "Log Aktivitas" di grup Sistem).
+  return GROUPS.filter((g) => !ADMIN_ONLY_GROUPS.has(g.title ?? ''))
+    .map((g) => ({ ...g, items: g.items.filter((m) => !ADMIN_ONLY_HREFS.has(m.href)) }))
+    .filter((g) => g.items.length > 0);
 }
 
 function mobileMainForLevel(level: number): MenuItem[] {

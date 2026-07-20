@@ -6,6 +6,9 @@ import { getSession } from "@/lib/auth";
 import { sendMail } from "@/lib/mail";
 import { tplAkunDisetujui, tplAkunDitolak } from "@/lib/mail-templates";
 import { createNotifikasi, safeNotify } from "@/lib/notifikasi";
+import { catatAktivitas } from "@/lib/log-aktivitas";
+
+const NAMA_LEVEL: Record<number, string> = { 2: "Staff", 3: "Warga", 4: "Operator OPD" };
 
 /** Pastikan pemanggil adalah operator/admin (level 1 atau 2). */
 async function requireAdmin() {
@@ -164,6 +167,14 @@ export async function POST(req: NextRequest) {
       await sendMail({ to: user.userEmail, ...mail });
     }
 
+    await catatAktivitas(
+      session,
+      "BUAT",
+      "Akun",
+      `Membuat akun ${user.userFullname ?? user.userId} (${NAMA_LEVEL[level] ?? `level ${level}`})`,
+      { entitasId: user.id, req },
+    );
+
     return ok({ id: user.id }, ["Info: Akun berhasil dibuat dan langsung aktif"]);
   } catch {
     return fail(["Info: Gagal membuat akun"], 500);
@@ -224,6 +235,14 @@ export async function PATCH(req: NextRequest) {
         }),
       );
     }
+
+    await catatAktivitas(
+      session,
+      "UBAH",
+      "Akun",
+      `${status === 1 ? "Mengaktifkan" : "Menonaktifkan"} akun ${user.userFullname ?? user.userId}`,
+      { entitasId: user.id, req },
+    );
 
     return ok(null, [
       status === 1 ? "Info: Akun berhasil diaktifkan" : "Info: Akun dinonaktifkan/ditolak",

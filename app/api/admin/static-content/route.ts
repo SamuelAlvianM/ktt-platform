@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
 import { getSession } from "@/lib/auth";
 import { getStaticBlock } from "@/lib/static-content-registry";
+import { catatAktivitas } from "@/lib/log-aktivitas";
 import type { Prisma } from "@prisma/client";
 
 /** Simpan/ubah konten statis (upsert per kunci) — admin/operator. */
@@ -34,6 +35,11 @@ export async function PUT(req: NextRequest) {
       updatedBy: session.uid,
     },
     update: { konten: data, updatedBy: session.uid },
+  });
+
+  await catatAktivitas(session, "UBAH", "Konten", `Memperbarui konten "${block.judul}"`, {
+    entitasId: block.kunci,
+    req,
   });
 
   return ok(null, ["Konten berhasil disimpan"]);

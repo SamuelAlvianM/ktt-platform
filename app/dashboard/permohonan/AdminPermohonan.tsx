@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { useInfiniteScroll } from '@/lib/use-infinite-scroll';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -86,6 +87,12 @@ export function AdminPermohonan() {
   const [statusFilter, setStatusFilter] = useState('');
   const [q, setQ] = useState('');
   const [loading, setLoading] = useState(true);
+  // Load-on-scroll: cursor halaman berikutnya + indikator "memuat lagi".
+  const [cursor, setCursor] = useState<number | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
+  // Token anti-race saat filter/pencarian berubah; `appliedQ` = q yang sedang tampil.
+  const reqId = useRef(0);
+  const appliedQRef = useRef('');
   // Panel detail inline (menggantikan tabel — bukan pindah halaman).
   const [detail, setDetail] = useState<Detail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -99,20 +106,47 @@ export function AdminPermohonan() {
   const [confirmFinal, setConfirmFinal] = useState(false);
 
   const load = useCallback(async () => {
+    const my = ++reqId.current;
+    appliedQRef.current = q.trim();
     setLoading(true);
-    const params = new URLSearchParams();
+    const params = new URLSearchParams({ limit: '20' });
     if (statusFilter) params.set('status', statusFilter);
     if (q.trim()) params.set('q', q.trim());
     const res = await fetch(`/api/admin/permohonan?${params.toString()}`);
     const json = await res.json();
+    if (my !== reqId.current) return; // filter/pencarian sudah berganti
     setItems(json.data?.items ?? []);
+    setCursor(json.data?.nextCursor ?? null);
     if (json.data?.counts) setCounts(json.data.counts);
     setLoading(false);
   }, [statusFilter, q]);
 
+  const loadMore = useCallback(async () => {
+    if (cursor == null || loadingMore) return;
+    const my = reqId.current;
+    setLoadingMore(true);
+    try {
+      const params = new URLSearchParams({ limit: '20', cursor: String(cursor) });
+      if (statusFilter) params.set('status', statusFilter);
+      if (appliedQRef.current) params.set('q', appliedQRef.current);
+      const res = await fetch(`/api/admin/permohonan?${params.toString()}`);
+      const json = await res.json();
+      if (my !== reqId.current) return; // filter berganti saat memuat
+      setItems((prev) => [...prev, ...(json.data?.items ?? [])]);
+      setCursor(json.data?.nextCursor ?? null);
+    } finally {
+      if (my === reqId.current) setLoadingMore(false);
+    }
+  }, [cursor, loadingMore, statusFilter]);
+
   useEffect(() => {
     load();
   }, [statusFilter]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const sentinelRef = useInfiniteScroll(
+    loadMore,
+    cursor != null && !loading && !loadingMore && !detail && !detailLoading,
+  );
 
   const openDetail = async (it: Item) => {
     setDetailLoading(true);
@@ -344,7 +378,8 @@ export function AdminPermohonan() {
             <h2 className="font-semibold text-slate-900">Daftar Permohonan</h2>
             {!loading && (
               <span className="ml-auto rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-500">
-                {items.length} data
+                {items.length}
+                {cursor != null ? '+' : ''} data
               </span>
             )}
           </div>
@@ -396,6 +431,7 @@ export function AdminPermohonan() {
           ) : items.length === 0 ? (
             <div className="text-center py-12 text-sm text-slate-500">Tidak ada permohonan.</div>
           ) : (
+            <>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -442,6 +478,18 @@ export function AdminPermohonan() {
                 </tbody>
               </table>
             </div>
+            <div ref={sentinelRef} className="h-8" />
+            {loadingMore && (
+              <div className="flex justify-center py-4">
+                <Loader2 className="h-5 w-5 animate-spin text-primary" />
+              </div>
+            )}
+            {cursor == null && items.length > 20 && (
+              <p className="py-3 text-center text-xs text-slate-400">
+                — Semua data ditampilkan —
+              </p>
+            )}
+            </>
           )}
         </>
       )}
