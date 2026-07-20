@@ -33,8 +33,15 @@ export interface StaticField {
     name: string;
     label: string;
     type?: "text" | "image" | "icon" | "parent";
+    /** Kolom `image`: rasio crop tetap saat unggah (mis. 1200/1050) supaya
+     *  semua gambar seragam. */
+    aspect?: number;
+    /** Kolom `image`: keterangan ukuran singkat di bawah tile (mis. "1200×1050 px"). */
+    hint?: string;
   }[];
   placeholder?: string;
+  /** Catatan/petunjuk tambahan yang ditampilkan di bawah label field editor. */
+  catatan?: string;
 }
 
 export interface StaticBlock {
@@ -192,8 +199,16 @@ export const STATIC_BLOCKS: StaticBlock[] = [
         name: "slides",
         label: "Slide",
         type: "items",
+        catatan:
+          "Ukuran gambar disarankan 1200 × 1050 piksel (rasio ± 8:7) agar semua slide seragam dan pas mengisi bingkai carousel. Klik gambar yang sudah ada untuk menggantinya; saat mengunggah, gambar otomatis dipotong ke rasio ini.",
         itemFields: [
-          { name: "image", label: "Gambar", type: "image" },
+          {
+            name: "image",
+            label: "Gambar",
+            type: "image",
+            aspect: 1200 / 1050,
+            hint: "1200 × 1050 px",
+          },
           { name: "title", label: "Judul" },
           { name: "subtitle", label: "Sub-judul" },
         ],

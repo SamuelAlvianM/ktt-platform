@@ -154,3 +154,28 @@ export const KATEGORI_LAYANAN = [
 export function getLayanan(slug: string) {
   return LAYANAN_PERMOHONAN.find((l) => l.slug === slug);
 }
+
+/**
+ * Peta slug rute publik (di atas) → slug skema form tersegmentasi
+ * (lib/layanan-forms.ts, `LAYANAN_FORMS`). Rute publik memakai slug yang mudah
+ * dibaca/di-bookmark; API catch-all & skema form memakai slug warisan Laravel.
+ * Keduanya menunjuk layanan yang sama — pemetaan ini menyatukannya sehingga
+ * form warga/OPD bisa memakai renderer segmen yang sama dengan form petugas.
+ */
+export const ROUTE_KE_FORM_SLUG: Record<string, string> = {
+  "konsolidasi-update-data": "konsolidasi-update-data",
+  "akta-kelahiran-belum-nik": "akta-kelahiran-nik-tidak-ada",
+  "akta-kelahiran-ada-nik": "akta-kelahiran-nik-ada",
+  "kk-perubahan-biodata": "kk-perubahan-biodata",
+  "kk-pisah-kk": "kk-pisah",
+  "kk-numpang-kk": "kk-numpang",
+  "kk-penambahan-anak": "kk-tambah-anak",
+  "kk-cetak-ulang": "kk-cetak-ulang",
+  "akta-perceraian": "akta-perceraian",
+  "akta-kematian": "akta-kematian",
+  "akta-perkawinan": "akta-nikah",
+  "kartu-identitas-anak": "kia",
+  "perpindahan-penduduk": "perpindahan-penduduk",
+  "kedatangan-penduduk": "kedatangan",
+  "ktp-elektronik": "ktpel",
+};

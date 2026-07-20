@@ -53,7 +53,7 @@ interface MenuGroup {
 // Menu dashboard dikelompokkan menjadi beberapa kategori besar.
 const GROUPS: MenuGroup[] = [
   {
-    items: [{ href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, exact: true }],
+    items: [{ href: '/dashboard', label: 'Statistik Rekap', icon: LayoutDashboard, exact: true }],
   },
   {
     title: 'Layanan',
@@ -89,7 +89,7 @@ const GROUPS: MenuGroup[] = [
 
 // Item utama di bottom-bar mobile (sisanya lewat tombol "Menu").
 const MOBILE_MAIN: MenuItem[] = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, exact: true },
+  { href: '/dashboard', label: 'Statistik', icon: LayoutDashboard, exact: true },
   { href: '/dashboard/permohonan', label: 'Permohonan', icon: ClipboardList },
   { href: '/dashboard/konten', label: 'Konten', icon: FileText },
   { href: '/dashboard/pengaduan', label: 'Pengaduan', icon: MessageSquare },

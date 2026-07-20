@@ -35,6 +35,14 @@ interface Props {
   layanan: LayananForm;
   onBack: () => void;
   onSuccess?: (noregister: string) => void;
+  /** Warga/OPD mengisi untuk dirinya sendiri (bukan petugas atas nama warga).
+   *  Mengubah teks pengantar & banner. Renderer segmen-nya sama persis. */
+  mandiri?: boolean;
+  /** Nilai awal (mis. NIK/nama/email milik pengaju yang sedang login). */
+  prefill?: Record<string, string>;
+  /** Sembunyikan tombol "Kembali" di header — dipakai saat halaman pembungkus
+   *  sudah punya tombol kembali sendiri. */
+  hideHeaderBack?: boolean;
 }
 
 type Values = Record<string, string>;
@@ -59,8 +67,15 @@ function validateField(fd: FieldDef, value: string): string | null {
   return null;
 }
 
-export function StaffPengajuanForm({ layanan, onBack, onSuccess }: Props) {
-  const [values, setValues] = useState<Values>({});
+export function StaffPengajuanForm({
+  layanan,
+  onBack,
+  onSuccess,
+  mandiri = false,
+  prefill,
+  hideHeaderBack = false,
+}: Props) {
+  const [values, setValues] = useState<Values>(() => ({ ...(prefill ?? {}) }));
   const [fileNames, setFileNames] = useState<Record<string, string>>({});
   const [uploading, setUploading] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -300,9 +315,11 @@ export function StaffPengajuanForm({ layanan, onBack, onSuccess }: Props) {
     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
       {/* Header + back */}
       <div className="mb-6 flex items-center gap-3">
-        <Button variant="outline" size="sm" onClick={onBack} className="gap-1.5">
-          <ArrowLeft className="h-4 w-4" /> Kembali
-        </Button>
+        {!hideHeaderBack && (
+          <Button variant="outline" size="sm" onClick={onBack} className="gap-1.5">
+            <ArrowLeft className="h-4 w-4" /> Kembali
+          </Button>
+        )}
         <div>
           <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
             <FileText className="h-5 w-5 text-primary" /> {layanan.title}
@@ -312,7 +329,17 @@ export function StaffPengajuanForm({ layanan, onBack, onSuccess }: Props) {
       </div>
 
       <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-2.5 text-sm text-primary mb-6">
-        Anda mengisi permohonan <b>atas nama warga</b>. Pastikan data sesuai dokumen asli sebelum dikirim.
+        {mandiri ? (
+          <>
+            Lengkapi seluruh data di bawah lalu kirim. Isi <b>satu halaman ini</b>{' '}
+            sesuai dokumen asli — data Anda akan diverifikasi petugas.
+          </>
+        ) : (
+          <>
+            Anda mengisi permohonan <b>atas nama warga</b>. Pastikan data sesuai
+            dokumen asli sebelum dikirim.
+          </>
+        )}
       </div>
 
       <div className="space-y-5">
