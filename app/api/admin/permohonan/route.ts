@@ -11,30 +11,39 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const status = searchParams.get("status"); // MENUNGGU | DIPROSES | SELESAI | DITOLAK
   const q = searchParams.get("q")?.trim();
+  const cursor = searchParams.get("cursor");
+  const limit = Math.min(50, Math.max(10, parseInt(searchParams.get("limit") ?? "20", 10) || 20));
 
+  const where = {
+    ...(status ? { status } : {}),
+    ...(q
+      ? {
+          OR: [
+            { noregister: { contains: q } },
+            { user: { userFullname: { contains: q } } },
+            { user: { userId: { contains: q } } },
+          ],
+        }
+      : {}),
+  };
+
+  // Paginasi cursor (id desc ≈ createdAt desc) untuk load-on-scroll.
   const rawItems = await prisma.permohonan.findMany({
-    where: {
-      ...(status ? { status } : {}),
-      ...(q
-        ? {
-            OR: [
-              { noregister: { contains: q } },
-              { user: { userFullname: { contains: q } } },
-              { user: { userId: { contains: q } } },
-            ],
-          }
-        : {}),
-    },
+    where,
     include: {
       jenis: { select: { nama: true, kategori: true } },
       user: { select: { userId: true, userFullname: true, userHp: true } },
       _count: { select: { berkas: true } },
     },
-    orderBy: { createdAt: "desc" },
-    take: 300,
+    orderBy: { id: "desc" },
+    take: limit + 1,
+    ...(cursor ? { cursor: { id: Number(cursor) }, skip: 1 } : {}),
   });
+  const hasMore = rawItems.length > limit;
+  const pageRows = hasMore ? rawItems.slice(0, limit) : rawItems;
+  const nextCursor = hasMore ? pageRows[pageRows.length - 1].id : null;
 
-  const items = rawItems.map((i) => ({
+  const items = pageRows.map((i) => ({
     id: i.id,
     noregister: i.noregister,
     status: i.status,
@@ -49,18 +58,22 @@ export async function GET(req: NextRequest) {
     jumlahBerkas: i._count.berkas,
   }));
 
-  // Jumlah per status (global, untuk chip filter) — independen dari filter aktif.
-  const grouped = await prisma.permohonan.groupBy({
-    by: ["status"],
-    _count: { _all: true },
-  });
-  const counts: Record<string, number> = {};
-  let total = 0;
-  for (const g of grouped) {
-    counts[g.status] = g._count._all;
-    total += g._count._all;
+  // Jumlah per status (global, untuk chip filter) — hanya di halaman pertama
+  // (tanpa cursor) agar tidak dihitung ulang tiap scroll.
+  let counts: Record<string, number> | undefined;
+  if (!cursor) {
+    const grouped = await prisma.permohonan.groupBy({
+      by: ["status"],
+      _count: { _all: true },
+    });
+    counts = {};
+    let total = 0;
+    for (const g of grouped) {
+      counts[g.status] = g._count._all;
+      total += g._count._all;
+    }
+    counts[""] = total; // "Semua"
   }
-  counts[""] = total; // "Semua"
 
-  return ok({ items, counts });
+  return ok({ items, nextCursor, ...(counts ? { counts } : {}) });
 }
