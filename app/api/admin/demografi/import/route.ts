@@ -4,6 +4,7 @@ import { ok, fail } from "@/lib/api-response";
 import { getSession } from "@/lib/auth";
 import { parseDemografiExcel } from "@/lib/demografi-import";
 import { DEMOGRAFI_SLUGS } from "@/lib/demografi-kategori";
+import { catatAktivitas } from "@/lib/log-aktivitas";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -58,6 +59,14 @@ export async function POST(req: NextRequest) {
       })),
     }),
   ]);
+
+  await catatAktivitas(
+    session,
+    "IMPOR",
+    "Demografi",
+    `Impor Excel demografi kategori ${kategori}: ${parsed.kecamatan} kecamatan, ${parsed.pekon} desa`,
+    { entitasId: kategori, req },
+  );
 
   return ok(
     { kecamatan: parsed.kecamatan, pekon: parsed.pekon, kolom: parsed.kolom },

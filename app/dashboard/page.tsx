@@ -24,6 +24,7 @@ import {
   ShieldCheck,
   Eye,
   Wifi,
+  ScrollText,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -271,6 +272,24 @@ export default async function DashboardPage() {
     { label: 'Sedang Berjalan', value: berjalan, icon: Hourglass, tint: 'bg-amber-50 text-amber-600' },
     { label: 'Bulan Ini', value: permohonanBulanIni, icon: CalendarDays, tint: 'bg-sky-50 text-sky-600' },
   ];
+
+  // ── Log aktivitas terbaru (admin/level 1 saja) ──
+  const recentLog =
+    session.level === 1
+      ? await prisma.logAktivitas.findMany({
+          orderBy: { createdAt: 'desc' },
+          take: 6,
+          include: { user: { select: { userFullname: true, userId: true } } },
+        })
+      : [];
+  const AKSI_TINT: Record<string, string> = {
+    BUAT: 'bg-emerald-50 text-emerald-700',
+    UBAH: 'bg-sky-50 text-sky-700',
+    HAPUS: 'bg-rose-50 text-rose-700',
+    UNGGAH: 'bg-violet-50 text-violet-700',
+    IMPOR: 'bg-indigo-50 text-indigo-700',
+    LAINNYA: 'bg-slate-100 text-slate-600',
+  };
 
   const konten = [
     { label: 'Berita Terbit', value: beritaPublish, icon: Newspaper, href: '/dashboard/berita' },
@@ -520,6 +539,54 @@ export default async function DashboardPage() {
             )}
           </SectionCard>
         </div>
+
+        {/* ── Log aktivitas terbaru (admin saja) ── */}
+        {session.level === 1 && (
+          <div className="mb-4">
+            <SectionCard
+              title="Aktivitas Terbaru"
+              icon={ScrollText}
+              action={
+                <Link
+                  href="/dashboard/log"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary/80"
+                >
+                  Lihat semua <ArrowRight className="h-3 w-3" />
+                </Link>
+              }
+            >
+              {recentLog.length === 0 ? (
+                <p className="py-6 text-center text-sm text-slate-400">
+                  Belum ada aktivitas tercatat.
+                </p>
+              ) : (
+                <ul className="divide-y divide-slate-100">
+                  {recentLog.map((l) => (
+                    <li key={l.id} className="flex items-start gap-2.5 py-2.5">
+                      <span
+                        className={`mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wide ${AKSI_TINT[l.aksi] ?? AKSI_TINT.LAINNYA}`}
+                      >
+                        {l.aksi}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm text-slate-700">{l.ringkasan}</p>
+                        <p className="text-[0.68rem] text-slate-400">
+                          {l.user?.userFullname ?? l.user?.userId ?? 'Petugas'} &middot;{' '}
+                          {new Date(l.createdAt).toLocaleString('id-ID', {
+                            day: '2-digit',
+                            month: 'short',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </SectionCard>
+          </div>
+        )}
 
         {/* ── Aspirasi warga + akun + pengunjung + konten (2×2) ── */}
         <div className="grid gap-4 lg:grid-cols-2">

@@ -28,6 +28,7 @@ import {
   MessagesSquare,
   Images,
   BarChart3,
+  ScrollText,
   Home,
   LogOut,
   Loader2,
@@ -83,7 +84,10 @@ const GROUPS: MenuGroup[] = [
   },
   {
     title: 'Sistem',
-    items: [{ href: '/dashboard/users', label: 'Manajemen Akun', icon: Users }],
+    items: [
+      { href: '/dashboard/users', label: 'Manajemen Akun', icon: Users },
+      { href: '/dashboard/log', label: 'Log Aktivitas', icon: ScrollText },
+    ],
   },
 ];
 
@@ -104,11 +108,16 @@ const ADMIN_ONLY_HREFS = new Set([
   '/dashboard/media',
   '/dashboard/produk',
   '/dashboard/demografi',
+  '/dashboard/log',
 ]);
 
 function groupsForLevel(level: number): MenuGroup[] {
   if (level === 1) return GROUPS;
-  return GROUPS.filter((g) => !ADMIN_ONLY_GROUPS.has(g.title ?? ''));
+  // Selain menyembunyikan grup khusus admin, saring juga item admin yang
+  // menyelinap di grup umum (mis. "Log Aktivitas" di grup Sistem).
+  return GROUPS.filter((g) => !ADMIN_ONLY_GROUPS.has(g.title ?? ''))
+    .map((g) => ({ ...g, items: g.items.filter((m) => !ADMIN_ONLY_HREFS.has(m.href)) }))
+    .filter((g) => g.items.length > 0);
 }
 
 function mobileMainForLevel(level: number): MenuItem[] {
