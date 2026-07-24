@@ -28,6 +28,12 @@ model User {
   userNokk          String?   @map("user_nokk")
   userHp            String?   @map("user_hp")
   userEmail         String?   @map("user_email")
+  /// Kecamatan domisili sesuai KK — disimpan sebagai NAMA (bukan relasi) agar
+  /// data tetap utuh bila master wilayah di-seed ulang.
+  userKecamatan     String?   @map("user_kecamatan")
+  /// Foto wajah/selfie saat pendaftaran; dipakai petugas untuk mencocokkan
+  /// dengan foto KTP sekaligus menjadi foto profil. Berisi URL /uploads/selfie/…
+  userFoto          String?   @map("user_foto")
   activationCode    String?   @map("activation_code")
   activationCodeUrl String?   @db.Text @map("activation_code_url")
   activationTime    DateTime? @map("activation_time")

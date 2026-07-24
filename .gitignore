@@ -27,9 +27,21 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Media terupload runtime (backup terpisah, jangan ikut git)
-/storage/uploads/
+# Media terupload runtime (backup terpisah, jangan ikut git).
+# SELURUH storage/ berisi data PRIBADI warga (berkas permohonan KTP/KK di
+# storage/permohonan, foto selfie di storage/profil) — jangan pernah masuk git.
+/storage/
+
+# Artefak build & deploy (dibangun ulang, jangan di-commit)
+*.tar.gz
+*.zip
+*.stackdump
 
 # Deploy secrets
 deploy/.env
 .ssh/saibatin-tunnel.ctl
+
+# Jurnal kerja lokal (catatan sesi) — sengaja TIDAK masuk git & TIDAK ikut deploy.
+# deploy/deploy.sh hanya mengirim .next/standalone + public + tessdata, jadi
+# folder ini otomatis aman dari server; baris ini yang menahannya dari GitHub.
+/sync-sam-journals/

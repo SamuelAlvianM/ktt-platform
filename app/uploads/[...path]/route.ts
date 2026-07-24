@@ -16,6 +16,8 @@ const MIME_BY_EXT: Record<string, string> = {
 const ROOT_PUBLIK = join(process.cwd(), "public", "uploads");
 /** Berkas permohonan (KTP/KK) — DI LUAR public/ agar tak dilayani statis. */
 const ROOT_PRIVAT = join(process.cwd(), "storage", "permohonan");
+/** Foto wajah/selfie akun — juga pribadi, lihat lib/foto-profil.ts. */
+const ROOT_PROFIL = join(process.cwd(), "storage", "profil");
 
 /**
  * Folder yang memang untuk konsumsi publik (dokumen PPID / produk hukum yang
@@ -91,9 +93,9 @@ export async function GET(
     if (publik) {
       buffer = await readFile(join(ROOT_PUBLIK, rel));
     } else {
-      buffer = await readFile(join(ROOT_PRIVAT, rel)).catch(() =>
-        readFile(join(ROOT_PUBLIK, rel)),
-      );
+      buffer = await readFile(join(ROOT_PRIVAT, rel))
+        .catch(() => readFile(join(ROOT_PROFIL, rel)))
+        .catch(() => readFile(join(ROOT_PUBLIK, rel)));
     }
     return new NextResponse(new Uint8Array(buffer), {
       headers: {
