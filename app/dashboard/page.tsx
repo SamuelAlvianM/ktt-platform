@@ -4,6 +4,12 @@ import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { statsKunjungan } from '@/lib/kunjungan';
 import {
+  ProgressPermohonanChart,
+  TrenBulananChart,
+  LayananPopulerChart,
+  PermohonanHarianChart,
+} from '@/components/dashboard/dashboard-charts';
+import {
   FileText,
   Users,
   UserCheck,
@@ -37,35 +43,9 @@ const BULAN_PENDEK = [
 const fmt = (n: number) => n.toLocaleString('id-ID');
 const pct = (part: number, total: number) => (total > 0 ? Math.round((part / total) * 100) : 0);
 
-/** Kurva mulus (Catmull-Rom → kubik Bézier) untuk garis tren, agar tidak
- *  patah-patah seperti polyline. `t` = ketegangan (semakin kecil semakin lurus). */
-function smoothPath(pts: { x: number; y: number }[], t = 0.16): string {
-  if (pts.length < 2) return pts.length ? `M${pts[0].x},${pts[0].y}` : '';
-  const seg: string[] = [`M${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`];
-  for (let i = 0; i < pts.length - 1; i++) {
-    const p0 = pts[i - 1] ?? pts[i];
-    const p1 = pts[i];
-    const p2 = pts[i + 1];
-    const p3 = pts[i + 2] ?? p2;
-    const c1x = p1.x + (p2.x - p0.x) * t;
-    const c1y = p1.y + (p2.y - p0.y) * t;
-    const c2x = p2.x - (p3.x - p1.x) * t;
-    const c2y = p2.y - (p3.y - p1.y) * t;
-    seg.push(
-      `C${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`,
-    );
-  }
-  return seg.join(' ');
-}
-
-// Warna status permohonan & pengaduan (kelas literal agar ter-scan Tailwind).
-const STATUS_PERMOHONAN = [
-  { key: 'MENUNGGU', label: 'Menunggu', bar: 'bg-amber-400', text: 'text-amber-600' },
-  { key: 'DIPROSES', label: 'Diproses', bar: 'bg-sky-500', text: 'text-sky-600' },
-  { key: 'SELESAI', label: 'Selesai', bar: 'bg-emerald-500', text: 'text-emerald-600' },
-  { key: 'DITOLAK', label: 'Ditolak', bar: 'bg-rose-500', text: 'text-rose-600' },
-] as const;
-
+// Warna status pengaduan (kelas literal agar ter-scan Tailwind). Progress
+// permohonan kini digambar Highcharts (lihat dashboard-charts), tak lagi pakai
+// daftar warna ini.
 const STATUS_PENGADUAN = [
   { key: 'BARU', label: 'Baru', bar: 'bg-amber-400', text: 'text-amber-600' },
   { key: 'DIPROSES', label: 'Diproses', bar: 'bg-sky-500', text: 'text-sky-600' },
@@ -201,7 +181,6 @@ export default async function DashboardPage() {
     const idx = trendIndex.get(`${d.getFullYear()}-${d.getMonth()}`);
     if (idx !== undefined) trend[idx].count += 1;
   }
-  const maxTrend = Math.max(1, ...trend.map((t) => t.count));
 
   // ── Agregasi per tanggal (30 hari terakhir) ──
   const HARI = 30;
@@ -219,23 +198,8 @@ export default async function DashboardPage() {
     const idx = dailyIndex.get(`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`);
     if (idx !== undefined) daily[idx].count += 1;
   }
-  const maxDaily = Math.max(1, ...daily.map((t) => t.count));
   const totalDaily = daily.reduce((a, t) => a + t.count, 0);
   const avgDaily = totalDaily / HARI;
-  // Koordinat SVG (viewBox 600×150): garis mulus + area di bawahnya. Padding
-  // atas 14 / bawah 16 supaya puncak & lembah tidak menempel di tepi.
-  const CW = 600;
-  const CH = 150;
-  const PAD_T = 14;
-  const PAD_B = 16;
-  const yOf = (count: number) => CH - PAD_B - (count / maxDaily) * (CH - PAD_T - PAD_B);
-  const dailyPts = daily.map((t, i) => ({ x: (i / (HARI - 1)) * CW, y: yOf(t.count) }));
-  const dailyLine = smoothPath(dailyPts);
-  const dailyArea = `${dailyLine} L${CW},${CH} L0,${CH} Z`;
-  // Titik terakhir (hari ini) ditonjolkan sebagai penanda "terkini".
-  const lastDaily = daily[HARI - 1];
-  const lastYpct = (yOf(lastDaily.count) / CH) * 100;
-  const avgYpct = (yOf(avgDaily) / CH) * 100;
 
   // ── Layanan terpopuler (nama jenis) ──
   const jenisIds = topJenisGrouped.map((g) => g.jenisId);
@@ -250,7 +214,6 @@ export default async function DashboardPage() {
     nama: namaById.get(g.jenisId) ?? 'Lainnya',
     count: g._count._all,
   }));
-  const maxJenis = Math.max(1, ...topJenis.map((t) => t.count));
 
   // ── Pengaduan & akun ──
   const pengaduanCount = (key: string) =>
@@ -350,73 +313,26 @@ export default async function DashboardPage() {
             {totalPermohonan === 0 ? (
               <p className="py-6 text-center text-sm text-slate-400">Belum ada permohonan.</p>
             ) : (
-              <div className="space-y-3">
-                {STATUS_PERMOHONAN.map((s) => (
-                  <ProgressRow
-                    key={s.key}
-                    label={s.label}
-                    value={statusCount(s.key)}
-                    total={totalPermohonan}
-                    bar={s.bar}
-                    text={s.text}
-                  />
-                ))}
-              </div>
+              <ProgressPermohonanChart
+                data={[
+                  { label: 'Menunggu', value: statusCount('MENUNGGU'), color: '#fbbf24' },
+                  { label: 'Diproses', value: statusCount('DIPROSES'), color: '#0ea5e9' },
+                  { label: 'Selesai', value: statusCount('SELESAI'), color: '#10b981' },
+                  { label: 'Ditolak', value: statusCount('DITOLAK'), color: '#f43f5e' },
+                ]}
+              />
             )}
           </SectionCard>
 
           <SectionCard title="Tren Permohonan · 6 Bulan" icon={TrendingUp}>
-            <div className="flex h-36 items-end justify-between gap-2 pt-2">
-              {trend.map((t, i) => {
-                const kini = i === trend.length - 1; // bulan berjalan ditonjolkan
-                return (
-                  <div key={t.key} className="flex flex-1 flex-col items-center gap-1.5">
-                    <span
-                      className={`text-[0.68rem] font-bold tabular-nums ${kini ? 'text-primary' : 'text-slate-600'}`}
-                    >
-                      {t.count}
-                    </span>
-                    {/* Track samar setinggi penuh → bar pendek tetap punya konteks */}
-                    <div className="flex w-full flex-1 items-end justify-center">
-                      <div className="relative flex h-full w-full max-w-[30px] items-end justify-center overflow-hidden rounded-md bg-slate-100/70">
-                        <div
-                          className={`w-full rounded-md bg-gradient-to-t ${kini ? 'from-[#92400e] to-[#f59e0b]' : 'from-[#b45309] to-[#fcd34d]'}`}
-                          style={{ height: `${Math.max(6, (t.count / maxTrend) * 100)}%` }}
-                          title={`${t.label}: ${t.count} permohonan`}
-                        />
-                      </div>
-                    </div>
-                    <span
-                      className={`text-[0.62rem] font-medium ${kini ? 'text-primary' : 'text-slate-400'}`}
-                    >
-                      {t.label}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+            <TrenBulananChart data={trend.map((t) => ({ label: t.label, count: t.count }))} />
           </SectionCard>
 
           <SectionCard title="Layanan Terpopuler" icon={Gauge}>
             {topJenis.length === 0 ? (
               <p className="py-6 text-center text-sm text-slate-400">Belum ada data.</p>
             ) : (
-              <div className="space-y-3">
-                {topJenis.map((t) => (
-                  <div key={t.nama} className="space-y-1">
-                    <div className="flex items-center justify-between gap-2 text-xs">
-                      <span className="truncate font-medium text-slate-600">{t.nama}</span>
-                      <span className="shrink-0 font-bold tabular-nums text-slate-900">{fmt(t.count)}</span>
-                    </div>
-                    <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-[#b45309] to-[#fcd34d]"
-                        style={{ width: `${(t.count / maxJenis) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <LayananPopulerChart data={topJenis} />
             )}
           </SectionCard>
         </div>
@@ -437,105 +353,10 @@ export default async function DashboardPage() {
                 Belum ada permohonan dalam 30 hari terakhir.
               </p>
             ) : (
-              <div>
-                <div className="relative">
-                  <svg
-                    viewBox={`0 0 ${CW} ${CH}`}
-                    preserveAspectRatio="none"
-                    className="h-40 w-full overflow-visible"
-                    role="img"
-                    aria-label="Grafik jumlah permohonan per tanggal, 30 hari terakhir"
-                  >
-                    <defs>
-                      <linearGradient id="areaPermohonan" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#d97706" stopOpacity="0.28" />
-                        <stop offset="100%" stopColor="#d97706" stopOpacity="0" />
-                      </linearGradient>
-                    </defs>
-                    {/* Garis bantu horizontal — samar, hanya penanda tinggi */}
-                    {[0.5, 1].map((f) => (
-                      <line
-                        key={f}
-                        x1="0"
-                        x2={CW}
-                        y1={yOf(maxDaily * f)}
-                        y2={yOf(maxDaily * f)}
-                        stroke="#eef2f6"
-                        strokeWidth="1"
-                        vectorEffect="non-scaling-stroke"
-                      />
-                    ))}
-                    {/* Garis rata-rata (putus-putus) */}
-                    <line
-                      x1="0"
-                      x2={CW}
-                      y1={yOf(avgDaily)}
-                      y2={yOf(avgDaily)}
-                      stroke="#f59e0b"
-                      strokeWidth="1"
-                      strokeDasharray="4 4"
-                      vectorEffect="non-scaling-stroke"
-                      opacity="0.6"
-                    />
-                    <path d={dailyArea} fill="url(#areaPermohonan)" />
-                    <path
-                      d={dailyLine}
-                      fill="none"
-                      stroke="#d97706"
-                      strokeWidth="2.25"
-                      vectorEffect="non-scaling-stroke"
-                      strokeLinejoin="round"
-                      strokeLinecap="round"
-                    />
-                    {/* Garis dasar */}
-                    <line
-                      x1="0"
-                      x2={CW}
-                      y1={CH - PAD_B}
-                      y2={CH - PAD_B}
-                      stroke="#e2e8f0"
-                      strokeWidth="1"
-                      vectorEffect="non-scaling-stroke"
-                    />
-                    {/* Kolom hover: tooltip jumlah per tanggal */}
-                    {daily.map((t, i) => (
-                      <rect
-                        key={t.key}
-                        x={(i - 0.5) * (CW / (HARI - 1))}
-                        y="0"
-                        width={CW / (HARI - 1)}
-                        height={CH}
-                        fill="transparent"
-                      >
-                        <title>{`${t.label}: ${t.count} permohonan`}</title>
-                      </rect>
-                    ))}
-                  </svg>
-
-                  {/* Penanda "hari ini" (HTML overlay agar tidak gepeng karena
-                      viewBox di-stretch) */}
-                  <span
-                    className="pointer-events-none absolute z-10 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-[#d97706] shadow-sm"
-                    style={{ left: '100%', top: `${lastYpct}%` }}
-                    title={`Hari ini: ${lastDaily.count}`}
-                  />
-                  {/* Label rata-rata */}
-                  <span
-                    className="pointer-events-none absolute -translate-y-1/2 rounded bg-amber-50 px-1.5 py-0.5 text-[0.6rem] font-semibold text-amber-600"
-                    style={{ right: 0, top: `${avgYpct}%` }}
-                  >
-                    rata²&nbsp;{avgDaily.toFixed(1)}
-                  </span>
-                </div>
-                {/* Label tanggal (tiap ±5 hari) */}
-                <div className="mt-1.5 flex justify-between text-[0.62rem] font-medium text-slate-400">
-                  {daily
-                    .filter((_, i) => i % 5 === 0 || i === HARI - 1)
-                    .map((t) => (
-                      <span key={t.key}>{t.label}</span>
-                    ))}
-                </div>
-              </div>
+              <PermohonanHarianChart
+                data={daily.map((t) => ({ label: t.label, count: t.count }))}
+                rataRata={avgDaily}
+              />
             )}
           </SectionCard>
         </div>

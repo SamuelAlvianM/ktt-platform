@@ -18,6 +18,8 @@ export interface InfoPageContent {
   /** Tautan lanjutan (mis. situs resmi eksternal). Dibuka di tab baru bila external. */
   links?: { label: string; href: string; external?: boolean }[];
   downloadLabel?: string;
+  /** Gambar/infografis (path di public/), tampil di atas body. */
+  image?: string;
 }
 
 export interface InfoBerkas {
@@ -31,6 +33,9 @@ export function InfoPage({
   content,
   berkas,
   dokumenJenis,
+  extra,
+  tanpaBerkas,
+  variant = 'page',
 }: {
   content: InfoPageContent;
   /** Dokumen unggahan dashboard (Dokumen Publikasi) yang tampil di halaman ini. */
@@ -38,6 +43,15 @@ export function InfoPage({
   /** Kategori dokumen (t_produk.jenis). Bila diisi, admin (mode edit) dapat
    *  mengunggah/menghapus dokumen langsung dari halaman ini. */
   dokumenJenis?: string;
+  /** Konten tambahan setelah kartu utama, sebelum footer (mis. form khusus). */
+  extra?: React.ReactNode;
+  /** Halaman ini tidak memakai daftar berkas (mis. diganti galeri gambar) —
+   *  jangan tampilkan pesan "dokumen belum tersedia". */
+  tanpaBerkas?: boolean;
+  /** `page` (default) = halaman penuh dgn hero + Footer. `section` = kartu saja
+   *  (judul kecil, tanpa min-h-screen/Footer) supaya beberapa seksi editable bisa
+   *  ditumpuk dalam satu halaman (mis. Formulir PPID / Register). */
+  variant?: 'page' | 'section';
 }) {
   const { editMode } = useInlineEdit();
   const [items, setItems] = useState<InfoBerkas[]>(berkas ?? []);
@@ -59,32 +73,51 @@ export function InfoPage({
     setItems((prev) => prev.filter((x) => x.id !== b.id));
   };
 
-  return (
-    <div className="relative flex min-h-screen flex-col bg-slate-50/30">
-      <div className="container mx-auto flex-1 px-4 md:px-8 lg:px-16 py-12 lg:py-16">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8 flex items-start gap-4"
-        >
-          <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 flex-shrink-0">
-            <FileText className="w-6 h-6" />
-          </div>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-semibold text-slate-900 tracking-tight">
-              {content.title}
-            </h1>
-            <p className="text-sm text-slate-500 mt-1 max-w-2xl">{content.description}</p>
-          </div>
-        </motion.div>
+  const header =
+    variant === 'section' ? (
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold tracking-tight text-slate-900">
+          {content.title}
+        </h2>
+        {content.description && (
+          <p className="mt-1 text-sm text-slate-500">{content.description}</p>
+        )}
+      </div>
+    ) : (
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="mb-8 flex items-start gap-4"
+      >
+        <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 flex-shrink-0">
+          <FileText className="w-6 h-6" />
+        </div>
+        <div>
+          <h1 className="text-2xl md:text-3xl font-semibold text-slate-900 tracking-tight">
+            {content.title}
+          </h1>
+          <p className="text-sm text-slate-500 mt-1 max-w-2xl">{content.description}</p>
+        </div>
+      </motion.div>
+    );
 
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6 md:p-8 space-y-4"
-        >
+  const mainCard = (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.1 }}
+      className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6 md:p-8 space-y-4"
+    >
+          {content.image && (
+            // eslint-disable-next-line @next/next/no-img-element -- dimensi tak diketahui di level generik ini
+            <img
+              src={content.image}
+              alt={content.title}
+              className="w-full h-auto rounded-xl border border-slate-100"
+            />
+          )}
+
           {content.body?.map((p, i) => (
             <p key={i} className="text-sm leading-relaxed text-slate-700">
               {p}
@@ -193,7 +226,7 @@ export function InfoPage({
             />
           )}
 
-          {items.length === 0 && !canEditDocs && (
+          {items.length === 0 && !canEditDocs && !tanpaBerkas && (
             <div className="pt-4 border-t border-slate-100 text-sm text-slate-500">
               Dokumen resmi belum tersedia secara digital di portal ini. Untuk informasi
               lengkap, silakan{' '}
@@ -203,7 +236,25 @@ export function InfoPage({
               secara langsung.
             </div>
           )}
-        </motion.div>
+    </motion.div>
+  );
+
+  if (variant === 'section') {
+    return (
+      <section>
+        {header}
+        {mainCard}
+        {extra && <div className="mt-6">{extra}</div>}
+      </section>
+    );
+  }
+
+  return (
+    <div className="relative flex min-h-screen flex-col bg-slate-50/30">
+      <div className="container mx-auto flex-1 px-4 md:px-8 lg:px-16 py-12 lg:py-16">
+        {header}
+        {mainCard}
+        {extra && <div className="mt-6">{extra}</div>}
       </div>
       <Footer />
     </div>

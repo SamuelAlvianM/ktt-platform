@@ -67,7 +67,9 @@ const GROUPS: MenuGroup[] = [
     title: 'Konten & Media',
     items: [
       { href: '/dashboard/konten', label: 'Konten Halaman', icon: FileText },
-      { href: '/dashboard/navigasi', label: 'Menu Navigasi', icon: LayoutGrid },
+      // Disembunyikan dulu atas permintaan — halaman /dashboard/navigasi tetap ada,
+      // hanya menu sidebar-nya yang ditutup sementara.
+      // { href: '/dashboard/navigasi', label: 'Menu Navigasi', icon: LayoutGrid },
       { href: '/dashboard/berita', label: 'Berita', icon: Newspaper },
       { href: '/dashboard/media', label: 'Pustaka Media', icon: Images },
       { href: '/dashboard/produk', label: 'Dokumen Publikasi', icon: FolderOpen },

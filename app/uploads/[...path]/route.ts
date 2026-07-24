@@ -26,7 +26,7 @@ const ROOT_PROFIL = join(process.cwd(), "storage", "profil");
  * DEFAULT-DENY: apa pun di luar daftar ini dianggap berkas permohonan warga
  * (KTP/KK/akta) dan wajib berizin. Folder baru otomatis terlindungi.
  */
-const FOLDER_PUBLIK = new Set(["produk"]);
+const FOLDER_PUBLIK = new Set(["produk", "ppid"]);
 
 /** Semua penolakan memakai 404 agar keberadaan berkas tidak bocor. */
 const tidakDitemukan = () => new NextResponse("Not found", { status: 404 });

@@ -10,6 +10,15 @@ export const dynamic = "force-dynamic";
 
 const VID_COOKIE = "sidako_vid";
 
+/**
+ * Jendela satu "kunjungan" (sesi). Selama pengunjung masih aktif dalam rentang
+ * ini, me-refresh atau pindah halaman TIDAK menambah hitungan — supaya angka
+ * tidak bisa digelembungkan dengan sengaja menekan refresh berulang. Hitungan
+ * baru bertambah hanya bila pengunjung kembali setelah tidak aktif lebih lama
+ * dari jendela ini (dianggap kunjungan/sesi baru).
+ */
+const JENDELA_KUNJUNGAN_MS = 30 * 60_000; // 30 menit
+
 /** Statistik pengunjung: { online, hariIni, total }. */
 export async function GET() {
   return ok(await statsKunjungan());
@@ -40,11 +49,26 @@ export async function POST(req: NextRequest) {
   }
 
   const now = new Date();
+  const hariIni = tanggalHariIni();
   try {
+    // Aktivitas terakhir pengunjung ini hari ini (untuk menilai sesi baru/lama).
+    const sebelum = await prisma.kunjungan.findUnique({
+      where: { visitorId_tanggal: { visitorId: vid, tanggal: hariIni } },
+      select: { lastSeen: true },
+    });
+
+    // Tambah hitungan hanya bila memang tampilan halaman (pv) DAN ini kunjungan
+    // baru: belum pernah tercatat hari ini, atau sudah tidak aktif melewati
+    // jendela sesi. Refresh beruntun (lastSeen masih baru) → tidak menambah.
+    const kunjunganBaru =
+      pv &&
+      (!sebelum ||
+        now.getTime() - sebelum.lastSeen.getTime() > JENDELA_KUNJUNGAN_MS);
+
     await prisma.kunjungan.upsert({
-      where: { visitorId_tanggal: { visitorId: vid, tanggal: tanggalHariIni() } },
-      create: { visitorId: vid, tanggal: tanggalHariIni(), hits: 1, lastSeen: now },
-      update: { lastSeen: now, ...(pv ? { hits: { increment: 1 } } : {}) },
+      where: { visitorId_tanggal: { visitorId: vid, tanggal: hariIni } },
+      create: { visitorId: vid, tanggal: hariIni, hits: pv ? 1 : 0, lastSeen: now },
+      update: { lastSeen: now, ...(kunjunganBaru ? { hits: { increment: 1 } } : {}) },
     });
   } catch {
     /* pencatatan gagal tidak boleh mengganggu halaman */

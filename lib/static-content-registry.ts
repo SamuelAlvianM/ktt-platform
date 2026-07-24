@@ -20,7 +20,8 @@ export type StaticFieldType =
   | "textarea"
   | "list"
   | "richtext"
-  | "items";
+  | "items"
+  | "image";
 
 export interface StaticField {
   name: string;
@@ -39,6 +40,8 @@ export interface StaticField {
     /** Kolom `image`: keterangan ukuran singkat di bawah tile (mis. "1200×1050 px"). */
     hint?: string;
   }[];
+  /** Untuk type "image" (top-level): rasio crop tetap saat unggah. */
+  aspect?: number;
   placeholder?: string;
   /** Catatan/petunjuk tambahan yang ditampilkan di bawah label field editor. */
   catatan?: string;
@@ -239,6 +242,18 @@ STATIC_BLOCKS.push({
     "Judul, ikon, warna, dan sumber data (kategori + kolom) tiap kartu statistik di beranda.",
   fields: [{ name: "kartu", label: "Kartu Statistik", type: "items" }],
   defaults: { kartu: DEFAULT_KARTU },
+});
+
+/** Kunci blok konten statis untuk label periode data DKB (badge beranda). */
+export const DKB_PERIODE_KUNCI = "beranda.dkb-periode";
+
+STATIC_BLOCKS.push({
+  kunci: DKB_PERIODE_KUNCI,
+  judul: "Beranda — Periode Data Kependudukan (DKB)",
+  deskripsi:
+    "Label periode sumber data kependudukan (badge di pojok kanan atas kartu Statistik Demografi), mis. \"DKB Semester II 2024\". Perbarui tiap kali Disdukcapil menerima data DKB baru dari Kemendagri.",
+  fields: [{ name: "label", label: "Label Periode", type: "text" }],
+  defaults: { label: process.env.NEXT_PUBLIC_DKB_PERIODE ?? "DKB Semester II 2024" },
 });
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -476,9 +491,73 @@ function blokHalamanTambahan(kunci: string): StaticBlock | undefined {
   };
 }
 
+/**
+ * Halaman info (PPID/WBS/Produk/Hubungi Kami — lihat components/shared/info-page.tsx)
+ * dibentuk lewat pola `EditableInfoPage` dengan kunci `info.<seksi>.<slug>`
+ * (lihat infoBlockKey). Sama seperti halaman navigasi tambahan, jumlahnya
+ * terlalu banyak dan bisa nambah kapan saja untuk didaftarkan satu-satu —
+ * blok dibentuk generik saat diminta. TANPA ini, tombol "Edit" di halaman
+ * info.* tidak berbuat apa-apa (getStaticBlock balas undefined → dialog
+ * editor tidak pernah terbuka).
+ */
+function blokInfoHalaman(kunci: string): StaticBlock | undefined {
+  const awalan = 'info.';
+  if (!kunci.startsWith(awalan)) return undefined;
+  const sisa = kunci.slice(awalan.length);
+  const titikPertama = sisa.indexOf('.');
+  if (titikPertama <= 0) return undefined;
+  const seksi = sisa.slice(0, titikPertama);
+  const slug = sisa.slice(titikPertama + 1);
+  if (!/^[a-z0-9-]+$/.test(seksi) || !/^[a-z0-9][a-z0-9-]{0,59}$/.test(slug)) {
+    return undefined;
+  }
+
+  return {
+    kunci,
+    judul: `Konten Halaman: ${slug}`,
+    deskripsi: 'Judul, deskripsi, isi, daftar poin, dan gambar halaman ini.',
+    fields: [
+      { name: 'title', label: 'Judul', type: 'text' },
+      { name: 'description', label: 'Deskripsi Singkat', type: 'textarea' },
+      { name: 'image', label: 'Gambar/Infografis', type: 'image' },
+      { name: 'body', label: 'Paragraf Isi', type: 'list' },
+      { name: 'list', label: 'Daftar Poin', type: 'list' },
+    ],
+    defaults: {},
+  };
+}
+
+/** Kunci galeri gambar PPID untuk sebuah slug halaman (mis. profil-ppid). */
+export function ppidGaleriKunci(slug: string) {
+  return `ppid.galeri.${slug}`;
+}
+
+/**
+ * Galeri gambar editable pada halaman PPID (mis. "Profil PPID Pelaksana").
+ * Dikelola komponen khusus (components/ppid/galeri-profil.tsx), bukan
+ * FieldEditor generik — jadi `fields` kosong. Perlu terdaftar di sini agar
+ * PUT /api/admin/static-content menerima penyimpanannya.
+ */
+function blokGaleriPpid(kunci: string): StaticBlock | undefined {
+  const awalan = 'ppid.galeri.';
+  if (!kunci.startsWith(awalan)) return undefined;
+  const slug = kunci.slice(awalan.length);
+  if (!/^[a-z0-9][a-z0-9-]{0,59}$/.test(slug)) return undefined;
+  return {
+    kunci,
+    judul: `Galeri Gambar PPID: ${slug}`,
+    deskripsi: 'Kumpulan gambar dengan nama & deskripsi opsional.',
+    fields: [],
+    defaults: { items: [] },
+  };
+}
+
 export function getStaticBlock(kunci: string): StaticBlock | undefined {
   return (
-    STATIC_BLOCKS.find((b) => b.kunci === kunci) ?? blokHalamanTambahan(kunci)
+    STATIC_BLOCKS.find((b) => b.kunci === kunci) ??
+    blokHalamanTambahan(kunci) ??
+    blokGaleriPpid(kunci) ??
+    blokInfoHalaman(kunci)
   );
 }
 
