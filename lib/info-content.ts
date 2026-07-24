@@ -61,6 +61,53 @@ export const ppidContent: Record<string, InfoPageContent> = {
       'PPID (Pejabat Pengelola Informasi dan Dokumentasi) bertugas mengelola dan menyajikan informasi publik di lingkungan Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung, sesuai amanat UU No. 14 Tahun 2008 tentang Keterbukaan Informasi Publik.',
     ],
   },
+  'gambaran-pembentukan-ppid': {
+    title: 'Gambaran Singkat Pembentukan PPID',
+    description: 'Latar belakang dan dasar hukum pembentukan PPID Disdukcapil Tana Tidung.',
+    body: [
+      'PPID dibentuk untuk melaksanakan amanat Undang-Undang Nomor 14 Tahun 2008 tentang Keterbukaan Informasi Publik, yang mewajibkan setiap badan publik — termasuk Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung — menyediakan, memberikan, dan/atau menerbitkan informasi publik yang berada di bawah kewenangannya.',
+      'Sebagai PPID Pelaksana, Disdukcapil Kabupaten Tana Tidung ditunjuk untuk menjalankan tugas pengelolaan dan pelayanan informasi publik di bawah koordinasi PPID Utama Pemerintah Kabupaten Tana Tidung.',
+    ],
+  },
+  'visi-misi-ppid': {
+    title: 'Visi dan Misi PPID',
+    description: 'Arah dan komitmen PPID Disdukcapil Tana Tidung dalam keterbukaan informasi publik.',
+    body: [
+      'Visi: Terwujudnya layanan informasi publik Disdukcapil Kabupaten Tana Tidung yang cepat, akurat, dan akuntabel.',
+    ],
+    list: [
+      'Menjamin hak masyarakat memperoleh informasi publik sesuai peraturan perundang-undangan',
+      'Meningkatkan kualitas pelayanan informasi publik yang cepat, tepat waktu, dan biaya ringan',
+      'Mewujudkan penyelenggaraan pemerintahan yang baik, transparan, efektif, dan akuntabel',
+    ],
+  },
+  'struktur-organisasi-ppid': {
+    title: 'Struktur Organisasi PPID',
+    description: 'Susunan pengelola informasi dan dokumentasi Disdukcapil Tana Tidung.',
+    list: [
+      'Atasan PPID: Kepala Dinas Kependudukan dan Pencatatan Sipil',
+      'PPID Pelaksana: Sekretaris Dinas',
+      'Petugas Layanan Informasi: pejabat/staf yang ditunjuk pada tiap bidang',
+    ],
+  },
+  'maklumat-ppid': {
+    title: 'Maklumat PPID',
+    description: 'Pernyataan komitmen PPID Disdukcapil Tana Tidung dalam layanan informasi publik.',
+    body: [
+      '"Kami PPID Disdukcapil Kabupaten Tana Tidung berkomitmen untuk memberikan pelayanan informasi publik yang cepat, tepat, mudah, dan transparan sesuai dengan peraturan perundang-undangan yang berlaku."',
+    ],
+  },
+  'tugas-tanggungjawab-ppid': {
+    title: 'Tugas dan Tanggung Jawab PPID',
+    description: 'Wewenang dan kewajiban PPID dalam mengelola informasi publik.',
+    list: [
+      'Mengumpulkan, mengelola, dan mendokumentasikan seluruh informasi publik dari unit kerja',
+      'Menyediakan, menyimpan, mendokumentasikan, dan mengamankan informasi publik',
+      'Melakukan verifikasi bahan informasi publik',
+      'Melakukan uji konsekuensi atas informasi yang dikecualikan',
+      'Menyelesaikan sengketa informasi publik sesuai ketentuan yang berlaku',
+    ],
+  },
   'laporan-ppid-pelaksana': {
     title: 'Laporan PPID Pelaksana',
     description: 'Laporan pelaksanaan tugas PPID pelaksana tahunan.',
@@ -96,6 +143,59 @@ export const ppidContent: Record<string, InfoPageContent> = {
   'perjanjian-kerjasama': {
     title: 'Perjanjian Kerjasama',
     description: 'Daftar perjanjian kerjasama Disdukcapil dengan pihak lain.',
+  },
+  rka: {
+    title: 'Rencana Kerja dan Anggaran (RKA)',
+    description: 'Dokumen rencana kerja dan anggaran tahunan perangkat daerah.',
+  },
+  lra: {
+    title: 'Laporan Realisasi Anggaran (LRA)',
+    description: 'Laporan realisasi anggaran pendapatan dan belanja instansi.',
+  },
+  rfk: {
+    title: 'Realisasi Fisik dan Keuangan (RFK)',
+    description: 'Laporan realisasi fisik dan keuangan pelaksanaan kegiatan.',
+  },
+  'rup-pengadaan': {
+    title: 'RUP Pengadaan',
+    description: 'Rencana Umum Pengadaan (RUP) barang/jasa Disdukcapil Tana Tidung.',
+  },
+  cakin: {
+    title: 'Capaian Indikator Kinerja (Cakin)',
+    description: 'Capaian indikator kinerja Disdukcapil Kabupaten Tana Tidung.',
+  },
+  lapkin: {
+    title: 'Laporan Kinerja (Lapkin)',
+    description: 'Laporan kinerja pelaksanaan program dan kegiatan Disdukcapil.',
+  },
+  sakip: {
+    title: 'Sistem Akuntabilitas Kinerja Instansi Pemerintah (SAKIP)',
+    description: 'Dokumen SAKIP Disdukcapil Kabupaten Tana Tidung.',
+  },
+  lppd: {
+    title: 'LPPD',
+    description: 'Laporan Penyelenggaraan Pemerintahan Daerah (LPPD).',
+  },
+  'rencana-aksi': {
+    title: 'Rencana Aksi (RA)',
+    description: 'Rencana aksi pelaksanaan program dan kegiatan instansi.',
+  },
+  calk: {
+    title: 'Catatan Atas Laporan Keuangan (CALK)',
+    description: 'Catatan atas laporan keuangan Disdukcapil Tana Tidung.',
+  },
+  'pejabat-pelaksana-teknis': {
+    title: 'Pejabat Pelaksana Teknis Kegiatan',
+    description:
+      'Daftar pejabat pelaksana teknis kegiatan (PPTK) di lingkungan Disdukcapil Tana Tidung.',
+  },
+  bmd: {
+    title: 'Barang Milik Daerah (BMD)',
+    description: 'Daftar dan pengelolaan barang milik daerah pada Disdukcapil.',
+  },
+  spip: {
+    title: 'Sistem Pengendalian Intern Pemerintah (SPIP)',
+    description: 'Penyelenggaraan Sistem Pengendalian Intern Pemerintah (SPIP) di Disdukcapil.',
   },
   'renstra-opd': {
     title: 'Renstra OPD',
@@ -147,14 +247,50 @@ export const ppidContent: Record<string, InfoPageContent> = {
     title: 'Pengendalian Gratifikasi',
     description: 'Kebijakan dan pelaporan pengendalian gratifikasi.',
   },
+
+  // ── Layanan & Formulir PPID (grup ketiga) ──
+  'sk-disdukcapil': {
+    title: 'SK Disdukcapil',
+    description:
+      'Surat Keputusan Kepala Dinas terkait penetapan PPID dan pengelolaan informasi publik di lingkungan Disdukcapil Tana Tidung.',
+    body: [
+      'Surat Keputusan (SK) menjadi dasar hukum penetapan pejabat dan tim pengelola layanan informasi publik. Dokumen resmi dapat diunduh pada tabel berkas di bawah.',
+    ],
+  },
+  'uji-konsekuensi': {
+    title: 'Uji Konsekuensi',
+    description:
+      'Hasil uji konsekuensi atas informasi yang dikecualikan, sesuai Pasal 17 UU No. 14 Tahun 2008 tentang Keterbukaan Informasi Publik.',
+    body: [
+      'Uji konsekuensi adalah pengujian yang dilakukan PPID untuk menetapkan suatu informasi termasuk dikecualikan atau tidak, dengan mempertimbangkan konsekuensi yang timbul apabila informasi tersebut dibuka. Dokumen hasil uji konsekuensi dapat diunduh pada tabel berkas di bawah.',
+    ],
+  },
+  'sengketa-informasi': {
+    title: 'Tata Cara Penyelesaian Sengketa Informasi',
+    description:
+      'Mekanisme penyelesaian sengketa informasi publik bila pemohon tidak puas atas tanggapan keberatan.',
+    image: '/ppid/tata-cara-sengketa-informasi.jpg',
+    body: [
+      'Apabila pemohon informasi tidak puas terhadap tanggapan atas keberatan, pemohon dapat mengajukan penyelesaian sengketa informasi kepada Komisi Informasi sesuai ketentuan yang berlaku. Alur lengkapnya ditampilkan pada infografis di atas.',
+    ],
+  },
+  'inovasi-layanan': {
+    title: 'Inovasi Layanan',
+    description:
+      'Inovasi layanan administrasi kependudukan dan keterbukaan informasi publik Disdukcapil Kabupaten Tana Tidung.',
+    body: [
+      'Disdukcapil Tana Tidung terus mengembangkan inovasi untuk mempercepat dan mempermudah layanan kepada masyarakat. Dokumen dan materi terkait inovasi layanan dapat diunduh pada tabel berkas di bawah.',
+    ],
+  },
 };
 
 export const wbsContent: Record<string, InfoPageContent> = {
   'tentang-wbs': {
     title: 'Tentang WBS',
     description: 'Whistle Blowing System Disdukcapil Tana Tidung.',
+    image: '/wbs/tata-cara-pengaduan-wbs.png',
     body: [
-      'Whistle Blowing System (WBS) adalah sarana pelaporan dugaan pelanggaran/tindak pidana korupsi di lingkungan Disdukcapil Tana Tidung. Identitas pelapor dijamin kerahasiaannya.',
+      'Whistle Blowing System (WBS) adalah sarana pelaporan dugaan penyalahgunaan wewenang, pelanggaran kode etik, kecurangan, gratifikasi, atau perbuatan lain yang merugikan masyarakat/instansi di lingkungan Disdukcapil Tana Tidung. Identitas pelapor dijamin kerahasiaannya.',
     ],
   },
   'form-pengaduan': {

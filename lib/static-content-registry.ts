@@ -527,14 +527,18 @@ function blokInfoHalaman(kunci: string): StaticBlock | undefined {
   };
 }
 
-/** Kunci galeri gambar PPID untuk sebuah slug halaman (mis. profil-ppid). */
+/** Kunci konten tab PPID (mode + galeri + link) untuk sebuah slug halaman. */
 export function ppidGaleriKunci(slug: string) {
   return `ppid.galeri.${slug}`;
 }
 
+/** Mode tampilan tab PPID. */
+export type PpidTabMode = 'gambar' | 'tabel' | 'campur';
+
 /**
- * Galeri gambar editable pada halaman PPID (mis. "Profil PPID Pelaksana").
- * Dikelola komponen khusus (components/ppid/galeri-profil.tsx), bukan
+ * Konten tab PPID editable (mis. "Profil PPID Pelaksana").
+ * Menyimpan mode tampilan (gambar/tabel/campur), daftar gambar galeri, jumlah
+ * kolom, dan daftar link. Dikelola komponen khusus (components/ppid/*), bukan
  * FieldEditor generik — jadi `fields` kosong. Perlu terdaftar di sini agar
  * PUT /api/admin/static-content menerima penyimpanannya.
  */
@@ -545,10 +549,12 @@ function blokGaleriPpid(kunci: string): StaticBlock | undefined {
   if (!/^[a-z0-9][a-z0-9-]{0,59}$/.test(slug)) return undefined;
   return {
     kunci,
-    judul: `Galeri Gambar PPID: ${slug}`,
-    deskripsi: 'Kumpulan gambar dengan nama & deskripsi opsional.',
+    judul: `Konten Tab PPID: ${slug}`,
+    deskripsi: 'Mode tampilan, gambar galeri, jumlah kolom, dan link.',
     fields: [],
-    defaults: { items: [] },
+    // Default 'tabel' agar halaman tetap seperti semula (portal dokumen);
+    // admin memilih 'gambar'/'campur' per tab lewat pemilih mode.
+    defaults: { mode: 'tabel', items: [], kolom: 2, links: [] },
   };
 }
 

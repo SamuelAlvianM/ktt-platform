@@ -101,6 +101,90 @@ export const PPID_SETIAP_SAAT: PpidInformasiGrup = {
       icon: 'Handshake',
       gradasi: 'from-cyan-400 to-cyan-600',
     },
+    {
+      title: 'Rencana Kerja dan Anggaran (RKA)',
+      href: '/ppid/rka',
+      description: 'Dokumen rencana kerja dan anggaran tahunan perangkat daerah.',
+      icon: 'Coins',
+      gradasi: 'from-teal-400 to-teal-600',
+    },
+    {
+      title: 'Laporan Realisasi Anggaran (LRA)',
+      href: '/ppid/lra',
+      description: 'Laporan realisasi anggaran pendapatan dan belanja instansi.',
+      icon: 'Wallet',
+      gradasi: 'from-amber-400 to-amber-600',
+    },
+    {
+      title: 'Realisasi Fisik dan Keuangan (RFK)',
+      href: '/ppid/rfk',
+      description: 'Laporan realisasi fisik dan keuangan pelaksanaan kegiatan.',
+      icon: 'Gauge',
+      gradasi: 'from-sky-400 to-sky-600',
+    },
+    {
+      title: 'RUP Pengadaan',
+      href: '/ppid/rup-pengadaan',
+      description: 'Rencana Umum Pengadaan (RUP) barang/jasa Disdukcapil.',
+      icon: 'ClipboardList',
+      gradasi: 'from-violet-400 to-violet-600',
+    },
+    {
+      title: 'Capaian Indikator Kinerja (Cakin)',
+      href: '/ppid/cakin',
+      description: 'Capaian indikator kinerja Disdukcapil Kabupaten Tana Tidung.',
+      icon: 'Target',
+      gradasi: 'from-rose-400 to-rose-600',
+    },
+    {
+      title: 'Laporan Kinerja (Lapkin)',
+      href: '/ppid/lapkin',
+      description: 'Laporan kinerja pelaksanaan program dan kegiatan.',
+      icon: 'FileCheck',
+      gradasi: 'from-emerald-400 to-emerald-600',
+    },
+    {
+      title: 'Sistem Akuntabilitas Kinerja Instansi Pemerintah (SAKIP)',
+      href: '/ppid/sakip',
+      description: 'Dokumen SAKIP Disdukcapil Kabupaten Tana Tidung.',
+      icon: 'Award',
+      gradasi: 'from-[#2e6da4] to-[#1b4b72]',
+    },
+    {
+      title: 'LPPD',
+      href: '/ppid/lppd',
+      description: 'Laporan Penyelenggaraan Pemerintahan Daerah (LPPD).',
+      icon: 'FileText',
+      gradasi: 'from-slate-500 to-slate-700',
+    },
+    {
+      title: 'Rencana Aksi (RA)',
+      href: '/ppid/rencana-aksi',
+      description: 'Rencana aksi pelaksanaan program dan kegiatan instansi.',
+      icon: 'Flag',
+      gradasi: 'from-cyan-400 to-cyan-600',
+    },
+    {
+      title: 'Catatan Atas Laporan Keuangan (CALK)',
+      href: '/ppid/calk',
+      description: 'Catatan atas laporan keuangan Disdukcapil Tana Tidung.',
+      icon: 'Book',
+      gradasi: 'from-sky-400 to-sky-600',
+    },
+    {
+      title: 'Pejabat Pelaksana Teknis Kegiatan',
+      href: '/ppid/pejabat-pelaksana-teknis',
+      description: 'Daftar pejabat pelaksana teknis kegiatan (PPTK) di lingkungan Disdukcapil.',
+      icon: 'UserCheck',
+      gradasi: 'from-amber-400 to-amber-600',
+    },
+    {
+      title: 'Barang Milik Daerah (BMD)',
+      href: '/ppid/bmd',
+      description: 'Daftar dan pengelolaan barang milik daerah pada Disdukcapil.',
+      icon: 'Landmark',
+      gradasi: 'from-teal-400 to-teal-600',
+    },
   ],
 };
 
@@ -168,10 +252,70 @@ export const PPID_BERKALA: PpidInformasiGrup = {
       icon: 'Gift',
       gradasi: 'from-cyan-400 to-cyan-600',
     },
+    {
+      title: 'Sistem Pengendalian Intern Pemerintah (SPIP)',
+      href: '/ppid/spip',
+      description: 'Penyelenggaraan Sistem Pengendalian Intern Pemerintah (SPIP).',
+      icon: 'Shield',
+      gradasi: 'from-slate-500 to-slate-700',
+    },
   ],
 };
 
 export const PPID_INFORMASI_GRUP = [PPID_SETIAP_SAAT, PPID_BERKALA];
+
+// ── Data sub-tab navbar PPID (dipakai PpidSubnav) ───────────────────────────
+// Sengaja BUKAN di components/ppid/ppid-subnav.tsx ('use client'): array polos
+// yang diimpor dari modul client tidak sampai utuh ke Server Component (jadi
+// referensi buram, .map() meledak) — hanya JSX/komponen yang aman melewati
+// batas itu. Data harus tinggal di modul biasa seperti ini.
+
+export interface PpidSubnavItem {
+  href: string;
+  label: string;
+  shortLabel?: string;
+}
+
+/** 6 sub-halaman menu navbar "Tentang PPID". */
+export const TENTANG_PPID_TABS: PpidSubnavItem[] = [
+  { href: '/ppid/profil-ppid', label: 'Profil PPID Pelaksana', shortLabel: 'Profil' },
+  { href: '/ppid/gambaran-pembentukan-ppid', label: 'Gambaran Pembentukan', shortLabel: 'Pembentukan' },
+  { href: '/ppid/visi-misi-ppid', label: 'Visi & Misi PPID', shortLabel: 'Visi & Misi' },
+  { href: '/ppid/struktur-organisasi-ppid', label: 'Struktur Organisasi', shortLabel: 'Struktur' },
+  { href: '/ppid/maklumat-ppid', label: 'Maklumat PPID', shortLabel: 'Maklumat' },
+  { href: '/ppid/tugas-tanggungjawab-ppid', label: 'Tugas & Tanggung Jawab', shortLabel: 'Tugas' },
+];
+
+/** 2 sub-halaman menu navbar "Informasi Publik".
+ *  Label ditulis lengkap sesuai istilah resmi UU KIP (selaras dengan judul
+ *  halaman `PPID_SETIAP_SAAT.judul` / `PPID_BERKALA.judul`); `shortLabel`
+ *  dipakai di layar sempit. */
+export const INFORMASI_PUBLIK_TABS: PpidSubnavItem[] = [
+  {
+    href: '/ppid/informasi-setiap-saat',
+    label: 'Informasi Wajib Tersedia Setiap Saat',
+    shortLabel: 'Setiap Saat',
+  },
+  {
+    href: '/ppid/informasi-berkala',
+    label: 'Informasi Wajib Diumumkan Secara Berkala',
+    shortLabel: 'Berkala',
+  },
+];
+
+/** 6 sub-halaman menu navbar "Layanan & Formulir PPID".
+ *  Grup ketiga PPID (di samping Tentang PPID & Informasi Publik) supaya tiap bar
+ *  tab tetap ringkas maks 6 chip. Dua halaman berisi 2 seksi editable (Formulir,
+ *  Register) dibuat sebagai route khusus; empat sisanya lewat catch-all
+ *  /ppid/[...slug]. */
+export const LAYANAN_PPID_TABS: PpidSubnavItem[] = [
+  { href: '/ppid/formulir-ppid', label: 'Formulir PPID', shortLabel: 'Formulir' },
+  { href: '/ppid/sk-disdukcapil', label: 'SK Disdukcapil', shortLabel: 'SK' },
+  { href: '/ppid/register-ppid', label: 'Register', shortLabel: 'Register' },
+  { href: '/ppid/uji-konsekuensi', label: 'Uji Konsekuensi', shortLabel: 'Uji Konsekuensi' },
+  { href: '/ppid/sengketa-informasi', label: 'Penyelesaian Sengketa Informasi', shortLabel: 'Sengketa' },
+  { href: '/ppid/inovasi-layanan', label: 'Inovasi Layanan', shortLabel: 'Inovasi' },
+];
 
 /** Pilihan gradasi warna kotak ikon — dipakai modal "Tambah menu baru". */
 export const PPID_GRADASI_PILIHAN = [

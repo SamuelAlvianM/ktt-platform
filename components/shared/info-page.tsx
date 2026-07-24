@@ -35,6 +35,7 @@ export function InfoPage({
   dokumenJenis,
   extra,
   tanpaBerkas,
+  sembunyikanKonten,
   variant = 'page',
 }: {
   content: InfoPageContent;
@@ -48,6 +49,9 @@ export function InfoPage({
   /** Halaman ini tidak memakai daftar berkas (mis. diganti galeri gambar) —
    *  jangan tampilkan pesan "dokumen belum tersedia". */
   tanpaBerkas?: boolean;
+  /** Sembunyikan kartu teks utama (mis. mode galeri: hanya gambar yang tampil).
+   *  Header judul & konten `extra` tetap dirender. */
+  sembunyikanKonten?: boolean;
   /** `page` (default) = halaman penuh dgn hero + Footer. `section` = kartu saja
    *  (judul kecil, tanpa min-h-screen/Footer) supaya beberapa seksi editable bisa
    *  ditumpuk dalam satu halaman (mis. Formulir PPID / Register). */
@@ -107,7 +111,9 @@ export function InfoPage({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 }}
-      className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6 md:p-8 space-y-4"
+      className={`bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6 md:p-8 space-y-4 ${
+        sembunyikanKonten && editMode ? 'opacity-60 ring-1 ring-dashed ring-amber-300' : ''
+      }`}
     >
           {content.image && (
             // eslint-disable-next-line @next/next/no-img-element -- dimensi tak diketahui di level generik ini
@@ -243,7 +249,12 @@ export function InfoPage({
     return (
       <section>
         {header}
-        {mainCard}
+        {sembunyikanKonten && editMode && (
+          <p className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
+            Kartu teks ini disembunyikan dari tampilan publik (mode Gambar)
+          </p>
+        )}
+        {(!sembunyikanKonten || editMode) && mainCard}
         {extra && <div className="mt-6">{extra}</div>}
       </section>
     );
@@ -253,7 +264,12 @@ export function InfoPage({
     <div className="relative flex min-h-screen flex-col bg-slate-50/30">
       <div className="container mx-auto flex-1 px-4 md:px-8 lg:px-16 py-12 lg:py-16">
         {header}
-        {mainCard}
+        {sembunyikanKonten && editMode && (
+          <p className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
+            Kartu teks ini disembunyikan dari tampilan publik (mode Gambar)
+          </p>
+        )}
+        {(!sembunyikanKonten || editMode) && mainCard}
         {extra && <div className="mt-6">{extra}</div>}
       </div>
       <Footer />

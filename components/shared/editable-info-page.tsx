@@ -16,6 +16,7 @@ export function EditableInfoPage({
   dokumenJenis,
   extra,
   tanpaBerkas,
+  sembunyikanKonten,
   variant = 'page',
 }: {
   kunci: string;
@@ -27,6 +28,8 @@ export function EditableInfoPage({
   extra?: React.ReactNode;
   /** Halaman tanpa daftar berkas (mis. diganti galeri) — sembunyikan pesan kosong. */
   tanpaBerkas?: boolean;
+  /** Sembunyikan kartu teks utama (hanya gambar galeri yang tampil). */
+  sembunyikanKonten?: boolean;
   /** Diteruskan ke InfoPage: `section` = kartu saja tanpa Footer/hero besar. */
   variant?: 'page' | 'section';
 }) {
@@ -55,6 +58,7 @@ export function EditableInfoPage({
         dokumenJenis={dokumenJenis}
         extra={extra}
         tanpaBerkas={tanpaBerkas}
+        sembunyikanKonten={sembunyikanKonten}
         variant={variant}
       />
     </EditableBlock>

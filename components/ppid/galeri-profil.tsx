@@ -6,13 +6,16 @@ import {
   ArrowDown,
   ArrowUp,
   CalendarDays,
+  ExternalLink,
   GripVertical,
   HelpCircle,
   ImagePlus,
   Images,
+  Link2,
   Loader2,
   MoveHorizontal,
   Pencil,
+  Plus,
   Trash2,
 } from 'lucide-react';
 import {
@@ -59,6 +62,22 @@ interface GaleriItem {
   span?: Lebar;
   /** Tanggal unggah (ISO) — ditampilkan sebagai tanggal posting. */
   tanggal?: string;
+}
+
+/** Tautan terkait: yang tampil adalah judul, klik → buka `url` di tab baru. */
+interface LinkItem {
+  id: string;
+  judul: string;
+  url: string;
+}
+
+/** Lengkapi URL tanpa skema agar aman dibuka di tab baru (mis. "disdukcapil.go.id"). */
+function rapikanUrl(url: string): string {
+  const u = url.trim();
+  if (!u) return '';
+  if (/^(https?:|mailto:|tel:)/i.test(u)) return u;
+  if (u.startsWith('/')) return u; // tautan internal
+  return `https://${u}`;
 }
 
 /** Tanggal posting → "24 Juli 2026"; kosong bila tidak valid. */
@@ -182,14 +201,46 @@ function TutorialSusun({
   );
 }
 
+/** Daftar tautan terkait — tampil sebagai chip judul, klik → buka di tab baru. */
+function TautanTerkait({ links }: { links: LinkItem[] }) {
+  if (links.length === 0) return null;
+  return (
+    <div className="mt-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-slate-700">
+        <Link2 className="h-4 w-4 text-primary" /> Tautan Terkait
+      </h3>
+      <div className="flex flex-wrap gap-2.5">
+        {links.map((l) => (
+          <a
+            key={l.id}
+            href={rapikanUrl(l.url)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-2 rounded-lg border border-primary/25 bg-white px-4 py-2.5 text-sm font-medium text-primary shadow-sm transition-colors hover:bg-primary/5"
+          >
+            {l.judul || l.url}
+            <ExternalLink className="h-3.5 w-3.5 opacity-60 transition-transform group-hover:translate-x-0.5" />
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function GaleriProfilPpid({ kunci }: { kunci: string }) {
   const { editMode } = useInlineEdit();
   const raw = useStaticContent([kunci])[kunci] as {
     items?: GaleriItem[];
     kolom?: number;
+    links?: LinkItem[];
+    [k: string]: unknown;
   };
   const items = useMemo<GaleriItem[]>(
     () => (Array.isArray(raw?.items) ? raw.items : []),
+    [raw],
+  );
+  const links = useMemo<LinkItem[]>(
+    () => (Array.isArray(raw?.links) ? raw.links : []),
     [raw],
   );
   const kolom = clampKolom(raw?.kolom);
@@ -210,11 +261,13 @@ export function GaleriProfilPpid({ kunci }: { kunci: string }) {
 
   const tampil = susun ? lokal : items;
 
-  const simpan = async (nextItems: GaleriItem[], nextKolom: number) => {
+  // Simpan HANYA sebagian konten (merge dengan sisa data seperti mode &
+  // sembunyikanKonten) supaya penyimpanan galeri tidak menghapus pilihan mode.
+  const simpanPatch = async (patch: Record<string, unknown>) => {
     const res = await fetch('/api/admin/static-content', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ kunci, konten: { items: nextItems, kolom: nextKolom } }),
+      body: JSON.stringify({ kunci, konten: { ...raw, ...patch } }),
     });
     const json = await res.json();
     if (json.error?.length) {
@@ -226,7 +279,7 @@ export function GaleriProfilPpid({ kunci }: { kunci: string }) {
   };
 
   const gantiKolom = async (k: number) => {
-    await simpan(items, k);
+    await simpanPatch({ kolom: k });
   };
 
   const nyalakanSusun = () => {
@@ -269,23 +322,20 @@ export function GaleriProfilPpid({ kunci }: { kunci: string }) {
     if (seret === null) return;
     setSeret(null);
     setSimpanUrutan(true);
-    await simpan(lokal, kolom);
+    await simpanPatch({ items: lokal });
     setSimpanUrutan(false);
   };
 
-  // Sembunyikan seluruh blok bila kosong & bukan mode edit — tanpa sisa.
-  if (items.length === 0 && !editMode) return null;
+  // Sembunyikan seluruh blok bila kosong (tanpa gambar & tautan) & bukan mode
+  // edit — tanpa sisa.
+  if (items.length === 0 && links.length === 0 && !editMode) return null;
 
   const gridStyle = { ['--k']: kolom } as React.CSSProperties;
 
   return (
     <section className="mt-8">
       {editMode && (
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <span className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700">
-            <Images className="h-4 w-4 text-primary" /> Galeri Gambar
-          </span>
-
+        <div className="mb-4 flex flex-wrap items-center justify-end gap-3">
           <div className="flex flex-wrap items-center gap-2">
             {/* Jumlah kolom per baris */}
             {items.length > 0 && (
@@ -421,40 +471,46 @@ export function GaleriProfilPpid({ kunci }: { kunci: string }) {
         </div>
       )}
 
+      <TautanTerkait links={links} />
+
       {tutorial && <TutorialSusun onTutup={tutupTutorial} />}
 
       {kelola && (
         <PanelKelola
           kunci={kunci}
           awal={items}
-          kolom={kolom}
+          awalLinks={links}
           onTutupTanpaSimpan={() => setKelola(false)}
           onSelesai={() => setKelola(false)}
-          simpan={simpan}
+          simpanPatch={simpanPatch}
         />
       )}
     </section>
   );
 }
 
-/** Panel/dialog pengelolaan galeri (unggah, nama/desc, lebar, urutan, hapus). */
+/** Panel/dialog pengelolaan galeri (unggah gambar, nama/desc, lebar, urutan,
+ *  hapus) + daftar tautan terkait (judul + URL). */
 function PanelKelola({
   kunci,
   awal,
-  kolom,
+  awalLinks,
   onTutupTanpaSimpan,
   onSelesai,
-  simpan,
+  simpanPatch,
 }: {
   kunci: string;
   awal: GaleriItem[];
-  kolom: number;
+  awalLinks: LinkItem[];
   onTutupTanpaSimpan: () => void;
   onSelesai: () => void;
-  simpan: (items: GaleriItem[], kolom: number) => Promise<boolean>;
+  simpanPatch: (patch: Record<string, unknown>) => Promise<boolean>;
 }) {
   const [draft, setDraft] = useState<GaleriItem[]>(() =>
     awal.map((i) => ({ ...i })),
+  );
+  const [draftLinks, setDraftLinks] = useState<LinkItem[]>(() =>
+    awalLinks.map((l) => ({ ...l })),
   );
   const [mengunggah, setMengunggah] = useState(false);
   const [menyimpan, setMenyimpan] = useState(false);
@@ -464,6 +520,23 @@ function PanelKelola({
     setDraft((d) => d.map((it) => (it.id === id ? { ...it, ...patch } : it)));
 
   const hapus = (id: string) => setDraft((d) => d.filter((it) => it.id !== id));
+
+  // ── Tautan ──
+  const tambahLink = () =>
+    setDraftLinks((l) => [...l, { id: idBaru(), judul: '', url: '' }]);
+  const ubahLink = (id: string, patch: Partial<LinkItem>) =>
+    setDraftLinks((l) => l.map((it) => (it.id === id ? { ...it, ...patch } : it)));
+  const hapusLink = (id: string) =>
+    setDraftLinks((l) => l.filter((it) => it.id !== id));
+  const geserLink = (i: number, arah: -1 | 1) => {
+    setDraftLinks((l) => {
+      const j = i + arah;
+      if (j < 0 || j >= l.length) return l;
+      const salin = [...l];
+      [salin[i], salin[j]] = [salin[j], salin[i]];
+      return salin;
+    });
+  };
 
   const geser = (i: number, arah: -1 | 1) => {
     setDraft((d) => {
@@ -528,7 +601,11 @@ function PanelKelola({
         ...(it.span && it.span !== 1 ? { span: it.span } : {}),
         ...(it.tanggal ? { tanggal: it.tanggal } : {}),
       }));
-      const ok = await simpan(items, kolom);
+      // Tautan tanpa URL dibuang; judul kosong → pakai URL sebagai label.
+      const links = draftLinks
+        .map((l) => ({ id: l.id, judul: l.judul.trim(), url: l.url.trim() }))
+        .filter((l) => l.url);
+      const ok = await simpanPatch({ items, links });
       if (ok) {
         toast.success('Galeri disimpan');
         onSelesai();
@@ -676,6 +753,86 @@ function PanelKelola({
             <p className="mt-1.5 text-[0.7rem] text-muted-foreground">
               Format JPG/PNG, maksimal 5 MB per gambar. Bisa memilih beberapa sekaligus.
             </p>
+          </div>
+
+          {/* ── Tautan terkait ── */}
+          <div className="border-t border-slate-100 pt-4">
+            <div className="mb-2 flex items-center gap-2">
+              <Link2 className="h-4 w-4 text-primary" />
+              <h3 className="text-sm font-semibold text-slate-800">Tautan Terkait</h3>
+            </div>
+            <p className="mb-3 text-[0.7rem] text-muted-foreground">
+              Yang tampil adalah <b>judul</b>; saat diklik akan membuka URL di tab baru.
+            </p>
+
+            {draftLinks.length > 0 && (
+              <ul className="mb-3 space-y-2">
+                {draftLinks.map((l, i) => (
+                  <li
+                    key={l.id}
+                    className="flex items-start gap-2 rounded-xl border border-slate-200 p-2.5"
+                  >
+                    <div className="min-w-0 flex-1 space-y-1.5">
+                      <Input
+                        value={l.judul}
+                        onChange={(e) => ubahLink(l.id, { judul: e.target.value })}
+                        placeholder="Judul tautan (mis. Portal Resmi)"
+                        className="h-8"
+                      />
+                      <Input
+                        value={l.url}
+                        onChange={(e) => ubahLink(l.id, { url: e.target.value })}
+                        placeholder="https://…"
+                        className="h-8"
+                      />
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7"
+                        disabled={i === 0}
+                        onClick={() => geserLink(i, -1)}
+                        aria-label="Naikkan urutan tautan"
+                      >
+                        <ArrowUp className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7"
+                        disabled={i === draftLinks.length - 1}
+                        onClick={() => geserLink(i, 1)}
+                        aria-label="Turunkan urutan tautan"
+                      >
+                        <ArrowDown className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        onClick={() => hapusLink(l.id)}
+                        aria-label="Hapus tautan"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={tambahLink}
+              className="w-full border-dashed"
+            >
+              <Plus className="mr-1.5 h-4 w-4" /> Tambah Tautan
+            </Button>
           </div>
         </div>
 

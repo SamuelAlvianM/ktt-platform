@@ -7,11 +7,11 @@ import { dokumenJenisForPath } from '@/lib/dokumen-registry';
 import { infoBlockKey } from '@/lib/static-content-registry';
 import { PpidSubnav } from '@/components/ppid/ppid-subnav';
 import { GaleriProfilPpid } from '@/components/ppid/galeri-profil';
-import { ppidGaleriKunci } from '@/lib/static-content-registry';
+import { PpidModeSelector } from '@/components/ppid/ppid-mode';
+import { PpidCampur } from '@/components/ppid/ppid-campur';
+import { ProfilTerhubung, type ProfilJenis } from '@/components/ppid/profil-terhubung';
+import { ppidGaleriKunci, type PpidTabMode } from '@/lib/static-content-registry';
 import { TENTANG_PPID_TABS, LAYANAN_PPID_TABS } from '@/lib/ppid-informasi';
-
-// Halaman PPID yang menampilkan galeri gambar (bukan tabel unduhan berkas).
-const SLUG_GALERI = new Set(['profil-ppid']);
 
 // Dinamis: menampilkan berkas unggahan dashboard (Dokumen Publikasi).
 export const dynamic = 'force-dynamic';
@@ -23,6 +23,31 @@ const LAYANAN_PPID_SLUGS = new Set(
   LAYANAN_PPID_TABS.map((t) => t.href.replace('/ppid/', '')),
 );
 
+// Tab "Tentang PPID" yang datanya DISATUKAN dengan beranda (seksi Profil
+// Instansi) → dirender oleh ProfilTerhubung (baca/tulis kunci profil.* yang
+// sama). Sisanya (profil-ppid, gambaran-pembentukan-ppid) memakai sistem mode
+// gambar/tabel/campur.
+const PROFIL_TERHUBUNG: Record<string, ProfilJenis> = {
+  'visi-misi-ppid': 'visi-misi',
+  'maklumat-ppid': 'maklumat',
+  'tugas-tanggungjawab-ppid': 'tugas',
+  'struktur-organisasi-ppid': 'struktur',
+};
+
+/** Baca konfigurasi tab (mode + sembunyikan kartu teks) dari StaticContent. */
+async function bacaKonfigTab(
+  slug: string,
+): Promise<{ mode: PpidTabMode; sembunyikanKonten: boolean }> {
+  const row = await prisma.staticContent.findUnique({
+    where: { kunci: ppidGaleriKunci(slug) },
+    select: { konten: true },
+  });
+  const k = row?.konten as { mode?: string; sembunyikanKonten?: boolean } | null;
+  const mode: PpidTabMode =
+    k?.mode === 'gambar' || k?.mode === 'campur' ? k.mode : 'tabel';
+  return { mode, sembunyikanKonten: !!k?.sembunyikanKonten };
+}
+
 export default async function PpidPage({
   params,
 }: {
@@ -33,25 +58,38 @@ export default async function PpidPage({
   const content = ppidContent[path];
   if (!content) notFound();
 
-  // Tab tertentu (mis. Profil PPID Pelaksana) menampilkan galeri gambar
-  // langsung, menggantikan tabel unduhan berkas.
-  const pakaiGaleri = SLUG_GALERI.has(path);
+  const profilJenis = PROFIL_TERHUBUNG[path];
 
-  const jenis = pakaiGaleri ? [] : dokumenJenisForPath(`/ppid/${path}`);
-  const berkas: InfoBerkas[] = jenis.length
-    ? (
-        await prisma.produk.findMany({
-          where: { jenis: { in: jenis }, file: { not: null } },
-          orderBy: { createdAt: 'desc' },
-          select: { id: true, judul: true, file: true, createdAt: true },
-        })
-      ).map((b) => ({
-        id: b.id,
-        judul: b.judul,
-        file: b.file as string,
-        createdAt: b.createdAt.toISOString(),
-      }))
-    : [];
+  // Mode tampilan (gambar/tabel/campur) hanya untuk tab "Tentang PPID" yang
+  // BUKAN tab terhubung-beranda.
+  const bisaPilihMode = TENTANG_PPID_SLUGS.has(path) && !profilJenis;
+  const { mode, sembunyikanKonten } = bisaPilihMode
+    ? await bacaKonfigTab(path)
+    : { mode: 'tabel' as PpidTabMode, sembunyikanKonten: false };
+  const pakaiTabel = mode === 'tabel';
+  const pakaiGambar = mode === 'gambar';
+  const pakaiCampur = mode === 'campur';
+  // Sembunyikan kartu teks hanya relevan di mode gambar (hanya gambar tampil).
+  const sembunyikanKartu = mode === 'gambar' && sembunyikanKonten;
+
+  const jenis = dokumenJenisForPath(`/ppid/${path}`);
+  // Berkas dibutuhkan mode Tabel (tabel di kartu) & Campur (panel Dokumen).
+  const perluBerkas = !profilJenis && (pakaiTabel || pakaiCampur);
+  const berkas: InfoBerkas[] =
+    perluBerkas && jenis.length
+      ? (
+          await prisma.produk.findMany({
+            where: { jenis: { in: jenis }, file: { not: null } },
+            orderBy: { createdAt: 'desc' },
+            select: { id: true, judul: true, file: true, createdAt: true },
+          })
+        ).map((b) => ({
+          id: b.id,
+          judul: b.judul,
+          file: b.file as string,
+          createdAt: b.createdAt.toISOString(),
+        }))
+      : [];
 
   return (
     <>
@@ -65,18 +103,33 @@ export default async function PpidPage({
           <PpidSubnav items={LAYANAN_PPID_TABS} layoutId="layanan-ppid" />
         </div>
       )}
-      <EditableInfoPage
-        kunci={infoBlockKey('ppid', path)}
-        fallback={content}
-        berkas={pakaiGaleri ? undefined : berkas}
-        dokumenJenis={pakaiGaleri ? undefined : jenis[0]}
-        tanpaBerkas={pakaiGaleri}
-        extra={
-          pakaiGaleri ? (
-            <GaleriProfilPpid kunci={ppidGaleriKunci(path)} />
-          ) : undefined
-        }
-      />
+
+      {profilJenis ? (
+        <ProfilTerhubung
+          jenis={profilJenis}
+          judul={content.title}
+          deskripsi={content.description}
+        />
+      ) : (
+        <>
+          {bisaPilihMode && <PpidModeSelector kunci={ppidGaleriKunci(path)} />}
+          <EditableInfoPage
+            kunci={infoBlockKey('ppid', path)}
+            fallback={content}
+            berkas={pakaiTabel ? berkas : undefined}
+            dokumenJenis={pakaiTabel ? jenis[0] : undefined}
+            tanpaBerkas={!pakaiTabel}
+            sembunyikanKonten={sembunyikanKartu}
+            extra={
+              pakaiCampur ? (
+                <PpidCampur kunci={ppidGaleriKunci(path)} berkas={berkas} />
+              ) : pakaiGambar ? (
+                <GaleriProfilPpid kunci={ppidGaleriKunci(path)} />
+              ) : undefined
+            }
+          />
+        </>
+      )}
     </>
   );
 }
