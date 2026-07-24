@@ -1,18 +1,16 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
-import { verifyRecaptcha } from "@/lib/recaptcha";
 import { getSession } from "@/lib/auth";
 import { notifyPetugas, safeNotify } from "@/lib/notifikasi";
 
-/** Kirim pengaduan masyarakat (port pengaduan/postdata). */
+/** Kirim pengaduan masyarakat (port pengaduan/postdata).
+ *  Tanpa reCAPTCHA — atas permintaan user, kanal WBS/pengaduan tidak memakai
+ *  captcha; bukti berupa foto (opsional) disisipkan ke `isi` oleh klien. */
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
-  const { nama, nik, email, hp, subjek, isi, recaptchaToken } = body as Record<string, string>;
+  const { nama, nik, email, hp, subjek, isi } = body as Record<string, string>;
 
-  if (!(await verifyRecaptcha(recaptchaToken))) {
-    return fail(["Info: Verifikasi reCAPTCHA gagal"]);
-  }
   if (!nama || !isi) return fail(["Info: Nama dan isi pengaduan wajib diisi"]);
 
   const pengaduan = await prisma.pengaduan.create({

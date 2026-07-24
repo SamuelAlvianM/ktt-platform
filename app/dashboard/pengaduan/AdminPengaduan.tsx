@@ -19,6 +19,21 @@ interface Item {
   createdAt: string;
 }
 
+/** Pisahkan teks pengaduan dari lampiran bukti foto (URL disisipkan klien WBS
+ *  dengan penanda "Bukti Foto:"). Berkas berada di storage privat — hanya
+ *  petugas yang sedang login dapat memuat thumbnail-nya. */
+function pisahBukti(isi: string): { teks: string; foto: string[] } {
+  const i = isi.indexOf('\n\nBukti Foto:');
+  if (i === -1) return { teks: isi, foto: [] };
+  const teks = isi.slice(0, i).trimEnd();
+  const foto = isi
+    .slice(i)
+    .split(/\r?\n/)
+    .map((s) => s.trim())
+    .filter((s) => /^\/uploads\/.+\.(jpe?g|png)$/i.test(s));
+  return { teks, foto };
+}
+
 function StatusBadge({ status }: { status: string }) {
   if (status === 'SELESAI') {
     return (
@@ -132,7 +147,7 @@ export function AdminPengaduan() {
                 <tr key={it.id} className="border-b border-slate-100 cursor-pointer hover:bg-slate-50/60" onClick={() => openDetail(it)}>
                   <td className="py-2.5 pr-4 font-medium text-slate-800">{it.nama}</td>
                   <td className="py-2.5 pr-4">{it.subjek ?? '-'}</td>
-                  <td className="py-2.5 pr-4 max-w-xs truncate text-slate-500">{it.isi}</td>
+                  <td className="py-2.5 pr-4 max-w-xs truncate text-slate-500">{pisahBukti(it.isi).teks}</td>
                   <td className="py-2.5 pr-4 text-xs text-slate-500">
                     {new Date(it.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </td>
@@ -169,10 +184,37 @@ export function AdminPengaduan() {
                 <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-slate-400" /> {detail.hp ?? '-'}</p>
                 <p className="flex items-center gap-2 sm:col-span-2"><Mail className="h-4 w-4 text-slate-400" /> {detail.email ?? '-'}</p>
               </div>
-              <div className="rounded-lg bg-slate-50 p-3">
-                <p className="text-xs font-semibold text-slate-500 mb-1">Isi Pengaduan</p>
-                <p className="text-slate-700 whitespace-pre-wrap">{detail.isi}</p>
-              </div>
+              {(() => {
+                const { teks, foto } = pisahBukti(detail.isi);
+                return (
+                  <div className="rounded-lg bg-slate-50 p-3">
+                    <p className="text-xs font-semibold text-slate-500 mb-1">Isi Pengaduan</p>
+                    <p className="text-slate-700 whitespace-pre-wrap">{teks}</p>
+                    {foto.length > 0 && (
+                      <div className="mt-3">
+                        <p className="mb-1.5 text-xs font-semibold text-slate-500">
+                          Bukti Foto ({foto.length})
+                        </p>
+                        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                          {foto.map((src) => (
+                            <a
+                              key={src}
+                              href={src}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block aspect-square overflow-hidden rounded-lg border border-slate-200 bg-white transition-opacity hover:opacity-90"
+                              title="Buka foto ukuran penuh"
+                            >
+                              {/* eslint-disable-next-line @next/next/no-img-element -- berkas privat dilayani route ber-sesi */}
+                              <img src={src} alt="Bukti foto pengaduan" className="h-full w-full object-cover" />
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
               <div>
                 <label className="text-sm font-medium text-slate-700">Balasan / Catatan</label>
                 <Textarea className="mt-1.5" rows={3} value={balasan} onChange={(e) => setBalasan(e.target.value)} placeholder="Tanggapan untuk pengadu (opsional)..." />

@@ -74,14 +74,18 @@ export function FieldEditor({
         <Label>{field.label}</Label>
         <div className="space-y-2">
           {list.map((item, idx) => (
-            <div key={idx} className="flex items-center gap-2">
-              <span className="w-5 text-center text-xs font-bold text-slate-400 shrink-0">
+            <div key={idx} className="flex items-start gap-2">
+              <span className="mt-2 w-5 shrink-0 text-center text-xs font-bold text-slate-400">
                 {idx + 1}
               </span>
-              <Input
+              <Textarea
+                rows={1}
                 value={item}
                 onChange={(e) => setItem(idx, e.target.value)}
                 placeholder={`Poin ${idx + 1}`}
+                // field-sizing-content (di komponen Textarea) membuat tinggi
+                // mengikuti isi: teks panjang wrap & melebar ke bawah, tak terpotong.
+                className="min-h-9 resize-none py-1.5 leading-relaxed"
               />
               <Button
                 type="button"
@@ -103,6 +107,25 @@ export function FieldEditor({
           <Plus className="h-4 w-4 mr-1.5" />
           Tambah Poin
         </Button>
+      </div>
+    );
+  }
+
+  if (field.type === 'image') {
+    return (
+      <div className="space-y-1.5">
+        <Label>{field.label}</Label>
+        <ImagePickerField
+          label={field.label}
+          value={String(value ?? '')}
+          onChange={onChange}
+          aspect={field.aspect}
+          className={cn('w-full', field.aspect ? '' : 'aspect-video')}
+          style={field.aspect ? { aspectRatio: String(field.aspect) } : undefined}
+        />
+        {field.catatan && (
+          <p className="text-xs text-slate-500">{field.catatan}</p>
+        )}
       </div>
     );
   }

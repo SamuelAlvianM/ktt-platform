@@ -1,5 +1,6 @@
 import { PpidInformasiIndex } from '@/components/ppid/informasi-index';
-import { PPID_SETIAP_SAAT } from '@/lib/ppid-informasi';
+import { PPID_SETIAP_SAAT, INFORMASI_PUBLIK_TABS } from '@/lib/ppid-informasi';
+import { PpidSubnav } from '@/components/ppid/ppid-subnav';
 
 export const metadata = {
   title: 'Informasi Wajib Tersedia Setiap Saat — PPID Disdukcapil Tana Tidung',
@@ -10,5 +11,10 @@ export const metadata = {
 export const dynamic = 'force-dynamic';
 
 export default function InformasiSetiapSaatPage() {
-  return <PpidInformasiIndex grup={PPID_SETIAP_SAAT} />;
+  return (
+    <PpidInformasiIndex
+      grup={PPID_SETIAP_SAAT}
+      subnav={<PpidSubnav items={INFORMASI_PUBLIK_TABS} layoutId="informasi-publik" />}
+    />
+  );
 }

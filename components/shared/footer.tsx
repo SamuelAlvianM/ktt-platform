@@ -7,8 +7,8 @@ const grup = {
   layanan: [
     { label: "Permohonan Online", href: "/permohonan-online" },
     { label: "Riwayat Permohonan", href: "/riwayat" },
-    { label: "Pengaduan Masyarakat", href: "/pengaduan" },
-    { label: "Survei Kepuasan", href: "/hubungi-kami#survei" },
+    { label: "Pengaduan / WBS", href: "/wbs/tentang-wbs" },
+    { label: "Survei Kepuasan", href: "/survei-kepuasan" },
   ],
   informasi: [
     { label: "Berita", href: "/media/berita" },

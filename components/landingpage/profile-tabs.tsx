@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence, useInView, LayoutGroup, easeInOut } from 'framer-motion';
+import Image from 'next/image';
 import {
   Target,
   FileText,
@@ -12,6 +13,8 @@ import {
   Quote,
   Minus,
   Pencil,
+  Contact,
+  History,
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { cn } from '@/lib/utils';
@@ -52,7 +55,29 @@ const TABS: TabConfig[] = [
   { id: 'maklumat',   label: 'Maklumat',         shortLabel: 'Maklumat', icon: <Users className="w-4 h-4" />,       description: 'Janji pelayanan publik' },
   { id: 'tugas',      label: 'Tugas & Fungsi',   shortLabel: 'Tugas',    icon: <CheckSquare className="w-4 h-4" />, description: 'Wewenang dan tanggung jawab' },
   { id: 'struktur',   label: 'Struktur',          shortLabel: 'Struktur', icon: <Network className="w-4 h-4" />,     description: 'Susunan organisasi' },
+  { id: 'profil-pejabat', label: 'Profil Pejabat', shortLabel: 'Pejabat', icon: <Contact className="w-4 h-4" />,     description: 'Kepala Dinas Kependudukan & Pencatatan Sipil' },
+  { id: 'sejarah',        label: 'Sejarah',        shortLabel: 'Sejarah', icon: <History className="w-4 h-4" />,     description: 'Perjalanan Disdukcapil Tana Tidung' },
 ];
+
+// Tab bergambar (Profil Pejabat, Sejarah) — sumber materi resmi Disdukcapil,
+// ditampilkan apa adanya (bukan data terstruktur) sehingga TIDAK memakai
+// StaticContent seperti 5 tab lain (StaticField belum punya tipe gambar
+// tunggal di luar list "items"). Ganti berkasnya langsung di public/ppid/
+// bila ada foto/infografis resmi baru dari dinas.
+const TAB_GAMBAR: Record<string, { src: string; width: number; height: number; alt: string }> = {
+  'profil-pejabat': {
+    src: '/ppid/profil-pejabat-kepala-dinas-v2.jpg',
+    width: 1095,
+    height: 438,
+    alt: 'Profil Singkat Kepala Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung',
+  },
+  sejarah: {
+    src: '/ppid/sejarah-disdukcapil.jpg',
+    width: 897,
+    height: 566,
+    alt: 'Sejarah Disdukcapil Kabupaten Tana Tidung',
+  },
+};
 
 const CONTENT: Record<string, any> = {
   'visi-misi': {
@@ -96,12 +121,16 @@ const CONTENT: Record<string, any> = {
     ],
   },
   'struktur': {
+    // Fallback terakhir bila API tak menjawab; bentuknya mengikuti StrukturData
+    // (mode + organisasi ber-parent & ber-tingkat). Umumnya tak terpakai karena
+    // /api/static-content selalu mengembalikan default registry.
+    mode: 'bagan',
     organisasi: [
-      { jabatan: 'Kepala Dinas', nama: '-', status: 'Pimpinan' },
-      { jabatan: 'Sekretaris', nama: '-', status: 'Pengawas' },
-      { jabatan: 'Kabid Pelayanan Pendaftaran Penduduk', nama: '-', status: 'Pelaksana' },
-      { jabatan: 'Kabid Pelayanan Pencatatan Sipil', nama: '-', status: 'Pelaksana' },
-      { jabatan: 'Kabid Pengelolaan Informasi Administrasi Kependudukan', nama: '-', status: 'Pelaksana' },
+      { jabatan: 'Kepala Dinas', nama: '-', parent: '', tingkat: 'pimpinan' },
+      { jabatan: 'Sekretaris', nama: '-', parent: 'Kepala Dinas', tingkat: 'kabid' },
+      { jabatan: 'Kabid Pelayanan Pendaftaran Penduduk', nama: '-', parent: 'Kepala Dinas', tingkat: 'kabid' },
+      { jabatan: 'Kabid Pelayanan Pencatatan Sipil', nama: '-', parent: 'Kepala Dinas', tingkat: 'kabid' },
+      { jabatan: 'Kabid Pengelolaan Informasi Administrasi Kependudukan', nama: '-', parent: 'Kepala Dinas', tingkat: 'kabid' },
     ],
   },
 };
@@ -306,6 +335,24 @@ function StrukturPanel({ data }: { data: typeof CONTENT['struktur'] }) {
   return <StrukturChart data={data} />;
 }
 
+/** Panel bergambar generik — dipakai Profil Pejabat & Sejarah. */
+function GambarPanel({ tabId }: { tabId: string }) {
+  const g = TAB_GAMBAR[tabId];
+  if (!g) return null;
+  return (
+    <motion.div {...fadeUp(0.15)} className="overflow-hidden rounded-2xl border border-slate-100 shadow-sm">
+      <Image
+        src={g.src}
+        alt={g.alt}
+        width={g.width}
+        height={g.height}
+        className="h-auto w-full"
+        sizes="(min-width: 1024px) 900px, 100vw"
+      />
+    </motion.div>
+  );
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function ProfileTabs() {
@@ -333,10 +380,13 @@ export default function ProfileTabs() {
   const activeTabConfig = TABS.find((t) => t.id === activeTab)!;
   const { editMode, openEditor } = useInlineEdit();
   const [strukturEditorOpen, setStrukturEditorOpen] = useState(false);
+  // Tab bergambar (lihat TAB_GAMBAR) belum punya editor CMS — sembunyikan
+  // tombol Edit di situ daripada menampilkan tombol yang tidak berbuat apa-apa.
+  const bisaEdit = !(activeTab in TAB_GAMBAR);
 
   return (
     <section ref={containerRef} className="relative py-14 overflow-hidden bg-white border-t border-slate-100">
-      {editMode && (
+      {editMode && bisaEdit && (
         <button
           onClick={() =>
             activeTab === 'struktur'
@@ -358,7 +408,7 @@ export default function ProfileTabs() {
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
       </div>
 
-      <div className="container mx-auto px-4 md:px-8 lg:px-16 relative z-10 max-w-5xl">
+      <div className="container mx-auto px-4 md:px-8 lg:px-16 relative z-10 max-w-6xl">
 
         {/* ── Section header ── */}
         <motion.div
@@ -451,6 +501,8 @@ export default function ProfileTabs() {
                   {activeTab === 'maklumat'    && <MaklumatPanel  data={activeContent} />}
                   {activeTab === 'tugas'       && <TugasPanel     data={activeContent} />}
                   {activeTab === 'struktur'    && <StrukturPanel  data={activeContent} />}
+                  {activeTab === 'profil-pejabat' && <GambarPanel tabId={activeTab} />}
+                  {activeTab === 'sejarah'        && <GambarPanel tabId={activeTab} />}
                 </div>
               </div>
             </motion.div>

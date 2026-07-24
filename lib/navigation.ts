@@ -83,50 +83,50 @@ export const navigationItems: NavMenu[] = [
     ],
   },
   {
+    // Disederhanakan dari 3 item jadi 2 menu utama — tiap menu mendarat di
+    // halaman yang punya sub-tab sendiri (lihat components/ppid/ppid-subnav.tsx):
+    // "Tentang PPID" → 6 tab (profil, pembentukan, visi-misi, struktur,
+    // maklumat, tugas). "Informasi Publik" → 2 tab (Setiap Saat / Berkala),
+    // menggabungkan dua halaman indeks kartu yang sebelumnya terpisah di navbar.
     title: "PPID",
     items: [
       {
-        title: "Profil PPID",
+        title: "Tentang PPID",
         href: "/ppid/profil-ppid",
-        description: "Profil PPID Disdukcapil",
+        description:
+          "Profil, gambaran pembentukan, visi-misi, struktur organisasi, maklumat, serta tugas dan tanggung jawab PPID",
       },
-      // Dua klasifikasi informasi publik kini berupa halaman indeks kartu
-      // (daftar lengkap kategorinya ada di lib/ppid-informasi.ts) — klik
-      // langsung masuk halaman, tanpa submenu melayang.
       {
-        title: "Informasi Wajib Tersedia Setiap Saat",
+        title: "Informasi Publik",
         href: "/ppid/informasi-setiap-saat",
         description:
-          "Daftar Informasi Publik yang wajib tersedia setiap saat (UU No. 14 Tahun 2008)",
+          "Daftar Informasi Publik yang wajib tersedia setiap saat maupun diumumkan secara berkala (UU No. 14 Tahun 2008)",
       },
       {
-        title: "Informasi Wajib Diumumkan Secara Berkala",
-        href: "/ppid/informasi-berkala",
+        title: "Layanan & Formulir PPID",
+        href: "/ppid/formulir-ppid",
         description:
-          "Daftar Informasi Publik yang wajib diumumkan secara berkala (UU No. 14 Tahun 2008)",
+          "Formulir permohonan & keberatan, SK, register, uji konsekuensi, penyelesaian sengketa, dan inovasi layanan PPID",
       },
     ],
   },
   {
-    title: "Pengaduan",
-    items: [
-      {
-        title: "Pengaduan Masyarakat",
-        href: "/pengaduan",
-        description:
-          "Sampaikan pengaduan layanan maupun laporan dugaan pelanggaran (WBS) — identitas pelapor dijaga kerahasiaannya",
-      },
-      {
-        title: "Kritik & Saran",
-        href: "/hubungi-kami/kritik-saran",
-        description: "Kritik dan saran untuk peningkatan layanan",
-      },
-    ],
+    // Menu Pengaduan & WBS disatukan atas permintaan user: dua kanal ini isinya
+    // sama dan menuju endpoint yang sama (/api/pengaduan), jadi cukup satu menu
+    // langsung (tanpa dropdown) ke halaman WBS. Halaman /pengaduan lama
+    // di-redirect ke sini agar tautan lama tidak mati.
+    title: "WBS",
+    href: "/wbs/tentang-wbs",
   },
   {
-    // Tanpa dropdown — langsung ke halaman info kontak (alamat, jam kerja,
-    // peta, tombol pengaduan).
-    title: "Hubungi Kami",
-    href: "/hubungi-kami",
+    // Tanpa dropdown — mendarat di halaman internal kita dulu (bukan langsung
+    // melempar ke skm.go.id). Halaman itu menyematkan formulir SKM resmi lewat
+    // iframe + tombol untuk membukanya penuh di tab baru. Lihat
+    // app/survei-kepuasan/page.tsx.
+    title: "Survei Kepuasan Masyarakat",
+    href: "/survei-kepuasan",
   },
+  // "Hubungi Kami" dihapus dari navbar atas permintaan user — informasi kontak
+  // (alamat, email, jam layanan) sudah tersedia permanen di footer. Halaman
+  // /hubungi-kami tetap ada dan dapat diakses lewat tautan footer.
 ];

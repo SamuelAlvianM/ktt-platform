@@ -183,12 +183,16 @@ export const STATIC_BLOCKS: StaticBlock[] = [
       },
     ],
     defaults: {
+      // mode 'bagan' = bagan manual; ganti ke 'gambar' + isi `gambar` lewat editor
+      // untuk menampilkan satu gambar bagan. `tingkat` menentukan warna kotak
+      // (pimpinan padat, kabid tint, staf outline).
+      mode: "bagan",
       organisasi: [
-        { jabatan: "Kepala Dinas", nama: "-", parent: "" },
-        { jabatan: "Sekretaris", nama: "-", parent: "Kepala Dinas" },
-        { jabatan: "Bidang Pelayanan Pendaftaran Penduduk", nama: "-", parent: "Kepala Dinas" },
-        { jabatan: "Bidang Pelayanan Pencatatan Sipil", nama: "-", parent: "Kepala Dinas" },
-        { jabatan: "Bidang Pengelolaan Informasi Administrasi Kependudukan", nama: "-", parent: "Kepala Dinas" },
+        { jabatan: "Kepala Dinas", nama: "-", parent: "", tingkat: "pimpinan" },
+        { jabatan: "Sekretaris", nama: "-", parent: "Kepala Dinas", tingkat: "kabid" },
+        { jabatan: "Bidang Pelayanan Pendaftaran Penduduk", nama: "-", parent: "Kepala Dinas", tingkat: "kabid" },
+        { jabatan: "Bidang Pelayanan Pencatatan Sipil", nama: "-", parent: "Kepala Dinas", tingkat: "kabid" },
+        { jabatan: "Bidang Pengelolaan Informasi Administrasi Kependudukan", nama: "-", parent: "Kepala Dinas", tingkat: "kabid" },
       ],
     },
   },

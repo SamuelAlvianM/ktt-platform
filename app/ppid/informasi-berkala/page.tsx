@@ -1,5 +1,6 @@
 import { PpidInformasiIndex } from '@/components/ppid/informasi-index';
-import { PPID_BERKALA } from '@/lib/ppid-informasi';
+import { PPID_BERKALA, INFORMASI_PUBLIK_TABS } from '@/lib/ppid-informasi';
+import { PpidSubnav } from '@/components/ppid/ppid-subnav';
 
 export const metadata = {
   title: 'Informasi Wajib Diumumkan Secara Berkala — PPID Disdukcapil Tana Tidung',
@@ -10,5 +11,10 @@ export const metadata = {
 export const dynamic = 'force-dynamic';
 
 export default function InformasiBerkalaPage() {
-  return <PpidInformasiIndex grup={PPID_BERKALA} />;
+  return (
+    <PpidInformasiIndex
+      grup={PPID_BERKALA}
+      subnav={<PpidSubnav items={INFORMASI_PUBLIK_TABS} layoutId="informasi-publik" />}
+    />
+  );
 }

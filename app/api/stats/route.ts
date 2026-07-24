@@ -5,6 +5,7 @@ import {
   normalizeKartu,
   warnaPreset,
 } from "@/lib/beranda-statistik";
+import { DKB_PERIODE_KUNCI } from "@/lib/static-content-registry";
 
 const BULAN_PENDEK = [
   "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
@@ -45,6 +46,7 @@ export async function GET() {
     grouped,
     recent,
     demografiRows,
+    periodeRow,
   ] = await Promise.all([
     prisma.permohonan.count(),
     prisma.permohonan.count({ where: { status: "SELESAI" } }),
@@ -70,6 +72,10 @@ export async function GET() {
         kategori: { in: kategoriSet.length ? kategoriSet : ["__none__"] },
       },
       select: { kategori: true, level: true, data: true },
+    }),
+    prisma.staticContent.findUnique({
+      where: { kunci: DKB_PERIODE_KUNCI },
+      select: { konten: true },
     }),
   ]);
 
@@ -146,6 +152,8 @@ export async function GET() {
     // ── Kependudukan (demografi / DKB) — kartu dinamis sesuai konfigurasi ──
     kartuDemografi,
     periodeKependudukan:
-      process.env.NEXT_PUBLIC_DKB_PERIODE ?? "DKB Semester II 2024",
+      (periodeRow?.konten as { label?: string } | null)?.label ||
+      process.env.NEXT_PUBLIC_DKB_PERIODE ||
+      "DKB Semester II 2024",
   });
 }

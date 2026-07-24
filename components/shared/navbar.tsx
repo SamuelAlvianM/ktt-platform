@@ -23,9 +23,14 @@ import {
   Loader2,
   Landmark,
   ShieldAlert,
+  Gauge,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { navigationItems } from "@/lib/navigation";
+
+/** Menu tanpa dropdown yang href-nya situs luar (mis. portal SKM resmi)
+ *  harus dibuka di tab baru, bukan lewat router Next di tab yang sama. */
+const isExternalHref = (href: string) => /^https?:\/\//.test(href);
 import { useStaticContent } from "@/lib/use-static-content";
 import {
   gabungNavigasi,
@@ -457,12 +462,25 @@ function MobileMenuItem({
   );
 
   if (!items) {
+    const resolvedHref = href ?? `/${title.toLowerCase().replace(/\s+/g, "-")}`;
+    const className =
+      "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.925rem] font-medium text-slate-700 transition-colors hover:bg-[#12395e]/5 hover:text-[#12395e]";
+    if (isExternalHref(resolvedHref)) {
+      return (
+        <a
+          href={resolvedHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={className}
+          onClick={onClose}
+        >
+          <MobileItemIcon icon={Icon} />
+          {title}
+        </a>
+      );
+    }
     return (
-      <Link
-        href={href ?? `/${title.toLowerCase().replace(/\s+/g, "-")}`}
-        className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.925rem] font-medium text-slate-700 transition-colors hover:bg-[#12395e]/5 hover:text-[#12395e]"
-        onClick={onClose}
-      >
+      <Link href={resolvedHref} className={className} onClick={onClose}>
         <MobileItemIcon icon={Icon} />
         {title}
       </Link>
@@ -578,11 +596,13 @@ const navigationIcons: { [key: string]: React.ElementType } = {
   Permohonan: FileText,
   "Pelayanan Online": Building2,
   Pengaduan: ShieldAlert,
+  WBS: ShieldAlert,
   Produk: FileText,
   "Media Informasi": Newspaper,
   Gallery: ImageIcon,
   "Hubungi Kami": Phone,
   PPID: Landmark,
+  "Survei Kepuasan Masyarakat": Gauge,
 };
 
 // navigationItems dipindah ke lib/navigation.ts (dipakai juga oleh dashboard Konten).
@@ -874,19 +894,31 @@ export function Navbar() {
               // Menu tanpa dropdown → link langsung (mis. Pelayanan Online).
               if (!item.items?.length && item.href) {
                 const Icon = navigationIcons[item.title];
+                const external = isExternalHref(item.href);
+                const linkClassName = cn(
+                  "relative px-2.5 py-2 text-sm font-medium flex items-center gap-1.5 rounded-md whitespace-nowrap text-white/90",
+                  "transition-all duration-300 ease-out",
+                  "hover:text-[#12395e] hover:bg-white/10",
+                  "before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0.5 before:bg-[#12395e]",
+                  "before:transition-all before:duration-300 before:ease-out",
+                  "hover:before:w-[calc(100%-1.25rem)]",
+                );
+                if (external) {
+                  return (
+                    <a
+                      key={item.title}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={linkClassName}
+                    >
+                      {Icon && <Icon className="h-4 w-4 flex-shrink-0" strokeWidth={2} />}
+                      {item.title}
+                    </a>
+                  );
+                }
                 return (
-                  <Link
-                    key={item.title}
-                    href={item.href}
-                    className={cn(
-                      "relative px-2.5 py-2 text-sm font-medium flex items-center gap-1.5 rounded-md whitespace-nowrap text-white/90",
-                      "transition-all duration-300 ease-out",
-                      "hover:text-[#12395e] hover:bg-white/10",
-                      "before:absolute before:bottom-0 before:left-1/2 before:-translate-x-1/2 before:w-0 before:h-0.5 before:bg-[#12395e]",
-                      "before:transition-all before:duration-300 before:ease-out",
-                      "hover:before:w-[calc(100%-1.25rem)]",
-                    )}
-                  >
+                  <Link key={item.title} href={item.href} className={linkClassName}>
                     {Icon && <Icon className="h-4 w-4 flex-shrink-0" strokeWidth={2} />}
                     {item.title}
                   </Link>

@@ -29,6 +29,7 @@ const HEADER_ICON =
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useInlineEdit } from '@/components/konten/inline-edit';
+import { useStaticContent } from '@/lib/use-static-content';
 import { DemografiMetric } from '@/components/landingpage/demografi-metric';
 // Editor template kartu (judul/ikon/warna) DINONAKTIFKAN sementara — mode edit
 // kini langsung membuka editor data Excel. Buka komentar untuk mengaktifkan lagi.
@@ -379,7 +380,12 @@ const FALLBACK: StatsData = {
 export default function StatsGrid() {
   const [stats, setStats] = useState<StatsData>(FALLBACK);
   const rootRef = useRef<HTMLDivElement>(null);
-  const { editMode } = useInlineEdit();
+  const { editMode, openEditor } = useInlineEdit();
+  // Label periode DKB — utamakan versi CMS (auto-refresh via refreshStaticContent
+  // setelah disimpan), fallback ke nilai dari /api/stats bila belum pernah diubah.
+  const dkbPeriode = useStaticContent(['beranda.dkb-periode'])['beranda.dkb-periode'] as {
+    label?: string;
+  };
 
   // Modal rincian demografi (dibuka saat kartu diklik di mode biasa).
   const [demoCard, setDemoCard] = useState<KartuDemografi | null>(null);
@@ -437,10 +443,22 @@ export default function StatsGrid() {
           </p>
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">Statistik Demografi</h2>
         </div>
-        <span className="flex items-center gap-1.5 text-xs font-semibold text-primary bg-primary/10 border border-primary/20 px-3 py-1.5 rounded-full shrink-0">
-          <CalendarClock className="w-3.5 h-3.5" />
-          {stats.periodeKependudukan}
-        </span>
+        {editMode ? (
+          <button
+            type="button"
+            onClick={() => openEditor('beranda.dkb-periode')}
+            title="Ubah label periode data DKB"
+            className="flex items-center gap-1.5 text-xs font-semibold text-primary bg-primary/10 border border-dashed border-primary/40 px-3 py-1.5 rounded-full shrink-0 hover:bg-primary/20 transition-colors"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+            {dkbPeriode?.label || stats.periodeKependudukan}
+          </button>
+        ) : (
+          <span className="flex items-center gap-1.5 text-xs font-semibold text-primary bg-primary/10 border border-primary/20 px-3 py-1.5 rounded-full shrink-0">
+            <CalendarClock className="w-3.5 h-3.5" />
+            {dkbPeriode?.label || stats.periodeKependudukan}
+          </span>
+        )}
       </div>
 
       {/* Info: mode biasa → klik untuk rincian; mode edit → klik untuk atur kartu. */}

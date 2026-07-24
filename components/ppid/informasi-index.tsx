@@ -18,7 +18,17 @@ import {
  * Daftar kartunya bisa ditambah admin: bila kunci `ppid.kartu.<slug>` sudah
  * pernah disimpan di StaticContent, isinya menggantikan daftar bawaan.
  */
-export async function PpidInformasiIndex({ grup }: { grup: PpidInformasiGrup }) {
+export async function PpidInformasiIndex({
+  grup,
+  subnav,
+  extra,
+}: {
+  grup: PpidInformasiGrup;
+  /** Bar sub-tab (mis. PpidSubnav) — dirender di bawah judul, di atas kartu. */
+  subnav?: React.ReactNode;
+  /** Konten tambahan setelah grid kartu, sebelum footer. */
+  extra?: React.ReactNode;
+}) {
   // Kartu efektif = simpanan admin (bila ada), selain itu bawaan.
   const row = await prisma.staticContent.findUnique({
     where: { kunci: ppidKartuKunci(grup.slug) },
@@ -75,6 +85,8 @@ export async function PpidInformasiIndex({ grup }: { grup: PpidInformasiGrup }) 
           <PpidTambahKartu grupSlug={grup.slug} kartuSaatIni={kartu} />
         ) : undefined
       }
+      subnav={subnav}
+      extra={extra}
     />
   );
 }
