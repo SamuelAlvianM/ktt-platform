@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { useInlineEdit } from '@/components/konten/inline-edit';
 import { useStaticContent } from '@/lib/use-static-content';
 import { getIcon } from '@/lib/icon-map';
+import { ProfilGambar } from '@/components/shared/profil-gambar';
 
 /**
  * Konten tab "Tentang PPID" yang datanya DISATUKAN dengan beranda (seksi Profil
@@ -234,10 +235,18 @@ export function ProfilTerhubung({
         )}
 
         <div className="animate-in fade-in slide-in-from-bottom-2 rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm duration-500 md:p-8">
-          {jenis === 'visi-misi' && <VisiMisiPanel data={data} />}
-          {jenis === 'maklumat' && <MaklumatPanel data={data} />}
-          {jenis === 'tugas' && <TugasPanel data={data} />}
-          {jenis === 'struktur' && <StrukturChart data={data} />}
+          {jenis === 'struktur' ? (
+            <StrukturChart data={data} />
+          ) : data?.mode === 'gambar' && data?.gambar ? (
+            // Mode gambar dipilih admin (toggle) → tampilkan gambar, bukan teks.
+            <ProfilGambar src={String(data.gambar)} alt={LABEL_BERANDA[jenis]} />
+          ) : (
+            <>
+              {jenis === 'visi-misi' && <VisiMisiPanel data={data} />}
+              {jenis === 'maklumat' && <MaklumatPanel data={data} />}
+              {jenis === 'tugas' && <TugasPanel data={data} />}
+            </>
+          )}
         </div>
       </div>
 

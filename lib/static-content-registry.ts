@@ -53,6 +53,13 @@ export interface StaticBlock {
   deskripsi: string;
   fields: StaticField[];
   defaults: Record<string, unknown>;
+  /**
+   * Blok dua-mode: editor menampilkan toggle "Tulis Manual | Gambar".
+   * Mode "gambar" hanya menampilkan field bernama `gambar` (harus ada, type
+   * image); mode "teks" menampilkan sisanya. Nilai mode disimpan di
+   * `konten.mode` ('teks' | 'gambar'). Tampilan publik menghormati mode ini.
+   */
+  modeGambar?: boolean;
 }
 
 export const STATIC_BLOCKS: StaticBlock[] = [
@@ -81,7 +88,14 @@ export const STATIC_BLOCKS: StaticBlock[] = [
     kunci: "profil.visi-misi",
     judul: "Profil — Visi & Misi",
     deskripsi: "Visi dan daftar misi dinas.",
+    modeGambar: true,
     fields: [
+      {
+        name: "gambar",
+        label: "Gambar",
+        type: "image",
+        catatan: "Unggah gambar yang akan ditampilkan sebagai isi tab ini.",
+      },
       { name: "visi", label: "Visi", type: "textarea" },
       { name: "misi", label: "Daftar Misi", type: "list" },
     ],
@@ -121,7 +135,14 @@ export const STATIC_BLOCKS: StaticBlock[] = [
     kunci: "profil.maklumat",
     judul: "Profil — Maklumat Pelayanan",
     deskripsi: "Janji pelayanan (4 kartu) dan pernyataan standar pelayanan.",
+    modeGambar: true,
     fields: [
+      {
+        name: "gambar",
+        label: "Gambar",
+        type: "image",
+        catatan: "Unggah gambar yang akan ditampilkan sebagai isi tab ini.",
+      },
       {
         name: "janji",
         label: "Janji Pelayanan",
@@ -149,7 +170,14 @@ export const STATIC_BLOCKS: StaticBlock[] = [
     kunci: "profil.tugas",
     judul: "Profil — Tugas & Fungsi",
     deskripsi: "Tugas utama dan daftar fungsi dinas.",
+    modeGambar: true,
     fields: [
+      {
+        name: "gambar",
+        label: "Gambar",
+        type: "image",
+        catatan: "Unggah gambar yang akan ditampilkan sebagai isi tab ini.",
+      },
       { name: "utama", label: "Tugas Utama", type: "textarea" },
       { name: "fungsi", label: "Daftar Fungsi", type: "list" },
     ],

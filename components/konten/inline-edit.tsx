@@ -24,7 +24,7 @@ import {
 import { FieldEditor } from '@/components/konten/field-editor';
 import { getStaticBlock } from '@/lib/static-content-registry';
 import { refreshStaticContent } from '@/lib/use-static-content';
-import { Pencil, PencilRuler, Loader2, Check, X } from 'lucide-react';
+import { Pencil, PencilRuler, Loader2, Check, X, Type, Image as ImageIcon } from 'lucide-react';
 
 interface InlineEditCtx {
   /** Mode edit sedang aktif (hanya admin, di halaman publik). */
@@ -188,6 +188,18 @@ function BlockEditorDialog({
 
   if (!block) return null;
 
+  // Blok dua-mode (Tulis Manual / Gambar): mode disimpan di draft.mode.
+  const mode: 'teks' | 'gambar' = draft.mode === 'gambar' ? 'gambar' : 'teks';
+  const setMode = (m: 'teks' | 'gambar') => setDraft((d) => ({ ...d, mode: m }));
+  // Field yang ditampilkan mengikuti mode: mode gambar → hanya field `gambar`;
+  // mode teks → semua kecuali `gambar`. Nilai field yang disembunyikan tetap
+  // ada di draft (tak terhapus), jadi berganti mode tak menghilangkan data.
+  const visibleFields = !block.modeGambar
+    ? block.fields
+    : mode === 'gambar'
+      ? block.fields.filter((f) => f.name === 'gambar')
+      : block.fields.filter((f) => f.name !== 'gambar');
+
   const save = async () => {
     setSaving(true);
     const res = await fetch('/api/admin/static-content', {
@@ -220,7 +232,37 @@ function BlockEditorDialog({
           </div>
         ) : (
           <div className="space-y-5">
-            {block.fields.map((field) => (
+            {block.modeGambar && (
+              <div className="flex justify-center">
+                <div className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1">
+                  <button
+                    type="button"
+                    onClick={() => setMode('teks')}
+                    className={cn(
+                      'inline-flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-sm font-medium transition-colors',
+                      mode === 'teks'
+                        ? 'bg-white text-primary shadow-sm'
+                        : 'text-slate-500 hover:text-slate-700',
+                    )}
+                  >
+                    <Type className="h-4 w-4" /> Tulis Manual
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMode('gambar')}
+                    className={cn(
+                      'inline-flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-sm font-medium transition-colors',
+                      mode === 'gambar'
+                        ? 'bg-white text-primary shadow-sm'
+                        : 'text-slate-500 hover:text-slate-700',
+                    )}
+                  >
+                    <ImageIcon className="h-4 w-4" /> Gambar
+                  </button>
+                </div>
+              </div>
+            )}
+            {visibleFields.map((field) => (
               <FieldEditor
                 key={field.name}
                 field={field}

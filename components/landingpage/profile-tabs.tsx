@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import { useStaticContent } from '@/lib/use-static-content';
 import { useInlineEdit } from '@/components/konten/inline-edit';
 import { getIcon } from '@/lib/icon-map';
+import { ProfilGambar } from '@/components/shared/profil-gambar';
 
 // react-organizational-chart menyentuh `document` saat import → hanya di client.
 const StrukturChart = dynamic(
@@ -64,6 +65,12 @@ const TABS: TabConfig[] = [
 // StaticContent seperti 5 tab lain (StaticField belum punya tipe gambar
 // tunggal di luar list "items"). Ganti berkasnya langsung di public/ppid/
 // bila ada foto/infografis resmi baru dari dinas.
+// Tab teks yang punya toggle "Tulis Manual | Gambar" di editornya: bila admin
+// memilih mode gambar (konten.mode === 'gambar') dan mengunggah gambar, tab
+// menampilkan gambar itu menggantikan teksnya.
+// (Struktur punya mekanisme mode gambarnya sendiri lewat StrukturChart.)
+const GAMBAR_OVERRIDE_TABS = new Set(['visi-misi', 'maklumat', 'tugas']);
+
 const TAB_GAMBAR: Record<string, { src: string; width: number; height: number; alt: string }> = {
   'profil-pejabat': {
     src: '/ppid/profil-pejabat-kepala-dinas-v2.jpg',
@@ -496,13 +503,21 @@ export default function ProfileTabs() {
 
                 {/* Panel content */}
                 <div className="min-h-[260px]">
-                  {activeTab === 'visi-misi'  && <VisiMisiPanel  data={activeContent} />}
-                  {activeTab === 'motto'       && <MottoPanel     data={activeContent} />}
-                  {activeTab === 'maklumat'    && <MaklumatPanel  data={activeContent} />}
-                  {activeTab === 'tugas'       && <TugasPanel     data={activeContent} />}
-                  {activeTab === 'struktur'    && <StrukturPanel  data={activeContent} />}
-                  {activeTab === 'profil-pejabat' && <GambarPanel tabId={activeTab} />}
-                  {activeTab === 'sejarah'        && <GambarPanel tabId={activeTab} />}
+                  {GAMBAR_OVERRIDE_TABS.has(activeTab) &&
+                  activeContent?.mode === 'gambar' &&
+                  activeContent?.gambar ? (
+                    <ProfilGambar src={activeContent.gambar} alt={activeTabConfig.label} />
+                  ) : (
+                    <>
+                      {activeTab === 'visi-misi'  && <VisiMisiPanel  data={activeContent} />}
+                      {activeTab === 'motto'       && <MottoPanel     data={activeContent} />}
+                      {activeTab === 'maklumat'    && <MaklumatPanel  data={activeContent} />}
+                      {activeTab === 'tugas'       && <TugasPanel     data={activeContent} />}
+                      {activeTab === 'struktur'    && <StrukturPanel  data={activeContent} />}
+                      {activeTab === 'profil-pejabat' && <GambarPanel tabId={activeTab} />}
+                      {activeTab === 'sejarah'        && <GambarPanel tabId={activeTab} />}
+                    </>
+                  )}
                 </div>
               </div>
             </motion.div>

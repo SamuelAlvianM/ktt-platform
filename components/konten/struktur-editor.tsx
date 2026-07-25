@@ -435,10 +435,8 @@ export function StrukturEditor({
               ) : (
                 <div className="flex flex-1 items-center gap-2 text-sm text-slate-400">
                   <CornerLeftUp className="h-4 w-4" />
-                  Pilih kotak di bagan untuk mengedit, atau
-                  <Button variant="outline" size="sm" onClick={() => addChild(null)}>
-                    <Plus className="h-4 w-4 mr-1.5" /> Jabatan Puncak
-                  </Button>
+                  Pilih kotak di bagan untuk mengedit, atau tombol
+                  <Plus className="inline h-3.5 w-3.5" /> pada kotak untuk menambah bawahan.
                 </div>
               )}
             </div>
