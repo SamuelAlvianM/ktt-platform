@@ -13,6 +13,7 @@ import {
 } from "@/lib/info-content";
 import type { InfoPageContent } from "@/components/shared/info-page";
 import { KARTU_STATISTIK_KUNCI, DEFAULT_KARTU } from "@/lib/beranda-statistik";
+import { SYARAT_LAYANAN } from "@/lib/syarat-layanan";
 import { PPID_INFORMASI_GRUP } from "@/lib/ppid-informasi";
 
 export type StaticFieldType =
@@ -418,6 +419,109 @@ STATIC_BLOCKS.push({
       "Anda dilarang menggunakan layanan dalam aplikasi untuk hal-hal yang dilarang oleh hukum dan peraturan perundang-undangan yang berlaku.",
     ],
   },
+});
+
+// ───────────────────────────────────────────────────────────────────────────
+// Syarat & Ketentuan — dibuat menyeluruh untuk seluruh fungsi & kegiatan portal.
+// Editable via /syarat.
+// ───────────────────────────────────────────────────────────────────────────
+STATIC_BLOCKS.push({
+  kunci: "info.syarat-ketentuan",
+  judul: "Halaman — Syarat & Ketentuan",
+  deskripsi:
+    "Syarat & ketentuan penggunaan portal SIDAKO (halaman /syarat). Tiap bagian berupa daftar poin yang bisa diedit.",
+  fields: [
+    { name: "intro", label: "Kalimat Pembuka", type: "textarea" },
+    { name: "pembaruan", label: "Label Terakhir Diperbarui", type: "text" },
+    { name: "umum", label: "Ketentuan Umum (per poin)", type: "list" },
+    { name: "akun", label: "Pendaftaran & Akun Pengguna (per poin)", type: "list" },
+    { name: "layanan", label: "Layanan Permohonan Online (per poin)", type: "list" },
+    { name: "kewajiban", label: "Kewajiban & Tanggung Jawab Pemohon (per poin)", type: "list" },
+    { name: "verifikasi", label: "Verifikasi, Pemrosesan & Jam Pelayanan (per poin)", type: "list" },
+    { name: "dokumen", label: "Penerbitan & Pengambilan Dokumen (per poin)", type: "list" },
+    { name: "larangan", label: "Larangan Penggunaan (per poin)", type: "list" },
+    { name: "penutup", label: "Ketentuan Penutup (per poin)", type: "list" },
+    {
+      name: "image",
+      label: "Gambar/Infografis (opsional)",
+      type: "image",
+      catatan:
+        "Opsional. Bila diisi, gambar tampil di atas isi (mis. infografis alur permohonan).",
+    },
+  ],
+  defaults: {
+    intro:
+      "Selamat datang di SIDAKO — portal layanan administrasi kependudukan dan pencatatan sipil Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung. Dengan mendaftar dan/atau menggunakan layanan pada portal ini, Anda dianggap telah membaca, memahami, dan menyetujui seluruh Syarat & Ketentuan berikut.",
+    pembaruan: "Terakhir diperbarui: Juli 2026",
+    umum: [
+      "SIDAKO adalah portal layanan administrasi kependudukan berbasis daring milik Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung, sebagai peralihan dari layanan tatap muka di kantor.",
+      "Seluruh layanan pada portal ini tidak dipungut biaya (gratis). Biaya koneksi internet untuk mengakses layanan sepenuhnya menjadi tanggung jawab pemohon.",
+      "Portal ini merupakan alat bantu pencatatan proses permohonan; penerbitan dokumen tetap tunduk pada verifikasi dan ketentuan Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung.",
+      "Beberapa layanan mensyaratkan akses kamera dan media penyimpanan perangkat untuk pengambilan foto serta pengunggahan berkas verifikasi.",
+      "Dinas berupaya menjaga kebenaran dan kekinian informasi pada portal, namun tidak menjamin secara mutlak kelengkapan, akurasi, keandalan, keamanan, maupun ketersediaan seluruh fitur setiap saat.",
+      "Dengan menggunakan portal ini, Anda juga menyetujui Kebijakan Privasi yang berlaku dan dapat diperbarui sewaktu-waktu.",
+    ],
+    akun: [
+      "Untuk mengajukan permohonan, Anda wajib memiliki akun dengan mendaftar dan mengisi data pribadi (nama, NIK, alamat, nomor telepon, surel, dan data lain) sesuai dokumen resmi.",
+      "Saat pendaftaran, Anda wajib mengambil swafoto (foto wajah) secara langsung untuk dicocokkan dengan KTP-elektronik sebagai bagian verifikasi identitas; foto tersebut menjadi foto profil akun Anda.",
+      "Anda menjamin bahwa seluruh data dan dokumen yang diberikan benar, akurat, terbaru, dan menjadi hak Anda, serta bersedia menunjukkan bukti identitas apabila diminta.",
+      "Satu akun digunakan oleh satu orang. Anda bertanggung jawab menjaga kerahasiaan kata sandi dan seluruh aktivitas yang terjadi pada akun Anda.",
+      "Setiap permohonan yang diajukan melalui akun Anda dianggap sah dan berasal dari Anda, kecuali Anda melaporkan kehilangan kendali atas akun sebelum layanan diproses.",
+      "Anda wajib segera memberitahu Dinas apabila mengetahui adanya penggunaan akun tanpa izin.",
+    ],
+    layanan: [
+      "Portal menyediakan permohonan dokumen kependudukan dan pencatatan sipil, antara lain: akta kelahiran, akta kematian, akta perkawinan, akta perceraian, Kartu Keluarga (KK), KTP-elektronik, Kartu Identitas Anak (KIA), surat pindah/datang (SKPWNI), serta layanan kependudukan lain yang tersedia.",
+      "Setiap jenis permohonan mewajibkan pemohon melengkapi persyaratan dan mengunggah berkas pendukung yang sah, jelas, dan terbaca sesuai ketentuan masing-masing layanan.",
+      "Data pada formulir permohonan harus sesuai dengan dokumen resmi; ketidaksesuaian dapat menyebabkan permohonan ditolak atau dikembalikan untuk diperbaiki.",
+      "Satu permohonan diajukan untuk satu peristiwa atau satu subjek sesuai jenis layanan yang dipilih.",
+      "Pengajuan permohonan hanya dapat dilakukan pada jam pelayanan aktif yang ditetapkan Dinas; di luar jam tersebut formulir permohonan dinonaktifkan sementara.",
+    ],
+    kewajiban: [
+      "Memberikan data dan dokumen yang benar; permohonan dengan data atau dokumen palsu maupun menyesatkan dapat dibatalkan sepihak dan/atau diproses sesuai hukum yang berlaku.",
+      "Mengunggah berkas milik sendiri atau yang Anda berhak menggunakannya, tanpa melanggar hak pihak lain.",
+      "Menjaga kerahasiaan akun dan tidak mengalihkan akun kepada pihak lain.",
+      "Tidak menyalahgunakan layanan untuk tujuan penipuan, komersial tanpa izin, atau perbuatan melawan hukum.",
+      "Bertanggung jawab penuh atas seluruh permohonan dan unggahan yang dilakukan melalui akun Anda.",
+    ],
+    verifikasi: [
+      "Dinas berhak memverifikasi ulang seluruh data dan berkas pemohon sebelum dokumen diterbitkan.",
+      "Dinas berhak menerima, menunda, meminta perbaikan, atau menolak permohonan disertai alasan, sesuai ketentuan dan standar pelayanan yang berlaku.",
+      "Waktu pemrosesan mengikuti Standar Operasional Prosedur (SOP) dan Standar Pelayanan masing-masing layanan; estimasi waktu bukan jaminan mutlak dan dipengaruhi kelengkapan berkas serta antrean.",
+      "Permohonan hanya diproses atas berkas yang lengkap dan memenuhi syarat.",
+      "Pengajuan hanya dilayani pada hari dan jam pelayanan aktif; permohonan di luar jam aktif dapat diajukan kembali pada jam pelayanan berikutnya.",
+    ],
+    dokumen: [
+      "Dokumen yang telah selesai dapat berupa dokumen digital bertanda tangan elektronik (TTE) yang sah sesuai peraturan perundang-undangan.",
+      "Pemohon memperoleh notifikasi status permohonan (diproses, perlu perbaikan, disetujui, atau ditolak) melalui portal.",
+      "Dokumen digital dapat diunduh melalui akun pemohon; pengambilan dokumen fisik (bila ada) mengikuti ketentuan Dinas.",
+      "Kehilangan atau kerusakan dokumen dapat diajukan penerbitan ulang sesuai prosedur yang berlaku.",
+    ],
+    larangan: [
+      "Mengunggah konten bermuatan SARA, pornografi, kebencian, atau yang melanggar hak kekayaan intelektual pihak lain.",
+      "Menggunakan portal untuk penipuan, pemalsuan dokumen atau identitas, maupun tindakan melawan hukum lainnya.",
+      "Merusak, menyalahgunakan, mengubah, atau mengganggu keamanan dan kinerja sistem portal.",
+      "Melecehkan, mengancam, atau membuat ketidaknyamanan terhadap petugas maupun pengguna lain.",
+      "Dinas berhak menghapus unggahan, menonaktifkan, atau memblokir akun yang melanggar ketentuan ini.",
+    ],
+    penutup: [
+      "Dinas dapat mengubah, memperbarui, atau menyesuaikan Syarat & Ketentuan ini sewaktu-waktu; perubahan berlaku sejak dipublikasikan pada portal.",
+      "Syarat & Ketentuan ini merupakan satu kesatuan dengan Kebijakan Privasi yang berlaku.",
+      "Segala hal yang timbul dari penggunaan portal tunduk pada hukum Negara Republik Indonesia.",
+      "Untuk pertanyaan atau bantuan, silakan hubungi Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung melalui kanal resmi yang tersedia pada portal.",
+    ],
+    image: "",
+  },
+});
+
+// Persyaratan & penjelasan per-layanan (tab yang bisa dicari di atas S&K umum).
+// Default = lib/syarat-layanan.ts (berbasis peraturan nasional, branding-netral).
+STATIC_BLOCKS.push({
+  kunci: "info.syarat-layanan",
+  judul: "Halaman — Persyaratan per Layanan (Syarat & Ketentuan)",
+  deskripsi:
+    "Daftar persyaratan & penjelasan tiap layanan permohonan yang tampil sebagai tab bisa dicari di halaman /syarat.",
+  fields: [{ name: "layanan", label: "Daftar Layanan", type: "items" }],
+  defaults: { layanan: SYARAT_LAYANAN },
 });
 
 // ───────────────────────────────────────────────────────────────────────────
