@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -18,7 +18,8 @@ import {
 export function PengaturanPelayanan() {
   const [hidden, setHidden] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [statusSimpan, setStatusSimpan] = useState<'idle' | 'menyimpan' | 'tersimpan'>('idle');
+  const terakhirDisimpan = useRef<string>('');
 
   useEffect(() => {
     fetch('/api/admin/pelayanan-visibilitas')
@@ -26,10 +27,42 @@ export function PengaturanPelayanan() {
       .then((j) => {
         const h = j.data?.hidden;
         if (Array.isArray(h)) setHidden(new Set(h));
+        terakhirDisimpan.current = JSON.stringify(
+          (Array.isArray(h) ? [...h] : []).sort(),
+        );
       })
       .catch(() => toast.error('Gagal memuat pengaturan'))
       .finally(() => setLoading(false));
   }, []);
+
+  // Autosave: simpan otomatis 700ms setelah perubahan berhenti.
+  useEffect(() => {
+    if (loading) return;
+    const kini = JSON.stringify([...hidden].sort());
+    if (kini === terakhirDisimpan.current) return;
+    setStatusSimpan('menyimpan');
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch('/api/admin/pelayanan-visibilitas', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ hidden: [...hidden] }),
+        });
+        const j = await res.json();
+        if (j.error?.length) {
+          toast.error(j.error[0]);
+          setStatusSimpan('idle');
+          return;
+        }
+        terakhirDisimpan.current = kini;
+        setStatusSimpan('tersimpan');
+      } catch {
+        toast.error('Gagal menyimpan pengaturan');
+        setStatusSimpan('idle');
+      }
+    }, 700);
+    return () => clearTimeout(t);
+  }, [hidden, loading]);
 
   const grouped = useMemo(() => {
     const g: Record<string, typeof PELAYANAN_LIST> = {};
@@ -52,27 +85,6 @@ export function PengaturanPelayanan() {
 
   const setAll = (show: boolean) => {
     setHidden(show ? new Set() : new Set(PELAYANAN_LIST.map((p) => p.modalType)));
-  };
-
-  const save = async () => {
-    setSaving(true);
-    try {
-      const res = await fetch('/api/admin/pelayanan-visibilitas', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hidden: [...hidden] }),
-      });
-      const j = await res.json();
-      if (j.error?.length) {
-        toast.error(j.error[0]);
-        return;
-      }
-      toast.success('Pengaturan pelayanan disimpan');
-    } catch {
-      toast.error('Gagal menyimpan pengaturan');
-    } finally {
-      setSaving(false);
-    }
   };
 
   if (loading) {
@@ -141,11 +153,18 @@ export function PengaturanPelayanan() {
         ))}
       </div>
 
-      <div className="flex justify-end">
-        <Button onClick={save} disabled={saving} className="gap-1.5">
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-          Simpan Pengaturan
-        </Button>
+      <div className="flex items-center justify-end gap-1.5 text-xs text-slate-400">
+        {statusSimpan === 'menyimpan' ? (
+          <>
+            <Loader2 className="h-3.5 w-3.5 animate-spin" /> Menyimpan…
+          </>
+        ) : statusSimpan === 'tersimpan' ? (
+          <>
+            <Check className="h-3.5 w-3.5 text-success" /> Perubahan tersimpan otomatis
+          </>
+        ) : (
+          <>Perubahan tersimpan otomatis</>
+        )}
       </div>
     </div>
   );

@@ -1,9 +1,10 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
 import { verifyRecaptcha } from "@/lib/recaptcha";
 import { createSession } from "@/lib/auth";
+import { pesanLoginStatus } from "@/lib/akun-status";
 
 /**
  * Login — port dari LoginController (Laravel data-2).
@@ -33,7 +34,25 @@ export async function POST(req: NextRequest) {
 
     if (!user) return fail(["Info: NIK/Username belum terdaftar (L-02)"]);
     if (user.status !== 1) {
-      return fail(["Info: Akun belum aktif. Silakan aktivasi terlebih dahulu (L-03)"]);
+      // Pesan sesuai status (menunggu/ditolak/nonaktif) supaya warga tahu
+      // langkah berikutnya — cek status pendaftaran / hubungi staff.
+      // `data` membawa petunjuk agar halaman login memunculkan tombol menonjol
+      // ke "Cek Status Pendaftaran" (khusus warga, karena berbasis NIK) beserta
+      // NIK-nya, supaya warga tidak bingung menghadapi pesan gagal login.
+      const warga = user.userlevelId === 3;
+      return NextResponse.json(
+        {
+          error: [`Info: ${pesanLoginStatus(user.status)} (L-03)`],
+          success: [],
+          data: {
+            cekStatus: warga,
+            status: user.status,
+            nik: warga ? user.userId : null,
+          },
+          html: [],
+        },
+        { status: 400 },
+      );
     }
 
     const valid = await bcrypt.compare(password, user.password);

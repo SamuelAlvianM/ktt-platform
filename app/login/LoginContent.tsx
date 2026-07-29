@@ -10,10 +10,11 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertCircle, Eye, EyeOff, CheckCircle2, UserPlus, KeyRound, ArrowRight } from 'lucide-react';
+import { Loader2, AlertCircle, Eye, EyeOff, CheckCircle2, UserPlus, KeyRound, ArrowRight, Search } from 'lucide-react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { STATUS_AKUN } from '@/lib/akun-status';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -33,6 +34,9 @@ export default function LoginPage() {
 
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [recaptchaReady, setRecaptchaReady] = useState(!recaptchaEnabled);
+  // Petunjuk "Cek Status" saat login gagal karena status akun (menunggu/ditolak/
+  // nonaktif). Disetel dari `data` respons login supaya warga langsung diarahkan.
+  const [cekStatusHint, setCekStatusHint] = useState<{ status: number; nik: string } | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -77,6 +81,8 @@ export default function LoginPage() {
     if (validationErrors.length > 0) {
       setValidationErrors([]);
     }
+    // Identitas berganti → petunjuk status akun sebelumnya tak lagi relevan.
+    if (cekStatusHint) setCekStatusHint(null);
   };
 
   const validateForm = () => {
@@ -100,6 +106,7 @@ export default function LoginPage() {
     if (!validateForm()) {
       return;
     }
+    setCekStatusHint(null);
 
     if (recaptchaEnabled && !executeRecaptcha) {
       setValidationErrors(['reCAPTCHA belum siap. Silakan refresh halaman.']);
@@ -122,6 +129,11 @@ export default function LoginPage() {
     } catch (err: any) {
       const msg = err?.error?.[0] ?? 'Login gagal. Periksa NIK & password Anda.';
       toast.error(msg);
+      // Login gagal karena status akun (menunggu/ditolak/nonaktif) → tampilkan
+      // ajakan menonjol ke halaman Cek Status agar warga tahu langkah lanjut.
+      if (err?.data?.cekStatus) {
+        setCekStatusHint({ status: err.data.status, nik: err.data.nik ?? '' });
+      }
       console.error('Login error:', err);
     }
   };
@@ -210,6 +222,40 @@ export default function LoginPage() {
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
+            )}
+
+            {/* Ajakan menonjol ke Cek Status — muncul saat login gagal karena
+                status akun belum aktif (menunggu/ditolak/nonaktif). */}
+            {cekStatusHint && (
+              <div className="animate-in fade-in slide-in-from-top-2 duration-300 space-y-2.5 rounded-xl border-2 border-primary/40 bg-primary/5 p-4">
+                <div className="flex items-start gap-2.5">
+                  <Search className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-primary">
+                      {cekStatusHint.status === STATUS_AKUN.DITOLAK
+                        ? 'Pendaftaran Anda ditolak'
+                        : cekStatusHint.status === STATUS_AKUN.NONAKTIF
+                          ? 'Akun Anda dinonaktifkan'
+                          : 'Pendaftaran Anda masih diproses'}
+                    </p>
+                    <p className="mt-0.5 text-xs leading-relaxed text-slate-600">
+                      {cekStatusHint.status === STATUS_AKUN.DITOLAK
+                        ? 'Buka Cek Status untuk melihat alasannya, lalu perbaiki data dan ajukan ulang.'
+                        : cekStatusHint.status === STATUS_AKUN.NONAKTIF
+                          ? 'Buka Cek Status untuk melihat keterangannya. Hubungi Staff Disdukcapil untuk mengaktifkan kembali.'
+                          : 'Pendaftaran Anda sedang menunggu verifikasi petugas. Pantau statusnya di halaman Cek Status.'}
+                    </p>
+                  </div>
+                </div>
+                <a
+                  href={`/cek-status${cekStatusHint.nik ? `?nik=${cekStatusHint.nik}` : ''}`}
+                  className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+                >
+                  <Search className="h-4 w-4" />
+                  Cek Status Pendaftaran
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+              </div>
             )}
 
             {/* NIK/User ID Input */}
@@ -356,6 +402,17 @@ export default function LoginPage() {
               >
                 <KeyRound className="h-4 w-4" />
                 LUPA PASSWORD
+              </a>
+            </div>
+
+            {/* Cek status pendaftaran (staging) — untuk warga yg sudah mendaftar. */}
+            <div className="flex items-center justify-center">
+              <a
+                href="/cek-status"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white/70 px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-primary/40 hover:text-primary dark:border-slate-700 dark:bg-slate-900/60"
+              >
+                <Search className="h-3.5 w-3.5" />
+                Cek Status Pendaftaran (Akun Baru)
               </a>
             </div>
 

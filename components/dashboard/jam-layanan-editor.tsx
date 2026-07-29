@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { TimePicker } from '@/components/ui/time-picker';
@@ -56,7 +56,9 @@ function Toggle({
 export function JamLayananEditor() {
   const [cfg, setCfg] = useState<JamLayananConfig>(defaultJamLayanan());
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  // Autosave: status kecil pengganti tombol Simpan.
+  const [statusSimpan, setStatusSimpan] = useState<'idle' | 'menyimpan' | 'tersimpan'>('idle');
+  const terakhirDisimpan = useRef<string>('');
 
   // Bulk apply: hari-hari terpilih + jam yang akan diterapkan sekaligus.
   const [bulkDays, setBulkDays] = useState<Set<number>>(new Set());
@@ -69,11 +71,46 @@ export function JamLayananEditor() {
     fetch('/api/admin/jam-layanan')
       .then((r) => r.json())
       .then((j) => {
-        if (j.data) setCfg(j.data as JamLayananConfig);
+        if (j.data) {
+          setCfg(j.data as JamLayananConfig);
+          terakhirDisimpan.current = JSON.stringify(j.data);
+        }
       })
       .catch(() => toast.error('Gagal memuat jam layanan'))
       .finally(() => setLoading(false));
   }, []);
+
+  // Autosave: simpan otomatis 800ms setelah perubahan berhenti — tak perlu
+  // tombol Simpan. Jam tak valid (mulai ≥ selesai) ditahan sampai dibetulkan.
+  useEffect(() => {
+    if (loading) return;
+    const kini = JSON.stringify(cfg);
+    if (kini === terakhirDisimpan.current) return;
+    const jamTakValid = cfg.enabled && cfg.days.some((d) => d.buka && d.mulai >= d.selesai);
+    if (jamTakValid) return;
+    setStatusSimpan('menyimpan');
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch('/api/admin/jam-layanan', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(cfg),
+        });
+        const j = await res.json();
+        if (j.error?.length) {
+          toast.error(j.error[0]);
+          setStatusSimpan('idle');
+          return;
+        }
+        terakhirDisimpan.current = kini;
+        setStatusSimpan('tersimpan');
+      } catch {
+        toast.error('Gagal menyimpan jam layanan');
+        setStatusSimpan('idle');
+      }
+    }, 800);
+    return () => clearTimeout(t);
+  }, [cfg, loading]);
 
   const setDay = (idx: number, patch: Partial<JamLayananConfig['days'][number]>) =>
     setCfg((c) => ({
@@ -112,33 +149,6 @@ export function JamLayananEditor() {
         : [...c.holidays, newHoliday].sort(),
     }));
     setNewHoliday('');
-  };
-
-  const save = async () => {
-    for (const [i, d] of cfg.days.entries()) {
-      if (d.buka && d.mulai >= d.selesai) {
-        toast.error(`Jam ${HARI_LABEL[i]} tidak valid: mulai harus sebelum selesai`);
-        return;
-      }
-    }
-    setSaving(true);
-    try {
-      const res = await fetch('/api/admin/jam-layanan', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(cfg),
-      });
-      const j = await res.json();
-      if (j.error?.length) {
-        toast.error(j.error[0]);
-        return;
-      }
-      toast.success('Jam layanan disimpan');
-    } catch {
-      toast.error('Gagal menyimpan jam layanan');
-    } finally {
-      setSaving(false);
-    }
   };
 
   if (loading) {
@@ -189,13 +199,13 @@ export function JamLayananEditor() {
                     <TimePicker
                       value={d.mulai}
                       onChange={(v) => setDay(idx, { mulai: v })}
-                      className="h-8 w-[92px]"
+                      className="w-[104px]"
                     />
                     <span className="text-xs text-slate-400">s/d</span>
                     <TimePicker
                       value={d.selesai}
                       onChange={(v) => setDay(idx, { selesai: v })}
-                      className="h-8 w-[92px]"
+                      className="w-[104px]"
                     />
                   </div>
                 ) : (
@@ -229,9 +239,9 @@ export function JamLayananEditor() {
             ))}
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <TimePicker value={bulkMulai} onChange={setBulkMulai} className="h-8 w-[92px]" />
+            <TimePicker value={bulkMulai} onChange={setBulkMulai} className="w-[104px]" />
             <span className="text-xs text-slate-400">s/d</span>
-            <TimePicker value={bulkSelesai} onChange={setBulkSelesai} className="h-8 w-[92px]" />
+            <TimePicker value={bulkSelesai} onChange={setBulkSelesai} className="w-[104px]" />
             <Button type="button" variant="outline" size="sm" onClick={applyBulk}>
               Terapkan
             </Button>
@@ -284,11 +294,18 @@ export function JamLayananEditor() {
         </div>
       </div>
 
-      <div className="flex justify-end">
-        <Button onClick={save} disabled={saving} className="gap-1.5">
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-          Simpan Jam Layanan
-        </Button>
+      <div className="flex items-center justify-end gap-1.5 text-xs text-slate-400">
+        {statusSimpan === 'menyimpan' ? (
+          <>
+            <Loader2 className="h-3.5 w-3.5 animate-spin" /> Menyimpan…
+          </>
+        ) : statusSimpan === 'tersimpan' ? (
+          <>
+            <Check className="h-3.5 w-3.5 text-success" /> Perubahan tersimpan otomatis
+          </>
+        ) : (
+          <>Perubahan tersimpan otomatis</>
+        )}
       </div>
     </div>
   );

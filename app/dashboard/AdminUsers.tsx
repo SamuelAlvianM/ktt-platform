@@ -15,6 +15,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import {
   Loader2,
   Search,
@@ -28,6 +30,7 @@ import {
   Camera,
   MapPin,
   ChevronRight,
+  ChevronDown,
   Trash2,
   AlertTriangle,
 } from 'lucide-react';
@@ -35,6 +38,8 @@ import { toast } from 'sonner';
 import { CameraCapture } from '@/components/shared/camera-capture';
 import { SearchSelect } from '@/components/shared/search-select';
 import { useMediaQuery } from '@/lib/use-media-query';
+import { STATUS_AKUN, infoStatus } from '@/lib/akun-status';
+import { KOLOM_TOLAK, uraikanAlasanTolak, labelKolom } from '@/lib/akun-tolak';
 
 const EMPTY_FORM = {
   nama: '',
@@ -113,6 +118,55 @@ const STATUS_PERMOHONAN: Record<string, string> = {
   DITOLAK: 'bg-rose-50 text-rose-700 ring-rose-100',
 };
 
+/**
+ * Dropdown multi-pilih bagian data yang "tidak sesuai" saat menolak. Warga
+ * melihat daftar ini di Cek Status & diminta memperbaikinya saat daftar ulang.
+ */
+function PilihKolomTolak({
+  nilai,
+  onChange,
+}: {
+  nilai: string[];
+  onChange: (v: string[]) => void;
+}) {
+  const [buka, setBuka] = useState(false);
+  const toggle = (key: string) =>
+    onChange(nilai.includes(key) ? nilai.filter((k) => k !== key) : [...nilai, key]);
+  const terpilih = KOLOM_TOLAK.filter((k) => nilai.includes(k.key)).map((k) => k.label);
+
+  return (
+    <Popover open={buka} onOpenChange={setBuka}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="flex w-full items-center justify-between gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-left text-sm hover:border-primary/40"
+        >
+          <span className={terpilih.length === 0 ? 'text-slate-400' : 'text-slate-700'}>
+            {terpilih.length === 0 ? 'Pilih bagian yang tidak sesuai…' : terpilih.join(', ')}
+          </span>
+          <ChevronDown className="h-4 w-4 shrink-0 text-slate-400" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-64 p-1.5">
+        <div className="space-y-0.5">
+          {KOLOM_TOLAK.map((k) => (
+            <label
+              key={k.key}
+              className="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-sm hover:bg-slate-50"
+            >
+              <Checkbox
+                checked={nilai.includes(k.key)}
+                onCheckedChange={() => toggle(k.key)}
+              />
+              <span className="text-slate-700">{k.label}</span>
+            </label>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 /** Satu baris "label — nilai" di panel detail. */
 function Baris({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -124,7 +178,21 @@ function Baris({ label, children }: { label: string; children: React.ReactNode }
 }
 
 /** Isi panel detail — dipakai panel samping (desktop) maupun modal (mobile). */
-function IsiDetail({ detail, memuat }: { detail: DetailUser | null; memuat: boolean }) {
+function IsiDetail({
+  detail,
+  memuat,
+  busy,
+  onAktifkan,
+  onTolak,
+  onNonaktif,
+}: {
+  detail: DetailUser | null;
+  memuat: boolean;
+  busy: boolean;
+  onAktifkan: () => void;
+  onTolak: () => void;
+  onNonaktif: () => void;
+}) {
   if (memuat || !detail) {
     return (
       <div className="flex justify-center py-16">
@@ -132,6 +200,8 @@ function IsiDetail({ detail, memuat }: { detail: DetailUser | null; memuat: bool
       </div>
     );
   }
+
+  const info = infoStatus(detail.status);
 
   return (
     <div className="space-y-5">
@@ -158,18 +228,41 @@ function IsiDetail({ detail, memuat }: { detail: DetailUser | null; memuat: bool
             <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[0.68rem] font-medium text-slate-600">
               {detail.level?.nama ?? `Level ${detail.userlevelId}`}
             </span>
-            {detail.status === 1 ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 text-[0.68rem] font-semibold text-success">
-                <CheckCircle2 className="h-3 w-3" /> Aktif
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 rounded-full bg-warning/10 px-2 py-0.5 text-[0.68rem] font-semibold text-warning">
-                <XCircle className="h-3 w-3" /> Belum Aktif
-              </span>
-            )}
+            <span
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.68rem] font-semibold ring-1 ${info.badge}`}
+            >
+              {info.label}
+            </span>
           </div>
         </div>
       </div>
+
+      {/* Alasan penolakan — ditonjolkan; warga juga melihatnya via Cek Status. */}
+      {detail.status === STATUS_AKUN.DITOLAK &&
+        detail.ket &&
+        (() => {
+          const { kolom, alasan } = uraikanAlasanTolak(detail.ket);
+          return (
+            <div className="rounded-xl border border-rose-200 bg-rose-50 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-rose-500">
+                Alasan penolakan
+              </p>
+              {alasan && <p className="mt-1 text-sm text-rose-800">{alasan}</p>}
+              {kolom.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {labelKolom(kolom).map((l) => (
+                    <span
+                      key={l}
+                      className="rounded-full bg-rose-100 px-2 py-0.5 text-[0.68rem] font-medium text-rose-700"
+                    >
+                      {l}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
       {/* Data diri */}
       <div>
@@ -195,7 +288,9 @@ function IsiDetail({ detail, memuat }: { detail: DetailUser | null; memuat: bool
           <Baris label="Diaktifkan">{fmtTanggal(detail.activationTime)}</Baris>
           <Baris label="Login terakhir">{fmtTanggal(detail.loginLast)}</Baris>
           <Baris label="IP terakhir">{detail.ipAddress || '-'}</Baris>
-          {detail.ket && <Baris label="Catatan">{detail.ket}</Baris>}
+          {detail.ket && (
+            <Baris label="Catatan">{uraikanAlasanTolak(detail.ket).alasan}</Baris>
+          )}
         </dl>
       </div>
 
@@ -239,6 +334,40 @@ function IsiDetail({ detail, memuat }: { detail: DetailUser | null; memuat: bool
           </a>
         )}
       </div>
+
+      {/* Aksi status akun — semua tindakan status dipusatkan di panel detail. */}
+      <div className="border-t border-slate-100 pt-4">
+        {detail.status === STATUS_AKUN.AKTIF ? (
+          <Button
+            variant="outline"
+            className="w-full gap-1.5 border-warning/40 text-warning hover:bg-warning/10"
+            disabled={busy}
+            onClick={onNonaktif}
+          >
+            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4" />}
+            Nonaktifkan Akun
+          </Button>
+        ) : (
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              className="gap-1.5 bg-success text-white hover:bg-success/90"
+              disabled={busy}
+              onClick={onAktifkan}
+            >
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+              Aktifkan
+            </Button>
+            <Button
+              variant="outline"
+              className="gap-1.5 border-rose-300 text-rose-600 hover:bg-rose-50"
+              disabled={busy}
+              onClick={onTolak}
+            >
+              <XCircle className="h-4 w-4" /> Tolak
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -246,7 +375,7 @@ function IsiDetail({ detail, memuat }: { detail: DetailUser | null; memuat: bool
 export function AdminUsers() {
   const [items, setItems] = useState<AdminUser[]>([]);
   const [grup, setGrup] = useState<GrupKey>('3');
-  const [statusFilter, setStatusFilter] = useState<'' | '0' | '1'>('');
+  const [statusFilter, setStatusFilter] = useState<'' | '0' | '1' | '2' | '3'>('');
   const [q, setQ] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [busyId, setBusyId] = useState<number | null>(null);
@@ -266,10 +395,12 @@ export function AdminUsers() {
 
   // Konfirmasi tindakan berisiko — memakai modal, bukan window.prompt/confirm.
   const [konfirmasi, setKonfirmasi] = useState<{
-    tipe: 'nonaktif' | 'hapus';
+    tipe: 'nonaktif' | 'tolak' | 'hapus';
     user: AdminUser;
   } | null>(null);
   const [alasan, setAlasan] = useState('');
+  // Bagian data yang ditandai "tidak sesuai" saat menolak pendaftaran.
+  const [kolomTolak, setKolomTolak] = useState<string[]>([]);
   const [jeda, setJeda] = useState(0);
 
   // Tombol hapus baru bisa ditekan setelah beberapa detik — jeda singkat ini
@@ -334,13 +465,18 @@ export function AdminUsers() {
     };
   }, [detailId]);
 
-  const setStatus = async (id: number, status: number, alasan?: string) => {
+  const setStatus = async (
+    id: number,
+    status: number,
+    alasan?: string,
+    kolom?: string[],
+  ) => {
     setBusyId(id);
     setMessage(null);
     const res = await fetch('/api/admin/users', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, status, alasan }),
+      body: JSON.stringify({ id, status, alasan, kolom }),
     });
     const json = await res.json();
     setBusyId(null);
@@ -442,8 +578,10 @@ export function AdminUsers() {
               {(
                 [
                   ['', 'Semua'],
-                  ['0', 'Belum Aktif'],
+                  ['0', 'Menunggu'],
                   ['1', 'Aktif'],
+                  ['2', 'Ditolak'],
+                  ['3', 'Nonaktif'],
                 ] as const
               ).map(([val, label]) => (
                 <button
@@ -539,49 +677,24 @@ export function AdminUsers() {
                         <td className="py-2.5 pr-4">{u.level?.nama ?? u.userlevelId}</td>
                       )}
                       <td className="py-2.5 pr-4">
-                        {u.status === 1 ? (
-                          <span className="inline-flex items-center gap-1 text-xs font-medium text-success">
-                            <CheckCircle2 className="h-3.5 w-3.5" /> Aktif
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 text-xs font-medium text-warning">
-                            <XCircle className="h-3.5 w-3.5" /> Belum Aktif
-                          </span>
-                        )}
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ${infoStatus(u.status).badge}`}
+                        >
+                          {infoStatus(u.status).label}
+                        </span>
                       </td>
                       {/* Tombol aksi tidak boleh ikut membuka panel detail. */}
                       <td className="py-2.5 pr-4" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center gap-1.5">
-                          {u.status === 1 ? (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              disabled={busyId === u.id}
-                              onClick={() => {
-                                setAlasan('');
-                                setKonfirmasi({ tipe: 'nonaktif', user: u });
-                              }}
-                            >
-                              {busyId === u.id ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                'Nonaktifkan'
-                              )}
-                            </Button>
-                          ) : (
-                            <Button
-                              size="sm"
-                              className="bg-success text-white hover:bg-success/90"
-                              disabled={busyId === u.id}
-                              onClick={() => setStatus(u.id, 1)}
-                            >
-                              {busyId === u.id ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                'Aktifkan'
-                              )}
-                            </Button>
-                          )}
+                          {/* Semua tindakan status ada di panel Detail. */}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="gap-1.5"
+                            onClick={() => setDetailId(u.id)}
+                          >
+                            <ChevronRight className="h-3.5 w-3.5" /> Detail
+                          </Button>
 
                           {/* Hapus permanen — hanya Super Admin. */}
                           {myLevel === 1 && (
@@ -623,7 +736,23 @@ export function AdminUsers() {
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            <IsiDetail detail={detail} memuat={detailLoading} />
+            <IsiDetail
+              detail={detail}
+              memuat={detailLoading}
+              busy={busyId === detail?.id}
+              onAktifkan={() => detail && setStatus(detail.id, STATUS_AKUN.AKTIF)}
+              onTolak={() => {
+                if (!detail) return;
+                setAlasan('');
+                setKolomTolak([]);
+                setKonfirmasi({ tipe: 'tolak', user: detail });
+              }}
+              onNonaktif={() => {
+                if (!detail) return;
+                setAlasan('');
+                setKonfirmasi({ tipe: 'nonaktif', user: detail });
+              }}
+            />
           </div>
         </aside>
       )}
@@ -643,7 +772,22 @@ export function AdminUsers() {
           <DialogHeader>
             <DialogTitle>Detail Akun</DialogTitle>
           </DialogHeader>
-          <IsiDetail detail={detail} memuat={detailLoading} />
+          <IsiDetail
+            detail={detail}
+            memuat={detailLoading}
+            busy={busyId === detail?.id}
+            onAktifkan={() => detail && setStatus(detail.id, STATUS_AKUN.AKTIF)}
+            onTolak={() => {
+              if (!detail) return;
+              setAlasan('');
+              setKonfirmasi({ tipe: 'tolak', user: detail });
+            }}
+            onNonaktif={() => {
+              if (!detail) return;
+              setAlasan('');
+              setKonfirmasi({ tipe: 'nonaktif', user: detail });
+            }}
+          />
         </DialogContent>
       </Dialog>
 
@@ -651,51 +795,91 @@ export function AdminUsers() {
           bawaan peramban yang tampilannya tidak menyatu dengan dashboard. */}
       <Dialog open={!!konfirmasi} onOpenChange={(o) => !o && setKonfirmasi(null)}>
         <DialogContent className="sm:max-w-md">
-          {konfirmasi?.tipe === 'nonaktif' ? (
-            <>
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <XCircle className="h-5 w-5 text-warning" />
-                  Nonaktifkan Akun
-                </DialogTitle>
-                <DialogDescription>
-                  <b>{konfirmasi.user.userFullname ?? konfirmasi.user.userId}</b> tidak
-                  akan bisa masuk lagi sampai diaktifkan kembali. Riwayat
-                  permohonannya tetap tersimpan.
-                </DialogDescription>
-              </DialogHeader>
+          {konfirmasi?.tipe === 'nonaktif' || konfirmasi?.tipe === 'tolak' ? (
+            (() => {
+              const isTolak = konfirmasi.tipe === 'tolak';
+              const nama = konfirmasi.user.userFullname ?? konfirmasi.user.userId;
+              return (
+                <>
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <XCircle className={`h-5 w-5 ${isTolak ? 'text-rose-500' : 'text-warning'}`} />
+                      {isTolak ? 'Tolak Pendaftaran' : 'Nonaktifkan Akun'}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {isTolak ? (
+                        <>
+                          Pendaftaran <b>{nama}</b> akan ditolak. Warga melihat alasannya
+                          di <b>Cek Status Pendaftaran</b> dan dapat mengajukan ulang.
+                        </>
+                      ) : (
+                        <>
+                          <b>{nama}</b> tidak akan bisa masuk lagi sampai diaktifkan kembali
+                          oleh staff. Riwayat permohonannya tetap tersimpan.
+                        </>
+                      )}
+                    </DialogDescription>
+                  </DialogHeader>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="alasan">Alasan penolakan/penonaktifan</Label>
-                <Textarea
-                  id="alasan"
-                  value={alasan}
-                  onChange={(e) => setAlasan(e.target.value)}
-                  rows={3}
-                  placeholder="mis. Data NIK tidak sesuai dengan Kartu Keluarga"
-                />
-                <p className="text-[0.7rem] text-muted-foreground">
-                  Dikirim ke email pemilik akun. Boleh dikosongkan.
-                </p>
-              </div>
+                  {isTolak && (
+                    <div className="space-y-1.5">
+                      <Label>Bagian data yang tidak sesuai</Label>
+                      <PilihKolomTolak nilai={kolomTolak} onChange={setKolomTolak} />
+                      <p className="text-[0.7rem] text-muted-foreground">
+                        Opsional. Warga melihat daftar ini dan diminta memperbaikinya
+                        saat mendaftar ulang.
+                      </p>
+                    </div>
+                  )}
 
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setKonfirmasi(null)}>
-                  Batal
-                </Button>
-                <Button
-                  className="bg-warning text-white hover:bg-warning/90"
-                  disabled={busyId === konfirmasi.user.id}
-                  onClick={() => {
-                    const u = konfirmasi.user;
-                    setKonfirmasi(null);
-                    setStatus(u.id, 0, alasan.trim() || undefined);
-                  }}
-                >
-                  Nonaktifkan
-                </Button>
-              </DialogFooter>
-            </>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="alasan">
+                      Alasan {isTolak ? 'penolakan' : 'penonaktifan'}
+                      {isTolak && <span className="text-destructive"> *</span>}
+                    </Label>
+                    <Textarea
+                      id="alasan"
+                      value={alasan}
+                      onChange={(e) => setAlasan(e.target.value)}
+                      rows={3}
+                      placeholder="mis. Foto selfie buram, nama tidak sesuai Kartu Keluarga"
+                    />
+                    <p className="text-[0.7rem] text-muted-foreground">
+                      {isTolak
+                        ? 'Wajib diisi. Ditampilkan ke pemohon & dikirim ke emailnya.'
+                        : 'Opsional. Akun dinonaktifkan sementara karena alasan keamanan.'}
+                    </p>
+                  </div>
+
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setKonfirmasi(null)}>
+                      Batal
+                    </Button>
+                    <Button
+                      className={
+                        isTolak
+                          ? 'bg-rose-600 text-white hover:bg-rose-600/90'
+                          : 'bg-warning text-white hover:bg-warning/90'
+                      }
+                      disabled={busyId === konfirmasi.user.id || (isTolak && !alasan.trim())}
+                      onClick={() => {
+                        const u = konfirmasi.user;
+                        const kol = isTolak ? kolomTolak : undefined;
+                        setKonfirmasi(null);
+                        setStatus(
+                          u.id,
+                          isTolak ? STATUS_AKUN.DITOLAK : STATUS_AKUN.NONAKTIF,
+                          alasan.trim() || undefined,
+                          kol,
+                        );
+                      }}
+                    >
+                      {isTolak ? 'Tolak Pendaftaran' : 'Nonaktifkan'}
+                    </Button>
+                  </DialogFooter>
+                </>
+              );
+            })()
           ) : konfirmasi?.tipe === 'hapus' ? (
             <>
               <DialogHeader>

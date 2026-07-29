@@ -8,6 +8,8 @@ import { tplAkunDisetujui, tplAkunDitolak } from "@/lib/mail-templates";
 import { createNotifikasi, safeNotify } from "@/lib/notifikasi";
 import { catatAktivitas } from "@/lib/log-aktivitas";
 import { simpanFotoProfil } from "@/lib/foto-profil";
+import { STATUS_AKUN } from "@/lib/akun-status";
+import { susunAlasanTolak } from "@/lib/akun-tolak";
 
 const NAMA_LEVEL: Record<number, string> = { 2: "Staff", 3: "Warga", 4: "Operator OPD" };
 
@@ -31,7 +33,7 @@ export async function GET(req: NextRequest) {
 
   const items = await prisma.user.findMany({
     where: {
-      ...(statusParam === "0" || statusParam === "1"
+      ...(["0", "1", "2", "3"].includes(statusParam ?? "")
         ? { status: Number(statusParam) }
         : {}),
       ...(levelParam === "staff"
@@ -216,15 +218,28 @@ export async function PATCH(req: NextRequest) {
   if (!session) return fail(["Tidak diizinkan"], 403);
 
   const body = await req.json().catch(() => ({}));
-  const { id, status, alasan } = body as {
+  const { id, status, alasan, kolom } = body as {
     id?: number;
     status?: number;
     alasan?: string;
+    /** Key kolom pendaftaran yang ditandai "tidak sesuai" (khusus penolakan). */
+    kolom?: string[];
   };
 
-  if (typeof id !== "number" || (status !== 0 && status !== 1)) {
+  if (typeof id !== "number" || ![0, 1, 2, 3].includes(status as number)) {
     return fail(["Info: Parameter id/status tidak valid"]);
   }
+  // Penolakan wajib disertai alasan — supaya warga tahu apa yang harus diperbaiki.
+  if (status === STATUS_AKUN.DITOLAK && !alasan?.trim()) {
+    return fail(["Info: Alasan penolakan wajib diisi"]);
+  }
+
+  // Penolakan → `ket` menggabungkan daftar kolom bermasalah + alasan (satu teks
+  // human-readable). Status lain cukup menyimpan alasan apa adanya (opsional).
+  const ketFinal =
+    status === STATUS_AKUN.DITOLAK
+      ? susunAlasanTolak(Array.isArray(kolom) ? kolom : [], (alasan ?? "").trim())
+      : alasan?.trim() || undefined;
 
   try {
     const sebelum = await prisma.user.findUnique({
@@ -236,17 +251,20 @@ export async function PATCH(req: NextRequest) {
       data: {
         status,
         updatedBy: typeof session.uid === "number" ? session.uid : undefined,
-        ...(status === 1 ? { activationTime: new Date() } : {}),
-        ...(alasan ? { ket: alasan } : {}),
+        ...(status === STATUS_AKUN.AKTIF ? { activationTime: new Date() } : {}),
+        ...(ketFinal ? { ket: ketFinal } : {}),
       },
     });
 
-    // Notifikasi email hanya saat status benar-benar berubah.
+    // Email hanya saat status berubah: disetujui (aktif) atau ditolak (+alasan).
+    // Menunggu & nonaktif tidak di-email — warga melihatnya saat login/cek status.
     if (user.userEmail && sebelum && sebelum.status !== status) {
       const nama = user.userFullname ?? user.userId;
-      const mail =
-        status === 1 ? tplAkunDisetujui(nama) : tplAkunDitolak(nama, alasan);
-      await sendMail({ to: user.userEmail, ...mail });
+      if (status === STATUS_AKUN.AKTIF) {
+        await sendMail({ to: user.userEmail, ...tplAkunDisetujui(nama) });
+      } else if (status === STATUS_AKUN.DITOLAK) {
+        await sendMail({ to: user.userEmail, ...tplAkunDitolak(nama, ketFinal) });
+      }
     }
 
     // Notifikasi in-app ke pemilik akun saat DIAKTIFKAN — terlihat begitu ia
@@ -265,17 +283,27 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
+    const AKSI: Record<number, string> = {
+      [STATUS_AKUN.AKTIF]: "Mengaktifkan",
+      [STATUS_AKUN.DITOLAK]: "Menolak",
+      [STATUS_AKUN.NONAKTIF]: "Menonaktifkan",
+      [STATUS_AKUN.MENUNGGU]: "Mengembalikan ke menunggu",
+    };
     await catatAktivitas(
       session,
       "UBAH",
       "Akun",
-      `${status === 1 ? "Mengaktifkan" : "Menonaktifkan"} akun ${user.userFullname ?? user.userId}`,
+      `${AKSI[status as number] ?? "Mengubah status"} akun ${user.userFullname ?? user.userId}`,
       { entitasId: user.id, req },
     );
 
-    return ok(null, [
-      status === 1 ? "Info: Akun berhasil diaktifkan" : "Info: Akun dinonaktifkan/ditolak",
-    ]);
+    const PESAN: Record<number, string> = {
+      [STATUS_AKUN.AKTIF]: "Info: Akun berhasil diaktifkan",
+      [STATUS_AKUN.DITOLAK]: "Info: Akun ditolak, alasan dikirim ke pemohon",
+      [STATUS_AKUN.NONAKTIF]: "Info: Akun dinonaktifkan",
+      [STATUS_AKUN.MENUNGGU]: "Info: Akun dikembalikan ke status menunggu",
+    };
+    return ok(null, [PESAN[status as number] ?? "Info: Status akun diperbarui"]);
   } catch {
     return fail(["Info: Gagal memperbarui status user"], 500);
   }

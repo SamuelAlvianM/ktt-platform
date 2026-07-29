@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -32,6 +32,7 @@ import {
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import Image from 'next/image';
 import { siteConfig } from '@/lib/site-config';
+import { labelKolom } from '@/lib/akun-tolak';
 
 interface Kecamatan {
   id: number;
@@ -83,6 +84,16 @@ function LabelWajib({ htmlFor, children }: { htmlFor?: string; children: React.R
   );
 }
 
+/** Badge kecil "Perlu diperbaiki" di samping label kolom yang ditandai petugas. */
+function TandaPerbaiki({ tampil }: { tampil: boolean }) {
+  if (!tampil) return null;
+  return (
+    <span className="ml-1.5 inline-flex items-center rounded-full bg-rose-100 px-2 py-0.5 text-[0.62rem] font-semibold uppercase tracking-wide text-rose-700 ring-1 ring-rose-200 dark:bg-rose-900/40 dark:text-rose-200 dark:ring-rose-800">
+      Perlu diperbaiki
+    </span>
+  );
+}
+
 export default function RegisterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -114,6 +125,61 @@ export default function RegisterPage() {
   const [mounted, setMounted] = useState(false);
   const [kecamatanList, setKecamatanList] = useState<Kecamatan[]>([]);
   const urlId = searchParams.get('id');
+
+  // Daftar ulang setelah ditolak: datang dari halaman Cek Status membawa NIK &
+  // daftar bagian yang perlu diperbaiki (`?nik=…&perbaiki=nama,foto`).
+  const nikUlang = searchParams.get('nik');
+  const modeUlang = !!nikUlang && /^\d{16}$/.test(nikUlang);
+  const kolomPerbaiki = useMemo(
+    () =>
+      (searchParams.get('perbaiki') ?? '')
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean),
+    [searchParams],
+  );
+  const labelPerbaiki = labelKolom(kolomPerbaiki);
+  // Sorotan pada kolom yang ditandai petugas agar warga sadar bagian mana yang
+  // harus diperbaiki: badge di label + cincin merah di kotak isian.
+  const perluPerbaiki = (key: string) => modeUlang && kolomPerbaiki.includes(key);
+  const cincinPerbaiki = (key: string) =>
+    perluPerbaiki(key) ? 'ring-2 ring-rose-400 border-rose-400' : '';
+
+  // Daftar ulang setelah ditolak: isi NIK + bawa kembali seluruh data awal yang
+  // dulu diinput warga (nama, KK, kecamatan, WhatsApp, email) supaya cukup
+  // memperbaiki bagian yang ditandai petugas, bukan mengetik ulang semuanya.
+  // Foto selfie sengaja TIDAK diisi ulang — wajib dipotret lagi. Data diambil
+  // dari /api/auth/cek-status yang hanya mengirim prefill saat status DITOLAK.
+  useEffect(() => {
+    if (!modeUlang || !nikUlang) return;
+    setFormData((f) => (f.nik === nikUlang ? f : { ...f, nik: nikUlang }));
+    let batal = false;
+    fetch('/api/auth/cek-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nik: nikUlang }),
+    })
+      .then((r) => r.json())
+      .then((j) => {
+        if (batal) return;
+        const p = j.data?.prefill;
+        if (!p) return;
+        // Hanya isi kolom yang masih kosong agar tidak menimpa yang sudah
+        // sempat diketik warga saat data lambat datang.
+        setFormData((f) => ({
+          ...f,
+          nama: f.nama || p.nama || '',
+          kk: f.kk || p.kk || '',
+          hp: f.hp || p.hp || '',
+          email: f.email || p.email || '',
+          kecamatan: f.kecamatan || p.kecamatan || '',
+        }));
+      })
+      .catch(() => {});
+    return () => {
+      batal = true;
+    };
+  }, [modeUlang, nikUlang]);
 
   // ── OTP WhatsApp (Fonnte) ──
   const [otpChallenge, setOtpChallenge] = useState('');
@@ -328,12 +394,31 @@ export default function RegisterPage() {
         ? await executeRecaptcha('register_action')
         : undefined;
 
-      await dispatch(registerUser({
+      const hasil = await dispatch(registerUser({
         ...formData,
         foto,
         recaptchaToken,
         otpBukti: otpBukti || undefined,
       })).unwrap();
+
+      // NIK sudah pernah didaftarkan (menunggu/nonaktif) → arahkan ke Cek Status.
+      if (hasil?.data?.redirect === 'cek-status' && hasil?.data?.nik) {
+        toast.message(hasil?.success?.[0] ?? 'NIK sudah pernah didaftarkan.');
+        router.push(`/cek-status?nik=${hasil.data.nik}`);
+        return;
+      }
+
+      // Daftar ulang setelah ditolak → data diperbarui, kembali menunggu.
+      if (hasil?.data?.ulang) {
+        toast.success(
+          hasil?.success?.[0] ??
+            'Data pendaftaran diperbarui. Kembali menunggu verifikasi petugas.',
+        );
+        setTimeout(() => {
+          router.push(`/cek-status?nik=${hasil?.data?.nik ?? formData.nik}`);
+        }, 1500);
+        return;
+      }
 
       toast.success('Pendaftaran berhasil! Akun menunggu verifikasi/aktivasi oleh admin.');
       // Success - redirect to login after 3 seconds
@@ -389,7 +474,7 @@ export default function RegisterPage() {
 
             {/* Title */}
             <CardTitle className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-              Pendaftaran Akun
+              {modeUlang ? 'Perbaiki & Daftar Ulang' : 'Pendaftaran Akun'}
             </CardTitle>
           </div>
 
@@ -400,6 +485,37 @@ export default function RegisterPage() {
 
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-5">
+            {/* Banner daftar ulang — pendaftaran sebelumnya ditolak. */}
+            {modeUlang && (
+              <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 dark:border-rose-900/50 dark:bg-rose-950/30">
+                <p className="flex items-center gap-2 text-sm font-semibold text-rose-700 dark:text-rose-300">
+                  <AlertCircle className="h-4 w-4 shrink-0" />
+                  Perbaiki data pendaftaran Anda
+                </p>
+                <p className="mt-1 text-[0.8rem] leading-relaxed text-rose-700/90 dark:text-rose-200/80">
+                  Pendaftaran sebelumnya ditolak petugas. Perbaiki data lalu kirim
+                  ulang untuk ditinjau kembali.
+                </p>
+                {labelPerbaiki.length > 0 && (
+                  <div className="mt-2.5">
+                    <p className="text-[0.72rem] font-medium text-rose-600 dark:text-rose-300">
+                      Bagian yang perlu diperbaiki:
+                    </p>
+                    <div className="mt-1.5 flex flex-wrap gap-1.5">
+                      {labelPerbaiki.map((l) => (
+                        <span
+                          key={l}
+                          className="rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-medium text-rose-700 ring-1 ring-rose-200 dark:bg-rose-900/40 dark:text-rose-200 dark:ring-rose-800"
+                        >
+                          {l}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Ketentuan pendaftaran */}
             <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-900/40">
               <ul className="list-disc space-y-1.5 pl-4 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
@@ -486,7 +602,9 @@ export default function RegisterPage() {
                 <Bagian judul="Informasi Personal" ikon={UserRound}>
                   <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                     <div className="space-y-2">
-                      <LabelWajib htmlFor="nik">NIK</LabelWajib>
+                      <LabelWajib htmlFor="nik">
+                        NIK <TandaPerbaiki tampil={perluPerbaiki('nik')} />
+                      </LabelWajib>
                       <Input
                         id="nik"
                         name="nik"
@@ -499,7 +617,7 @@ export default function RegisterPage() {
                         onBlur={() => setFocusedField(null)}
                         disabled={isLoading || !recaptchaReady}
                         maxLength={16}
-                        className={kelasInput('nik', !!formData.nik)}
+                        className={kelasInput('nik', !!formData.nik, cincinPerbaiki('nik'))}
                       />
                       <Petunjuk
                         items={[
@@ -510,7 +628,9 @@ export default function RegisterPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <LabelWajib htmlFor="kk">Nomor Kartu Keluarga</LabelWajib>
+                      <LabelWajib htmlFor="kk">
+                        Nomor Kartu Keluarga <TandaPerbaiki tampil={perluPerbaiki('kk')} />
+                      </LabelWajib>
                       <Input
                         id="kk"
                         name="kk"
@@ -523,7 +643,7 @@ export default function RegisterPage() {
                         onBlur={() => setFocusedField(null)}
                         disabled={isLoading || !recaptchaReady}
                         maxLength={16}
-                        className={kelasInput('kk', !!formData.kk)}
+                        className={kelasInput('kk', !!formData.kk, cincinPerbaiki('kk'))}
                       />
                       <Petunjuk
                         items={[
@@ -536,7 +656,9 @@ export default function RegisterPage() {
 
                   <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                     <div className="space-y-2">
-                      <LabelWajib htmlFor="nama">Nama Lengkap</LabelWajib>
+                      <LabelWajib htmlFor="nama">
+                        Nama Lengkap <TandaPerbaiki tampil={perluPerbaiki('nama')} />
+                      </LabelWajib>
                       <div className="relative">
                         <UserPlus className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                         <Input
@@ -549,7 +671,7 @@ export default function RegisterPage() {
                           onFocus={() => setFocusedField('nama')}
                           onBlur={() => setFocusedField(null)}
                           disabled={isLoading || !recaptchaReady}
-                          className={kelasInput('nama', !!formData.nama, 'pl-10')}
+                          className={kelasInput('nama', !!formData.nama, `pl-10 ${cincinPerbaiki('nama')}`)}
                         />
                       </div>
                       <Petunjuk
@@ -562,17 +684,21 @@ export default function RegisterPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <LabelWajib>Kecamatan</LabelWajib>
-                      <SearchSelect
-                        value={formData.kecamatan}
-                        onValueChange={(v) => setFormData((f) => ({ ...f, kecamatan: v }))}
-                        options={kecamatanList.map((k) => ({ value: k.nama, label: k.nama }))}
-                        placeholder="Pilih Kecamatan"
-                        searchPlaceholder="Cari kecamatan…"
-                        emptyText="Kecamatan tidak ditemukan."
-                        disabled={isLoading || !recaptchaReady}
-                        icon={<MapPin className="h-4 w-4 shrink-0 text-slate-400" />}
-                      />
+                      <LabelWajib>
+                        Kecamatan <TandaPerbaiki tampil={perluPerbaiki('kecamatan')} />
+                      </LabelWajib>
+                      <div className={`rounded-md ${cincinPerbaiki('kecamatan')}`}>
+                        <SearchSelect
+                          value={formData.kecamatan}
+                          onValueChange={(v) => setFormData((f) => ({ ...f, kecamatan: v }))}
+                          options={kecamatanList.map((k) => ({ value: k.nama, label: k.nama }))}
+                          placeholder="Pilih Kecamatan"
+                          searchPlaceholder="Cari kecamatan…"
+                          emptyText="Kecamatan tidak ditemukan."
+                          disabled={isLoading || !recaptchaReady}
+                          icon={<MapPin className="h-4 w-4 shrink-0 text-slate-400" />}
+                        />
+                      </div>
                       <p className="mt-1.5 text-[0.72rem] leading-relaxed text-slate-500 dark:text-slate-400">
                         Pilih kecamatan sesuai domisili dan alamat pada Kartu Keluarga Anda saat ini
                       </p>
@@ -585,7 +711,9 @@ export default function RegisterPage() {
                   <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                     {/* HP/WhatsApp */}
                     <div className="space-y-2">
-                      <LabelWajib htmlFor="hp">Nomor WhatsApp</LabelWajib>
+                      <LabelWajib htmlFor="hp">
+                        Nomor WhatsApp <TandaPerbaiki tampil={perluPerbaiki('hp')} />
+                      </LabelWajib>
                       <div className="relative">
                         <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                         <Input
@@ -598,7 +726,7 @@ export default function RegisterPage() {
                           onFocus={() => setFocusedField('hp')}
                           onBlur={() => setFocusedField(null)}
                           disabled={isLoading || !recaptchaReady}
-                          className={kelasInput('hp', !!formData.hp, 'pl-10')}
+                          className={kelasInput('hp', !!formData.hp, `pl-10 ${cincinPerbaiki('hp')}`)}
                         />
                       </div>
 
@@ -613,7 +741,9 @@ export default function RegisterPage() {
 
                     {/* Email */}
                     <div className="space-y-2">
-                      <LabelWajib htmlFor="email">Alamat Email</LabelWajib>
+                      <LabelWajib htmlFor="email">
+                        Alamat Email <TandaPerbaiki tampil={perluPerbaiki('email')} />
+                      </LabelWajib>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                         <Input
@@ -626,7 +756,7 @@ export default function RegisterPage() {
                           onFocus={() => setFocusedField('email')}
                           onBlur={() => setFocusedField(null)}
                           disabled={isLoading || !recaptchaReady}
-                          className={kelasInput('email', !!formData.email, 'pl-10')}
+                          className={kelasInput('email', !!formData.email, `pl-10 ${cincinPerbaiki('email')}`)}
                         />
                       </div>
                       <Petunjuk
@@ -784,16 +914,20 @@ export default function RegisterPage() {
                 <Bagian judul="Foto Wajah / Selfie" ikon={Camera}>
                   <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                     <div className="space-y-2">
-                      <LabelWajib>Lampirkan Foto Selfie</LabelWajib>
+                      <LabelWajib>
+                        Lampirkan Foto Selfie <TandaPerbaiki tampil={perluPerbaiki('foto')} />
+                      </LabelWajib>
                       {/* Wajib dipotret saat itu juga — unggah berkas sengaja
                           ditutup supaya fotonya benar-benar wajah pendaftar,
                           bukan gambar lama yang diambil dari galeri. */}
-                      <CameraCapture
-                        value={foto}
-                        onChange={setFoto}
-                        disabled={isLoading || !recaptchaReady}
-                        tanpaUnggah
-                      />
+                      <div className={`rounded-xl ${cincinPerbaiki('foto')}`}>
+                        <CameraCapture
+                          value={foto}
+                          onChange={setFoto}
+                          disabled={isLoading || !recaptchaReady}
+                          tanpaUnggah
+                        />
+                      </div>
                       <Petunjuk
                         items={[
                           'Perangkat wajib memiliki kamera/webcam',
@@ -860,7 +994,7 @@ export default function RegisterPage() {
               ) : (
                 <>
                   <UserPlus className="mr-2 h-4 w-4" />
-                  Buat Akun Baru
+                  {modeUlang ? 'Kirim Pendaftaran Ulang' : 'Buat Akun Baru'}
                 </>
               )}
             </Button>

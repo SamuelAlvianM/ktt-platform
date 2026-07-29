@@ -5,6 +5,7 @@ import { Clock } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
@@ -23,6 +24,18 @@ interface TimePickerProps {
   placeholder?: string;
   disabled?: boolean;
   className?: string;
+}
+
+const isJam = (s: string) => /^([01]\d|2[0-3]):[0-5]\d$/.test(s);
+
+/**
+ * Masker ketik: ambil angkanya saja lalu sisipkan ":" otomatis, sehingga
+ * pengguna cukup mengetik "1600" dan menjadi "16:00".
+ */
+function masker(input: string): string {
+  const angka = input.replace(/\D/g, "").slice(0, 4);
+  if (angka.length <= 2) return angka;
+  return `${angka.slice(0, 2)}:${angka.slice(2)}`;
 }
 
 /** Kolom angka (jam/menit) yang bisa discroll, item aktif disorot. */
@@ -77,8 +90,8 @@ function ScrollColumn({
 }
 
 /**
- * Pemilih jam (HH:mm) bergaya sama dengan DatePicker — pengganti
- * input type="time" bawaan browser.
+ * Pemilih jam (HH:mm) — bisa DIKETIK langsung (masker "1600" → "16:00") atau
+ * dipilih lewat popover dua kolom (jam & menit). Pengganti input type="time".
  */
 export function TimePicker({
   id,
@@ -89,50 +102,85 @@ export function TimePicker({
   className,
 }: TimePickerProps) {
   const [open, setOpen] = React.useState(false);
-  const valid = /^\d{2}:\d{2}$/.test(value);
-  const [hour, minute] = valid ? value.split(":") : [undefined, undefined];
+  // Teks mentah yang sedang diketik — dipisah dari `value` supaya bisa
+  // mengetik sebagian ("16") tanpa nilainya ikut berubah.
+  const [teks, setTeks] = React.useState(() => (isJam(value) ? value : ""));
+  const [hour, minute] = isJam(value) ? value.split(":") : [undefined, undefined];
+
+  React.useEffect(() => {
+    setTeks(isJam(value) ? value : "");
+  }, [value]);
+
+  const terimaTeks = (mentah: string) => {
+    const bertopeng = masker(mentah);
+    setTeks(bertopeng);
+    if (!bertopeng) {
+      onChange("");
+      return;
+    }
+    if (isJam(bertopeng)) onChange(bertopeng);
+  };
+
+  // Ketikan setengah jadi dikembalikan ke nilai sah terakhir.
+  const rapikan = () => setTeks(isJam(value) ? value : "");
 
   const pick = (h?: string, m?: string) => {
     onChange(`${h ?? hour ?? "00"}:${m ?? minute ?? "00"}`);
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          id={id}
-          type="button"
-          variant="outline"
-          disabled={disabled}
-          className={cn(
-            "w-full justify-start text-left font-normal h-9 px-3",
-            !valid && "text-muted-foreground",
-            className,
-          )}
+    <div className={cn("relative", className)}>
+      <Input
+        id={id}
+        value={teks}
+        onChange={(e) => terimaTeks(e.target.value)}
+        onBlur={rapikan}
+        disabled={disabled}
+        placeholder={placeholder === "Pilih jam" ? "jj:mm" : placeholder}
+        inputMode="numeric"
+        autoComplete="off"
+        aria-label={placeholder}
+        className="h-9 w-full pr-9 tabular-nums"
+      />
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            disabled={disabled}
+            aria-label="Buka pemilih jam"
+            className="absolute right-0 top-0 h-9 w-9 text-muted-foreground hover:bg-transparent hover:text-foreground"
+          >
+            <Clock className="h-4 w-4" />
+          </Button>
+        </PopoverTrigger>
+        {/* pointer-events-auto: popover di-portal ke <body>, sedangkan Sheet/Dialog
+            mengunci `body { pointer-events: none }` → tanpa ini kolom jam/menit
+            tak bisa diklik maupun discroll saat picker dibuka di dalam panel. */}
+        <PopoverContent
+          className="pointer-events-auto w-auto p-3"
+          align="end"
         >
-          <Clock className="mr-2 h-4 w-4 shrink-0 opacity-60" />
-          {valid ? value : placeholder}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-3" align="start">
-        <div className="flex gap-2">
-          <ScrollColumn
-            label="Jam"
-            items={HOURS}
-            active={hour}
-            onPick={(v) => pick(v, undefined)}
-          />
-          <ScrollColumn
-            label="Menit"
-            items={MINUTES}
-            active={minute}
-            onPick={(v) => {
-              pick(undefined, v);
-              setOpen(false);
-            }}
-          />
-        </div>
-      </PopoverContent>
-    </Popover>
+          <div className="flex gap-2">
+            <ScrollColumn
+              label="Jam"
+              items={HOURS}
+              active={hour}
+              onPick={(v) => pick(v, undefined)}
+            />
+            <ScrollColumn
+              label="Menit"
+              items={MINUTES}
+              active={minute}
+              onPick={(v) => {
+                pick(undefined, v);
+                setOpen(false);
+              }}
+            />
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }

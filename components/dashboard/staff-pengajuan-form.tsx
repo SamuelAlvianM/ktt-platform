@@ -14,7 +14,9 @@ import {
   X,
   Send,
   FileText,
+  ZoomIn,
 } from 'lucide-react';
+import { ImageViewer, useImageViewer } from '@/components/shared/image-viewer';
 import { cn } from '@/lib/utils';
 import {
   Select,
@@ -30,6 +32,10 @@ import {
   type OcrUploadResult,
 } from '@/components/permohonan-online/ocr-upload-button';
 import type { LayananForm, FieldDef } from '@/lib/layanan-forms';
+import {
+  useStatusJamLayanan,
+  PanelJamTutup,
+} from '@/components/permohonan-online/jam-layanan-gate';
 
 interface Props {
   layanan: LayananForm;
@@ -82,10 +88,25 @@ export function StaffPengajuanForm({
   const [submitting, setSubmitting] = useState(false);
   // Field yang sedang di-hover saat seret berkas (untuk sorot drop zone).
   const [dragField, setDragField] = useState<string | null>(null);
+  // Penampil berkas layar penuh (zoom + maju/mundur antar dokumen terunggah).
+  const { viewer, bukaGambar, tutupGambar } = useImageViewer();
+  // Status jam pelayanan (WIB) — form dinonaktifkan bila di luar jam aktif.
+  const { loading: loadingJam, status: statusJam, tertutup: jamTutup } =
+    useStatusJamLayanan();
 
   const allFields = useMemo(
     () => layanan.sections.flatMap((s) => s.fields),
     [layanan]
+  );
+
+  // Semua dokumen (gambar) yang sudah terunggah — supaya penampil bisa
+  // maju/mundur antar berkas, bukan hanya yang diklik.
+  const gambarTerunggah = useMemo(
+    () =>
+      allFields
+        .filter((fd) => fd.type === 'file' && (values[fd.name] ?? '').trim())
+        .map((fd) => ({ src: values[fd.name], judul: fd.label })),
+    [allFields, values],
   );
 
   const setVal = (name: string, value: string) => {
@@ -197,8 +218,23 @@ export function StaffPengajuanForm({
             // Pratinjau gambar + tombol batal.
             <div className="overflow-hidden rounded-lg border-2 border-success/40 bg-success/5">
               <div className="group relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={val} alt={fd.label} className="h-28 w-full bg-slate-100 object-cover" />
+                {/* Klik pratinjau → penampil layar penuh (zoom & putar), supaya
+                    pengunggah bisa memastikan hasil fotonya benar-benar terbaca. */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const i = gambarTerunggah.findIndex((g) => g.src === val);
+                    bukaGambar(gambarTerunggah, i < 0 ? 0 : i);
+                  }}
+                  className="block w-full cursor-zoom-in"
+                  title="Klik untuk perbesar, zoom & putar"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={val} alt={fd.label} className="h-28 w-full bg-slate-100 object-cover" />
+                  <span className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/25">
+                    <ZoomIn className="h-5 w-5 text-white opacity-0 transition-opacity group-hover:opacity-100" />
+                  </span>
+                </button>
                 <button
                   type="button"
                   onClick={() => removeFile(fd.name)}
@@ -328,6 +364,10 @@ export function StaffPengajuanForm({
         </div>
       </div>
 
+      {jamTutup && statusJam ? (
+        <PanelJamTutup status={statusJam} onBack={onBack} />
+      ) : (
+        <>
       <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-2.5 text-sm text-primary mb-6">
         {mandiri ? (
           <>
@@ -368,11 +408,21 @@ export function StaffPengajuanForm({
 
       <div className="mt-6 flex justify-end gap-3">
         <Button variant="outline" onClick={onBack}>Batal</Button>
-        <Button onClick={submit} disabled={submitting || !!uploading} className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90">
+        <Button onClick={submit} disabled={submitting || !!uploading || loadingJam} className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90">
           {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           {submitting ? 'Mengirim...' : 'Kirim Permohonan'}
         </Button>
       </div>
+        </>
+      )}
+
+      {viewer && (
+        <ImageViewer
+          items={viewer.items}
+          indexAwal={viewer.idx}
+          onClose={tutupGambar}
+        />
+      )}
     </div>
   );
 }

@@ -8,6 +8,8 @@ import { tplRegistrasiDiterima } from "@/lib/mail-templates";
 import { cekBukti, normalisasiHp, otpWajib } from "@/lib/otp";
 import { notifyPetugas, safeNotify } from "@/lib/notifikasi";
 import { simpanFotoProfil } from "@/lib/foto-profil";
+import { waRegistrasiDiterima } from "@/lib/notifikasi-wa";
+import { STATUS_AKUN } from "@/lib/akun-status";
 
 /**
  * Registrasi warga — port dari RegisterController@postDatas (Laravel data-2).
@@ -68,16 +70,39 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const aktifByNik = await prisma.user.count({
-      where: { userId: nik, status: 1 },
+    // Akun dengan NIK ini sudah ada? Perlakuannya bergantung status:
+    // - aktif (1)    → sudah punya akun, arahkan login.
+    // - menunggu (0) → sedang diverifikasi, jangan buat duplikat.
+    // - nonaktif (3) → diblokir petugas, arahkan hubungi Staff (via cek-status).
+    // - ditolak (2)  → boleh DAFTAR ULANG: perbarui data record yang sama & set
+    //                  kembali MENUNGGU. Inilah jalur "perbaiki data lalu ajukan
+    //                  ulang" — warga harus mengubah datanya, bukan sekali klik.
+    const existing = await prisma.user.findFirst({
+      where: { userId: nik },
+      orderBy: { id: "desc" },
+      select: { id: true, status: true },
     });
-    if (aktifByNik > 0) {
-      return fail([
-        "Info: NIK sudah terdaftar, Gunakan NIK yg Berbeda atau Silahkan Login (N-03)",
-      ]);
+    if (existing) {
+      if (existing.status === STATUS_AKUN.AKTIF) {
+        return fail([
+          "Info: NIK sudah terdaftar dan aktif. Silahkan Login (N-03)",
+        ]);
+      }
+      if (existing.status !== STATUS_AKUN.DITOLAK) {
+        // Menunggu / nonaktif → belum boleh daftar ulang; arahkan ke halaman
+        // Cek Status Pendaftaran (di sana terlihat status & langkah lanjutan).
+        return ok({ redirect: "cek-status", nik }, [
+          "Info: NIK ini sudah pernah didaftarkan. Kami arahkan ke halaman status pendaftaran.",
+        ]);
+      }
     }
+
     const aktifByEmail = await prisma.user.count({
-      where: { userEmail: email, status: 1 },
+      where: {
+        userEmail: email,
+        status: STATUS_AKUN.AKTIF,
+        ...(existing ? { NOT: { id: existing.id } } : {}),
+      },
     });
     if (aktifByEmail > 0) {
       return fail([
@@ -89,24 +114,38 @@ export async function POST(req: NextRequest) {
     const hashpass = await bcrypt.hash(pass, 10);
     const activationCodeUrl = await bcrypt.hash(nik + Date.now(), 10);
 
-    const userBaru = await prisma.user.create({
-      data: {
-        userId: nik,
-        password: hashpass,
-        userlevelId: 3,
-        userFullname: nama,
-        userNik: nik,
-        userNokk: kk,
-        userHp: hp,
-        userEmail: email,
-        userKecamatan: kecamatan.trim(),
-        activationCode,
-        activationCodeUrl,
-        ipAddress: req.headers.get("x-forwarded-for") ?? "",
-        status: 0,
-        createdBy: 3,
-      },
-    });
+    const dataAkun = {
+      userId: nik,
+      password: hashpass,
+      userlevelId: 3,
+      userFullname: nama,
+      userNik: nik,
+      userNokk: kk,
+      userHp: hp,
+      userEmail: email,
+      userKecamatan: kecamatan.trim(),
+      activationCode,
+      activationCodeUrl,
+      ipAddress: req.headers.get("x-forwarded-for") ?? "",
+      status: 0,
+    };
+
+    // NIK yang DITOLAK → perbarui record yang sama (daftar ulang) & bersihkan
+    // sisa penolakan; selain itu buat akun baru.
+    const userBaru = existing
+      ? await prisma.user.update({
+          where: { id: existing.id },
+          data: {
+            ...dataAkun,
+            status: STATUS_AKUN.MENUNGGU,
+            ket: null,
+            activationTime: null,
+            updatedBy: 3,
+          },
+        })
+      : await prisma.user.create({
+          data: { ...dataAkun, createdBy: 3 },
+        });
 
     // Foto baru bisa disimpan setelah akun ada — nama berkasnya diawali id
     // pemilik, dan itulah dasar kontrol akses di app/uploads/[...path].
@@ -122,22 +161,31 @@ export async function POST(req: NextRequest) {
     const konfirmasi = tplRegistrasiDiterima(nama);
     await sendMail({ to: email, ...konfirmasi });
 
-    // Notifikasi ke petugas: ada akun baru yang menunggu aktivasi.
+    // Notifikasi ke petugas: pendaftaran baru, atau pengajuan ulang setelah
+    // ditolak (datanya sudah diperbaiki) yang perlu ditinjau kembali.
     await safeNotify(() =>
       notifyPetugas({
         tipe: "AKUN_BARU",
-        judul: "Pendaftaran akun baru",
-        isi: `${nama} (NIK ${nik}) mendaftar dan menunggu aktivasi akun.`,
+        judul: existing ? "Pengajuan ulang pendaftaran" : "Pendaftaran akun baru",
+        isi: existing
+          ? `${nama} (NIK ${nik}) memperbaiki data & mengajukan ulang pendaftaran — mohon ditinjau kembali.`
+          : `${nama} (NIK ${nik}) mendaftar dan menunggu aktivasi akun.`,
         link: "/dashboard/users",
         refType: "User",
         refId: userBaru.id,
       }),
     );
 
+    // Konfirmasi WhatsApp (Fonnte) — pendaftaran diterima & masuk verifikasi.
+    // Tahan-gagal: token kosong / nomor invalid tidak menggagalkan pendaftaran.
+    await waRegistrasiDiterima(hp, nama, nik);
+
     return ok(
-      { nik, email, hp },
+      { nik, email, hp, ulang: !!existing },
       [
-        "Info: Permohonan akun Anda sedang diproses dan menunggu verifikasi/aktivasi",
+        existing
+          ? "Info: Pendaftaran ulang terkirim. Data Anda diperbarui dan kembali menunggu verifikasi petugas."
+          : "Info: Permohonan akun Anda sedang diproses dan menunggu verifikasi/aktivasi",
       ]
     );
   } catch {

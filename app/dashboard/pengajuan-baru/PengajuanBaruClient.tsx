@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 import {
   FileText,
   Baby,
@@ -18,31 +18,45 @@ import {
   ArrowRight,
   FilePlus2,
   SlidersHorizontal,
-} from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+  Clock,
+  ListChecks,
+} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from '@/components/ui/sheet';
-import { BackButton } from '@/components/shared/back-button';
-import { useAppSelector } from '@/store/hooks';
-import { LAYANAN_FORMS, type LayananForm } from '@/lib/layanan-forms';
-import { StaffPengajuanForm } from '@/components/dashboard/staff-pengajuan-form';
-import { PengaturanPelayanan } from '@/components/dashboard/pengaturan-pelayanan';
-import { JamLayananEditor } from '@/components/dashboard/jam-layanan-editor';
+} from "@/components/ui/sheet";
+import { BackButton } from "@/components/shared/back-button";
+import { useAppSelector } from "@/store/hooks";
+import { LAYANAN_FORMS, type LayananForm } from "@/lib/layanan-forms";
+import { StaffPengajuanForm } from "@/components/dashboard/staff-pengajuan-form";
+import { PengaturanPelayanan } from "@/components/dashboard/pengaturan-pelayanan";
+import { JamLayananEditor } from "@/components/dashboard/jam-layanan-editor";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const ICONS: Record<string, React.ElementType> = {
-  FileText, Baby, Users, UserPlus, Printer, ScrollText, Heart, Book, IdCard, MapPin, Home, Zap,
+  FileText,
+  Baby,
+  Users,
+  UserPlus,
+  Printer,
+  ScrollText,
+  Heart,
+  Book,
+  IdCard,
+  MapPin,
+  Home,
+  Zap,
 };
 
 export function PengajuanBaruClient() {
   const [selected, setSelected] = useState<LayananForm | null>(null);
   const [showSettings, setShowSettings] = useState(false);
-  const [q, setQ] = useState('');
+  const [q, setQ] = useState("");
   // Pengaturan pelayanan (visibilitas + jam) hanya untuk admin (level 1).
   const { user } = useAppSelector((s) => s.auth);
   const isAdmin = (user?.level ?? 3) === 1;
@@ -51,13 +65,15 @@ export function PengajuanBaruClient() {
     ? LAYANAN_FORMS.filter(
         (l) =>
           l.title.toLowerCase().includes(q.trim().toLowerCase()) ||
-          l.desc.toLowerCase().includes(q.trim().toLowerCase())
+          l.desc.toLowerCase().includes(q.trim().toLowerCase()),
       )
     : LAYANAN_FORMS;
 
   // ── Form inline (menu grid disembunyikan) ──
   if (selected) {
-    return <StaffPengajuanForm layanan={selected} onBack={() => setSelected(null)} />;
+    return (
+      <StaffPengajuanForm layanan={selected} onBack={() => setSelected(null)} />
+    );
   }
 
   // ── Grid pilihan layanan ──
@@ -70,13 +86,19 @@ export function PengajuanBaruClient() {
             <FilePlus2 className="h-6 w-6 text-primary" /> Pengajuan Baru
           </h1>
           <p className="text-sm text-slate-500">
-            Bantu warga mengajukan permohonan. Pilih jenis layanan untuk membuka formulirnya.
+            Bantu warga mengajukan permohonan. Pilih jenis layanan untuk membuka
+            formulirnya.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input placeholder="Cari layanan..." value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
+            <Input
+              placeholder="Cari layanan..."
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              className="pl-9"
+            />
           </div>
           {isAdmin && (
             <Button
@@ -95,35 +117,49 @@ export function PengajuanBaruClient() {
       {/* Drawer pengaturan: meluncur dari kanan dengan overlay gelap */}
       {isAdmin && (
         <Sheet open={showSettings} onOpenChange={setShowSettings}>
-          <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-xl">
+          <SheetContent
+            side="right"
+            className="w-full overflow-y-auto sm:max-w-xl"
+          >
             <SheetHeader className="pb-0">
               <SheetTitle className="flex items-center gap-2">
-                <SlidersHorizontal className="h-5 w-5 text-primary" /> Kelola Layanan
+                <SlidersHorizontal className="h-5 w-5 text-primary" /> Kelola
+                Layanan
               </SheetTitle>
               <SheetDescription>
                 Atur ketersediaan jenis layanan &amp; jam kerja permohonan.
               </SheetDescription>
             </SheetHeader>
-            <div className="space-y-8 px-4 pb-8">
-              <section>
-                <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-                  Jam Kerja Permohonan
-                </h3>
+            <Tabs defaultValue="jam" className="px-4 ">
+              <TabsList className="flex flex-row w-full gap-1 rounded-xl bg-slate-100 p-1">
+                <TabsTrigger
+                  value="jam"
+                  className="cursor-pointer gap-1.5 rounded-lg py-2 font-medium text-slate-500 transition-colors data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm"
+                >
+                  <Clock className="h-4 w-4" /> Jam Kerja
+                </TabsTrigger>
+                <TabsTrigger
+                  value="layanan"
+                  className="cursor-pointer gap-1.5 rounded-lg py-2 font-medium text-slate-500 transition-colors data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm"
+                >
+                  <ListChecks className="h-4 w-4" /> Ketersediaan Layanan
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="jam" className="pt-5">
                 <JamLayananEditor />
-              </section>
-              <section>
-                <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-                  Ketersediaan Jenis Layanan
-                </h3>
+              </TabsContent>
+              <TabsContent value="layanan" className="pt-5">
                 <PengaturanPelayanan />
-              </section>
-            </div>
+              </TabsContent>
+            </Tabs>
           </SheetContent>
         </Sheet>
       )}
 
       {filtered.length === 0 ? (
-        <div className="py-16 text-center text-sm text-slate-500">Tidak ada layanan cocok "{q}".</div>
+        <div className="py-16 text-center text-sm text-slate-500">
+          Tidak ada layanan cocok "{q}".
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((l, i) => {
@@ -139,8 +175,12 @@ export function PengajuanBaruClient() {
                   <Icon className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-slate-900 group-hover:text-primary">{l.title}</p>
-                  <p className="line-clamp-1 text-xs text-slate-500">{l.desc}</p>
+                  <p className="truncate text-sm font-semibold text-slate-900 group-hover:text-primary">
+                    {l.title}
+                  </p>
+                  <p className="line-clamp-1 text-xs text-slate-500">
+                    {l.desc}
+                  </p>
                 </div>
                 <ArrowRight className="h-4 w-4 flex-shrink-0 text-slate-300 transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
               </button>

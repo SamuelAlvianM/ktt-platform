@@ -80,16 +80,35 @@ async function main() {
     });
   }
 
-  // Wilayah contoh (kecamatan + kelurahan)
-  const kec = await prisma.wilayah.upsert({
-    where: { kode: "6504010" },
-    update: {},
-    create: { kode: "6504010", nama: "Sesayap", jenis: "KECAMATAN" },
-  });
+  // Wilayah — seluruh kecamatan Kabupaten Tana Tidung (Kalimantan Utara).
+  // Kode mengikuti Kemendagri (65.04.xx). Upsert → idempoten & aman diulang.
+  const KECAMATAN_KTT: { kode: string; nama: string }[] = [
+    { kode: "6504010", nama: "Sesayap" },
+    { kode: "6504020", nama: "Sesayap Hilir" },
+    { kode: "6504030", nama: "Tana Lia" },
+    { kode: "6504040", nama: "Betayau" },
+    { kode: "6504050", nama: "Muruk Rian" },
+  ];
+  const kecById: Record<string, number> = {};
+  for (const k of KECAMATAN_KTT) {
+    const row = await prisma.wilayah.upsert({
+      where: { kode: k.kode },
+      update: { nama: k.nama, jenis: "KECAMATAN" },
+      create: { kode: k.kode, nama: k.nama, jenis: "KECAMATAN" },
+    });
+    kecById[k.kode] = row.id;
+  }
+
+  // Kelurahan/desa contoh (ibukota kecamatan Sesayap).
   await prisma.wilayah.upsert({
     where: { kode: "6504010001" },
     update: {},
-    create: { kode: "6504010001", nama: "Tideng Pale", jenis: "KELURAHAN", parentId: kec.id },
+    create: {
+      kode: "6504010001",
+      nama: "Tideng Pale",
+      jenis: "KELURAHAN",
+      parentId: kecById["6504010"],
+    },
   });
 
   // Berita contoh

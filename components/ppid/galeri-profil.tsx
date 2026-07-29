@@ -249,6 +249,8 @@ export function GaleriProfilPpid({ kunci }: { kunci: string }) {
   const [kelola, setKelola] = useState(false);
   const [susun, setSusun] = useState(false);
   const [tutorial, setTutorial] = useState(false);
+  // Gambar yang sedang dipratinjau (lightbox) saat diklik pengunjung.
+  const [preview, setPreview] = useState<GaleriItem | null>(null);
   // Salinan lokal supaya urutan berubah mulus saat diseret sebelum tersimpan.
   const [lokal, setLokal] = useState<GaleriItem[]>(items);
   const [seret, setSeret] = useState<number | null>(null);
@@ -442,17 +444,32 @@ export function GaleriProfilPpid({ kunci }: { kunci: string }) {
                 <img
                   src={it.src}
                   alt={it.nama || 'Gambar galeri PPID'}
-                  className="h-auto w-full"
+                  className={`h-auto w-full ${susun ? '' : 'cursor-zoom-in'}`}
                   draggable={false}
                   loading="lazy"
+                  onClick={() => {
+                    if (!susun) setPreview(it);
+                  }}
                 />
                 {susun && (
                   <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-slate-900/70 px-2 py-1 text-[0.65rem] font-medium text-white">
                     <GripVertical className="h-3.5 w-3.5" /> Seret
                   </span>
                 )}
+                {/* Tanpa nama & deskripsi: tanggal MENYATU di atas gambar (overlay
+                    gradien), jadi tidak ada strip putih di bawahnya. */}
+                {!it.nama && !it.desc && fmtTanggal(it.tanggal) && (
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 via-black/25 to-transparent px-3 pb-2 pt-8">
+                    <p className="flex items-center gap-1.5 text-xs font-medium text-white">
+                      <CalendarDays className="h-3.5 w-3.5" />
+                      {fmtTanggal(it.tanggal)}
+                    </p>
+                  </div>
+                )}
               </div>
-              {(it.nama || it.desc || it.tanggal) && (
+              {/* Strip putih HANYA bila ada nama atau deskripsi (tanggal ikut di
+                  sini). Tanpa keduanya, tanggal sudah menyatu di gambar (atas). */}
+              {(it.nama || it.desc) && (
                 <figcaption className="space-y-1.5 p-4">
                   {it.nama && (
                     <h3 className="font-semibold text-slate-900">{it.nama}</h3>
@@ -472,6 +489,39 @@ export function GaleriProfilPpid({ kunci }: { kunci: string }) {
       )}
 
       <TautanTerkait links={links} />
+
+      {/* Lightbox: klik gambar → pratinjau detail (gambar penuh + info bila ada). */}
+      {preview && (
+        <Dialog open onOpenChange={(o) => !o && setPreview(null)}>
+          <DialogContent className="max-w-4xl overflow-hidden p-2 sm:p-3">
+            <DialogHeader className="sr-only">
+              <DialogTitle>{preview.nama || 'Pratinjau gambar galeri'}</DialogTitle>
+            </DialogHeader>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={preview.src}
+              alt={preview.nama || 'Gambar galeri PPID'}
+              className="mx-auto max-h-[78vh] w-full rounded-lg object-contain"
+            />
+            {(preview.nama || preview.desc || fmtTanggal(preview.tanggal)) && (
+              <div className="space-y-1 px-2 pb-1">
+                {preview.nama && (
+                  <h3 className="font-semibold text-slate-900">{preview.nama}</h3>
+                )}
+                {fmtTanggal(preview.tanggal) && (
+                  <p className="flex items-center gap-1.5 text-xs text-slate-400">
+                    <CalendarDays className="h-3.5 w-3.5" />
+                    {fmtTanggal(preview.tanggal)}
+                  </p>
+                )}
+                {preview.desc && (
+                  <p className="text-sm leading-relaxed text-slate-600">{preview.desc}</p>
+                )}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      )}
 
       {tutorial && <TutorialSusun onTutup={tutupTutorial} />}
 
