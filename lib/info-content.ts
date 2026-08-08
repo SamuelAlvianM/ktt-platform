@@ -302,6 +302,50 @@ export const wbsContent: Record<string, InfoPageContent> = {
   },
 };
 
+/**
+ * Pusat Bantuan — menu baru atas permintaan dinas (Document from S.A.M, poin 3).
+ * Tiga halaman: FAQ, Pengaduan & Konsultasi, Penipuan IKD.
+ *
+ * Isi FAQ TIDAK di sini — daftar tanya-jawabnya blok tersendiri
+ * (`pusat-bantuan.faq` di static-content-registry) supaya admin bisa
+ * menambah/mengubah pertanyaan lewat dashboard.
+ */
+export const pusatBantuanContent: Record<string, InfoPageContent> = {
+  faq: {
+    title: 'Pertanyaan yang Sering Diajukan (FAQ)',
+    description:
+      'Jawaban atas pertanyaan yang paling sering ditanyakan warga seputar layanan Disdukcapil Tana Tidung.',
+    body: [
+      'Belum menemukan jawabannya? Sampaikan lewat halaman Pengaduan & Konsultasi, atau hubungi kanal layanan yang tercantum di sana.',
+    ],
+  },
+  'pengaduan-konsultasi': {
+    title: 'Pengaduan & Konsultasi',
+    description:
+      'Sampaikan pengaduan atau konsultasi layanan kependudukan — kami siap mendengar dan membantu Anda.',
+    image: '/pusat-bantuan/alur-pengaduan-konsultasi.jpg',
+    body: [
+      'Pengaduan dan konsultasi dapat disampaikan melalui kanal yang tersedia: datang langsung ke kantor Disdukcapil, WhatsApp, email, website, SP4N-Lapor, maupun media sosial resmi. Setiap laporan dicatat, diverifikasi, lalu diteruskan kepada bidang terkait untuk ditindaklanjuti.',
+      'Anda juga dapat langsung mengisi formulir di bawah ini. Kami akan menyampaikan jawaban atau solusinya melalui kanal yang Anda gunakan.',
+    ],
+  },
+  'penipuan-ikd': {
+    title: 'Waspada Penipuan Aktivasi IKD',
+    description:
+      'Kenali modus penipuan yang mengatasnamakan Disdukcapil Tana Tidung dalam aktivasi Identitas Kependudukan Digital.',
+    body: [
+      'Beredar upaya penipuan berupa video call atau telepon dari pihak yang mengatasnamakan Disdukcapil Tana Tidung dengan dalih aktivasi Identitas Kependudukan Digital (IKD). Kenali ciri-cirinya agar Anda tidak menjadi korban.',
+    ],
+    list: [
+      'Disdukcapil TIDAK melakukan panggilan video call atau telepon untuk aktivasi IKD.',
+      'Disdukcapil TIDAK pernah meminta kata sandi, PIN, foto dokumen, atau data perbankan.',
+      'Aktivasi IKD TIDAK dipungut biaya alias gratis.',
+      'Aktivasi IKD hanya dilakukan di kantor Disdukcapil resmi atau melalui petugas resmi yang melakukan jemput bola.',
+      'Unduh aplikasi IKD resmi hanya melalui PlayStore atau AppStore.',
+    ],
+  },
+};
+
 export const hubungiKamiContent: Record<string, InfoPageContent> = {
   alamat: {
     title: 'Alamat Disdukcapil',

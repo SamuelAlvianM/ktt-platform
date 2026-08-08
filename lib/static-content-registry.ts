@@ -9,6 +9,7 @@ import {
   produkContent,
   ppidContent,
   wbsContent,
+  pusatBantuanContent,
   hubungiKamiContent,
 } from "@/lib/info-content";
 import type { InfoPageContent } from "@/components/shared/info-page";
@@ -113,7 +114,14 @@ export const STATIC_BLOCKS: StaticBlock[] = [
     kunci: "profil.motto",
     judul: "Profil — Motto & Tujuan",
     deskripsi: "Motto pelayanan, tujuan, dan sasaran strategis.",
+    modeGambar: true,
     fields: [
+      {
+        name: "gambar",
+        label: "Gambar",
+        type: "image",
+        catatan: "Unggah gambar yang akan ditampilkan sebagai isi tab ini.",
+      },
       { name: "motto", label: "Motto", type: "text" },
       { name: "tujuan", label: "Daftar Tujuan", type: "list" },
       { name: "sasaran", label: "Daftar Sasaran", type: "list" },
@@ -223,6 +231,59 @@ export const STATIC_BLOCKS: StaticBlock[] = [
         { jabatan: "Bidang Pelayanan Pencatatan Sipil", nama: "-", parent: "Kepala Dinas", tingkat: "kabid" },
         { jabatan: "Bidang Pengelolaan Informasi Administrasi Kependudukan", nama: "-", parent: "Kepala Dinas", tingkat: "kabid" },
       ],
+    },
+  },
+  {
+    // Sebelumnya gambarnya dipaku di kode (components/landingpage/profile-tabs.tsx
+    // → TAB_GAMBAR). Dijadikan blok CMS atas permintaan dinas (Document from
+    // S.A.M, poin 4) supaya admin bisa mengganti sendiri tanpa deploy ulang.
+    // Default-nya sengaja mode 'gambar' + menunjuk berkas lama → tampilan
+    // instalasi yang belum disunting tetap persis seperti sebelumnya.
+    kunci: "profil.profil-pejabat",
+    judul: "Profil — Profil Pejabat",
+    deskripsi:
+      "Profil singkat Kepala Dinas. Bisa berupa gambar (infografis resmi) atau ditulis manual.",
+    modeGambar: true,
+    fields: [
+      {
+        name: "gambar",
+        label: "Gambar",
+        type: "image",
+        catatan: "Unggah gambar yang akan ditampilkan sebagai isi tab ini.",
+      },
+      { name: "nama", label: "Nama Pejabat", type: "text" },
+      { name: "jabatan", label: "Jabatan", type: "text" },
+      { name: "uraian", label: "Uraian", type: "textarea" },
+    ],
+    defaults: {
+      mode: "gambar",
+      gambar: "/ppid/profil-pejabat-kepala-dinas-v2.jpg",
+      nama: "-",
+      jabatan: "Kepala Dinas Kependudukan dan Pencatatan Sipil",
+      uraian: "",
+    },
+  },
+  {
+    kunci: "profil.sejarah",
+    judul: "Profil — Sejarah",
+    deskripsi:
+      "Sejarah dinas. Bisa berupa gambar (infografis resmi) atau ditulis manual.",
+    modeGambar: true,
+    fields: [
+      {
+        name: "gambar",
+        label: "Gambar",
+        type: "image",
+        catatan: "Unggah gambar yang akan ditampilkan sebagai isi tab ini.",
+      },
+      { name: "uraian", label: "Uraian", type: "textarea" },
+      { name: "tonggak", label: "Tonggak Penting", type: "list" },
+    ],
+    defaults: {
+      mode: "gambar",
+      gambar: "/ppid/sejarah-disdukcapil.jpg",
+      uraian: "",
+      tonggak: [],
     },
   },
   {
@@ -524,6 +585,73 @@ STATIC_BLOCKS.push({
   defaults: { layanan: SYARAT_LAYANAN },
 });
 
+// Daftar tanya-jawab halaman /pusat-bantuan/faq (permintaan dinas poin 3).
+// Dipisah dari blok `info.pusat-bantuan.faq` (yang mengatur judul/deskripsi/
+// paragraf) karena bentuknya pasangan tanya-jawab, bukan paragraf lepas.
+// 🔴 Isi bawaan di bawah ini DRAFT — batasnya sengaja hanya hal yang berlaku
+// umum (cara memakai portal + ketentuan UU 24/2013 soal biaya). Jam layanan,
+// nomor kontak, dan janji waktu penyelesaian TIDAK ditulis di sini karena
+// harus datang dari dinas. Admin menyunting lewat dashboard.
+STATIC_BLOCKS.push({
+  kunci: "pusat-bantuan.faq",
+  judul: "Pusat Bantuan — Daftar FAQ",
+  deskripsi:
+    "Pertanyaan yang sering diajukan beserta jawabannya, tampil sebagai daftar buka-tutup di halaman /pusat-bantuan/faq.",
+  fields: [
+    {
+      name: "daftar",
+      label: "Daftar Tanya-Jawab",
+      type: "items",
+      catatan:
+        "Urutan baris = urutan tampil. Baris pertama terbuka otomatis saat halaman dibuka.",
+      itemFields: [
+        { name: "pertanyaan", label: "Pertanyaan" },
+        { name: "jawaban", label: "Jawaban" },
+      ],
+    },
+  ],
+  defaults: {
+    daftar: [
+      {
+        pertanyaan: "Apakah pengurusan dokumen kependudukan dipungut biaya?",
+        jawaban:
+          "Tidak. Sesuai Undang-Undang Nomor 24 Tahun 2013 tentang Administrasi Kependudukan, pengurusan dokumen kependudukan tidak dipungut biaya alias gratis. Jika ada pihak yang meminta bayaran, laporkan melalui halaman Pengaduan & Konsultasi.",
+      },
+      {
+        pertanyaan: "Bagaimana cara mengajukan permohonan secara online?",
+        jawaban:
+          "Daftar akun terlebih dahulu, lalu masuk ke dashboard dan pilih menu Ajukan Permohonan. Pilih jenis layanan yang dibutuhkan, isi formulir, dan unggah berkas persyaratannya. Permohonan Anda akan langsung masuk ke petugas untuk diverifikasi.",
+      },
+      {
+        pertanyaan: "Bagaimana cara mengetahui status permohonan saya?",
+        jawaban:
+          "Buka menu Cek Status atau lihat daftar permohonan di dashboard akun Anda. Status permohonan diperbarui petugas seiring proses berjalan, sehingga Anda tidak perlu datang ke kantor hanya untuk menanyakan perkembangannya.",
+      },
+      {
+        pertanyaan: "Apa yang harus saya lakukan jika permohonan ditolak?",
+        jawaban:
+          "Buka detail permohonan tersebut untuk melihat alasan penolakannya. Perbaiki bagian yang diminta, lalu gunakan tombol Ajukan Ulang — Anda tidak perlu mengisi formulir dari awal.",
+      },
+      {
+        pertanyaan: "Berkas apa saja yang perlu saya siapkan?",
+        jawaban:
+          "Persyaratan berbeda untuk tiap jenis layanan. Daftar lengkapnya dapat dilihat di halaman Syarat & Ketentuan, atau pada keterangan yang muncul saat Anda memilih jenis layanan di formulir permohonan.",
+      },
+      {
+        pertanyaan: "Saya lupa kata sandi akun. Bagaimana cara mengaturnya ulang?",
+        jawaban:
+          "Pada halaman masuk, pilih tautan Lupa Kata Sandi. Tautan pengaturan ulang akan dikirim ke alamat surel yang Anda daftarkan.",
+      },
+      {
+        pertanyaan:
+          "Apakah Disdukcapil menghubungi warga lewat video call untuk aktivasi IKD?",
+        jawaban:
+          "Tidak pernah. Aktivasi Identitas Kependudukan Digital hanya dilakukan di kantor Disdukcapil resmi atau oleh petugas resmi yang melakukan jemput bola. Pelajari modus penipuannya di halaman Penipuan IKD.",
+      },
+    ],
+  },
+});
+
 // ───────────────────────────────────────────────────────────────────────────
 // Halaman info (Produk / PPID / WBS / Hubungi Kami) — SEMUA jadi editable.
 // Blok digenerate dari lib/info-content.ts (default awal), kunci =
@@ -535,9 +663,14 @@ const INFO_SECTIONS: {
   label: string;
   content: Record<string, InfoPageContent>;
 }[] = [
-  { seksi: "produk", label: "Produk", content: produkContent },
+  { seksi: "produk", label: "Informasi Produk", content: produkContent },
   { seksi: "ppid", label: "PPID", content: ppidContent },
   { seksi: "wbs", label: "WBS", content: wbsContent },
+  {
+    seksi: "pusat-bantuan",
+    label: "Pusat Bantuan",
+    content: pusatBantuanContent,
+  },
   { seksi: "hubungi-kami", label: "Hubungi Kami", content: hubungiKamiContent },
 ];
 

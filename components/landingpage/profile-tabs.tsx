@@ -2,7 +2,6 @@
 
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence, useInView, LayoutGroup, easeInOut } from 'framer-motion';
-import Image from 'next/image';
 import {
   Target,
   FileText,
@@ -60,31 +59,24 @@ const TABS: TabConfig[] = [
   { id: 'sejarah',        label: 'Sejarah',        shortLabel: 'Sejarah', icon: <History className="w-4 h-4" />,     description: 'Perjalanan Disdukcapil Tana Tidung' },
 ];
 
-// Tab bergambar (Profil Pejabat, Sejarah) — sumber materi resmi Disdukcapil,
-// ditampilkan apa adanya (bukan data terstruktur) sehingga TIDAK memakai
-// StaticContent seperti 5 tab lain (StaticField belum punya tipe gambar
-// tunggal di luar list "items"). Ganti berkasnya langsung di public/ppid/
-// bila ada foto/infografis resmi baru dari dinas.
-// Tab teks yang punya toggle "Tulis Manual | Gambar" di editornya: bila admin
+// Tab yang punya toggle "Tulis Manual | Gambar" di editornya: bila admin
 // memilih mode gambar (konten.mode === 'gambar') dan mengunggah gambar, tab
 // menampilkan gambar itu menggantikan teksnya.
 // (Struktur punya mekanisme mode gambarnya sendiri lewat StrukturChart.)
-const GAMBAR_OVERRIDE_TABS = new Set(['visi-misi', 'maklumat', 'tugas']);
-
-const TAB_GAMBAR: Record<string, { src: string; width: number; height: number; alt: string }> = {
-  'profil-pejabat': {
-    src: '/ppid/profil-pejabat-kepala-dinas-v2.jpg',
-    width: 1095,
-    height: 438,
-    alt: 'Profil Singkat Kepala Dinas Kependudukan dan Pencatatan Sipil Kabupaten Tana Tidung',
-  },
-  sejarah: {
-    src: '/ppid/sejarah-disdukcapil.jpg',
-    width: 897,
-    height: 566,
-    alt: 'Sejarah Disdukcapil Kabupaten Tana Tidung',
-  },
-};
+//
+// Motto, Profil Pejabat, dan Sejarah masuk ke sini atas permintaan dinas
+// (Document from S.A.M, poin 4). Profil Pejabat & Sejarah dulunya gambar yang
+// dipaku di kode; sekarang blok CMS `profil.profil-pejabat` / `profil.sejarah`
+// dengan default mode 'gambar' menunjuk berkas lama — jadi tampilannya tidak
+// berubah sampai admin menyuntingnya.
+const GAMBAR_OVERRIDE_TABS = new Set([
+  'visi-misi',
+  'motto',
+  'maklumat',
+  'tugas',
+  'profil-pejabat',
+  'sejarah',
+]);
 
 const CONTENT: Record<string, any> = {
   'visi-misi': {
@@ -139,6 +131,22 @@ const CONTENT: Record<string, any> = {
       { jabatan: 'Kabid Pelayanan Pencatatan Sipil', nama: '-', parent: 'Kepala Dinas', tingkat: 'kabid' },
       { jabatan: 'Kabid Pengelolaan Informasi Administrasi Kependudukan', nama: '-', parent: 'Kepala Dinas', tingkat: 'kabid' },
     ],
+  },
+  // Fallback dua tab yang dulu gambarnya dipaku di kode. Bentuk & nilainya
+  // sengaja sama persis dengan defaults registry supaya tampilan tidak
+  // berkedip ganti bentuk selama /api/static-content belum menjawab.
+  'profil-pejabat': {
+    mode: 'gambar',
+    gambar: '/ppid/profil-pejabat-kepala-dinas-v2.jpg',
+    nama: '-',
+    jabatan: 'Kepala Dinas Kependudukan dan Pencatatan Sipil',
+    uraian: '',
+  },
+  'sejarah': {
+    mode: 'gambar',
+    gambar: '/ppid/sejarah-disdukcapil.jpg',
+    uraian: '',
+    tonggak: [],
   },
 };
 
@@ -342,21 +350,62 @@ function StrukturPanel({ data }: { data: typeof CONTENT['struktur'] }) {
   return <StrukturChart data={data} />;
 }
 
-/** Panel bergambar generik — dipakai Profil Pejabat & Sejarah. */
-function GambarPanel({ tabId }: { tabId: string }) {
-  const g = TAB_GAMBAR[tabId];
-  if (!g) return null;
+/** Profil Pejabat dalam mode "Tulis Manual". */
+function PejabatPanel({ data }: { data: any }) {
+  if (!data?.nama && !data?.jabatan && !data?.uraian) return <PanelKosong />;
   return (
-    <motion.div {...fadeUp(0.15)} className="overflow-hidden rounded-2xl border border-slate-100 shadow-sm">
-      <Image
-        src={g.src}
-        alt={g.alt}
-        width={g.width}
-        height={g.height}
-        className="h-auto w-full"
-        sizes="(min-width: 1024px) 900px, 100vw"
-      />
+    <motion.div {...fadeUp(0.15)} className="max-w-3xl">
+      {data?.nama && (
+        <p className="text-xl font-semibold text-slate-900">{data.nama}</p>
+      )}
+      {data?.jabatan && (
+        <p className="mt-1 text-sm font-medium text-primary">{data.jabatan}</p>
+      )}
+      {data?.uraian && (
+        <p className="mt-5 whitespace-pre-line text-sm leading-relaxed text-slate-700">
+          {data.uraian}
+        </p>
+      )}
     </motion.div>
+  );
+}
+
+/** Sejarah dalam mode "Tulis Manual". */
+function SejarahPanel({ data }: { data: any }) {
+  const tonggak: string[] = Array.isArray(data?.tonggak) ? data.tonggak : [];
+  if (!data?.uraian && tonggak.length === 0) return <PanelKosong />;
+  return (
+    <motion.div {...fadeUp(0.15)} className="max-w-3xl">
+      {data?.uraian && (
+        <p className="whitespace-pre-line text-sm leading-relaxed text-slate-700">
+          {data.uraian}
+        </p>
+      )}
+      {tonggak.length > 0 && (
+        <div className="mt-6 space-y-3">
+          {tonggak.map((item, i) => (
+            <motion.div key={i} {...fadeUp(0.2 + i * 0.05)} className="flex gap-3">
+              <span className="mt-1.5 h-1.5 w-1.5 flex-none rounded-full bg-primary" />
+              <span className="text-sm text-slate-700">{item}</span>
+            </motion.div>
+          ))}
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+/**
+ * Ditampilkan bila admin memilih mode "Tulis Manual" tapi isinya belum diketik.
+ * Lebih jujur daripada panel kosong melompong yang terbaca seperti kerusakan.
+ */
+function PanelKosong() {
+  return (
+    <div className="flex min-h-[200px] items-center justify-center rounded-2xl border border-dashed border-slate-200 px-6 text-center">
+      <p className="text-sm text-slate-400">
+        Isi bagian ini belum ditulis. Admin dapat mengisinya lewat Mode Edit.
+      </p>
+    </div>
   );
 }
 
@@ -374,6 +423,8 @@ export default function ProfileTabs() {
     'profil.maklumat',
     'profil.tugas',
     'profil.struktur',
+    'profil.profil-pejabat',
+    'profil.sejarah',
   ]);
   const content: Record<string, any> = {
     'visi-misi': cms['profil.visi-misi'],
@@ -381,15 +432,17 @@ export default function ProfileTabs() {
     maklumat: cms['profil.maklumat'],
     tugas: cms['profil.tugas'],
     struktur: cms['profil.struktur'],
+    'profil-pejabat': cms['profil.profil-pejabat'],
+    sejarah: cms['profil.sejarah'],
   };
 
   const activeContent = content[activeTab] ?? CONTENT[activeTab];
   const activeTabConfig = TABS.find((t) => t.id === activeTab)!;
   const { editMode, openEditor } = useInlineEdit();
   const [strukturEditorOpen, setStrukturEditorOpen] = useState(false);
-  // Tab bergambar (lihat TAB_GAMBAR) belum punya editor CMS — sembunyikan
-  // tombol Edit di situ daripada menampilkan tombol yang tidak berbuat apa-apa.
-  const bisaEdit = !(activeTab in TAB_GAMBAR);
+  // Ketujuh tab kini punya editor CMS (Profil Pejabat & Sejarah menyusul sejak
+  // permintaan dinas poin 4), jadi tombol Edit selalu berguna.
+  const bisaEdit = true;
 
   return (
     <section ref={containerRef} className="relative py-14 overflow-hidden bg-white border-t border-slate-100">
@@ -514,8 +567,8 @@ export default function ProfileTabs() {
                       {activeTab === 'maklumat'    && <MaklumatPanel  data={activeContent} />}
                       {activeTab === 'tugas'       && <TugasPanel     data={activeContent} />}
                       {activeTab === 'struktur'    && <StrukturPanel  data={activeContent} />}
-                      {activeTab === 'profil-pejabat' && <GambarPanel tabId={activeTab} />}
-                      {activeTab === 'sejarah'        && <GambarPanel tabId={activeTab} />}
+                      {activeTab === 'profil-pejabat' && <PejabatPanel data={activeContent} />}
+                      {activeTab === 'sejarah'        && <SejarahPanel data={activeContent} />}
                     </>
                   )}
                 </div>

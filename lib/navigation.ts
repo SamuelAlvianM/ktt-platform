@@ -27,7 +27,10 @@ export const navigationItems: NavMenu[] = [
   // "Pelayanan Online" dihapus dari navbar publik — pembuatan permohonan
   // dipindah ke dashboard (warga & OPD) sebagai halaman penuh, bukan modal.
   {
-    title: "Produk",
+    // Dulu bernama "Produk"; diganti jadi "Informasi Produk" atas permintaan
+    // dinas (Document from S.A.M, poin 1). Path `/produk/*` sengaja TIDAK ikut
+    // berubah supaya tautan lama & berkas yang sudah diunggah tetap hidup.
+    title: "Informasi Produk",
     items: [
       {
         title: "Produk Disdukcapil",
@@ -119,11 +122,42 @@ export const navigationItems: NavMenu[] = [
     href: "/wbs/tentang-wbs",
   },
   {
+    // Permintaan dinas (Document from S.A.M, poin 3): menu baru SETELAH WBS.
+    // Pengaduan & Konsultasi memakai formulir yang sama dengan WBS
+    // (/api/pengaduan) — bedanya kanal umum vs pelaporan pelanggaran.
+    title: "Pusat Bantuan",
+    items: [
+      {
+        title: "FAQ",
+        href: "/pusat-bantuan/faq",
+        description: "Pertanyaan yang sering diajukan seputar layanan adminduk",
+      },
+      {
+        title: "Pengaduan & Konsultasi",
+        href: "/pusat-bantuan/pengaduan-konsultasi",
+        description:
+          "Alur layanan pengaduan dan konsultasi beserta formulir pengajuannya",
+      },
+      {
+        title: "Penipuan IKD",
+        href: "/pusat-bantuan/penipuan-ikd",
+        description:
+          "Waspada modus penipuan yang mengatasnamakan Disdukcapil Tana Tidung",
+      },
+    ],
+  },
+  {
     // Tanpa dropdown — mendarat di halaman internal kita dulu (bukan langsung
     // melempar ke skm.go.id). Halaman itu menyematkan formulir SKM resmi lewat
     // iframe + tombol untuk membukanya penuh di tab baru. Lihat
     // app/survei-kepuasan/page.tsx.
-    title: "Survei Kepuasan Masyarakat",
+    //
+    // Label dipendekkan dari "Survei Kepuasan Masyarakat" (231px — item
+    // terlebar di navbar) jadi "Survei Kepuasan" saat menu "Pusat Bantuan"
+    // ditambahkan, supaya deretan menu desktop tetap muat. Judul halaman &
+    // metadata-nya TETAP lengkap. Kalau label ini diubah, ubah juga kunci peta
+    // ikon di components/shared/navbar.tsx.
+    title: "Survei Kepuasan",
     href: "/survei-kepuasan",
   },
   // "Hubungi Kami" dihapus dari navbar atas permintaan user — informasi kontak

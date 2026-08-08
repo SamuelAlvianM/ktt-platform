@@ -1,6 +1,11 @@
 import Link from 'next/link';
 import { Footer } from '@/components/shared/footer';
-import { produkContent, ppidContent, hubungiKamiContent } from '@/lib/info-content';
+import {
+  produkContent,
+  ppidContent,
+  pusatBantuanContent,
+  hubungiKamiContent,
+} from '@/lib/info-content';
 
 const sections: { title: string; links: { label: string; href: string }[] }[] = [
   {
@@ -8,7 +13,7 @@ const sections: { title: string; links: { label: string; href: string }[] }[] = 
     links: [{ label: 'Permohonan Online', href: '/permohonan-online' }],
   },
   {
-    title: 'Produk',
+    title: 'Informasi Produk',
     links: Object.entries(produkContent).map(([slug, c]) => ({
       label: c.title,
       href: `/produk/${slug}`,
@@ -37,6 +42,13 @@ const sections: { title: string; links: { label: string; href: string }[] }[] = 
     links: Object.entries(ppidContent).map(([slug, c]) => ({
       label: c.title,
       href: `/ppid/${slug}`,
+    })),
+  },
+  {
+    title: 'Pusat Bantuan',
+    links: Object.entries(pusatBantuanContent).map(([slug, c]) => ({
+      label: c.title,
+      href: `/pusat-bantuan/${slug}`,
     })),
   },
   {

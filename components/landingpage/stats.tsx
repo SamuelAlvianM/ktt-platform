@@ -217,7 +217,7 @@ function ServiceCard({ pelayanan }: { pelayanan: PelayananStat }) {
           </div>
           <div>
             <p className="text-[0.62rem] font-bold uppercase tracking-widest text-primary">
-              Total Pelayanan
+              Total Pelayanan Online
             </p>
             <p className="text-2xl font-bold text-slate-900 leading-none mt-0.5">
               <AnimatedNumber value={total} />

@@ -152,7 +152,10 @@ export function FieldEditor({
   const catatan = field.catatan;
   const textCols = cols.filter((c) => c.type !== 'image');
   // Kolom bernuansa deskripsi → textarea yang bisa memanjang.
-  const isLongText = (name: string) => /desc|ket|penjelasan|subtitle|isi/i.test(name);
+  // `jawaban` ikut ke sini karena jawaban FAQ umumnya beberapa kalimat —
+  // di Input satu baris jadi tak terbaca saat disunting.
+  const isLongText = (name: string) =>
+    /desc|ket|penjelasan|subtitle|isi|jawaban/i.test(name);
   const setRow = (idx: number, name: string, v: string) => {
     const next = rows.map((r, i) => (i === idx ? { ...r, [name]: v } : r));
     onChange(next);

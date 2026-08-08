@@ -25,6 +25,7 @@ import {
   Landmark,
   ShieldAlert,
   Gauge,
+  LifeBuoy,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { navigationItems } from "@/lib/navigation";
@@ -44,8 +45,8 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logoutUser } from "@/store/slices/authSlice";
 
 /** Ambang navbar desktop (px). Di bawah ini navigasi memakai hamburger —
- *  samakan dengan kelas `min-[1440px]:` pada deretan menu di bawah. */
-const AMBANG_MENU_DESKTOP = 1440;
+ *  samakan dengan kelas `min-[1460px]:` pada deretan menu di bawah. */
+const AMBANG_MENU_DESKTOP = 1460;
 /** Lebar panel dropdown saat belum sempat diukur — samakan dgn `min-w-70`. */
 const LEBAR_PANEL_MIN = 280;
 /** Jarak aman panel dari tepi layar. */
@@ -684,11 +685,16 @@ const navigationIcons: { [key: string]: React.ElementType } = {
   Pengaduan: ShieldAlert,
   WBS: ShieldAlert,
   Produk: FileText,
+  // Dinas meminta menu "Produk" diganti nama jadi "Informasi Produk"; kunci
+  // lama dibiarkan supaya menu tambahan buatan admin yang masih bernama
+  // "Produk" tetap dapat ikonnya.
+  "Informasi Produk": FileText,
   "Media Informasi": Newspaper,
   Gallery: ImageIcon,
   "Hubungi Kami": Phone,
   PPID: Landmark,
-  "Survei Kepuasan Masyarakat": Gauge,
+  "Pusat Bantuan": LifeBuoy,
+  "Survei Kepuasan": Gauge,
 };
 
 // navigationItems dipindah ke lib/navigation.ts (dipakai juga oleh dashboard Konten).
@@ -960,7 +966,7 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          {/* Ambang 1440px, bukan `lg` (1024px): deretan menu memakai flex-nowrap
+          {/* Ambang 1460px, bukan `lg` (1024px): deretan menu memakai flex-nowrap
               + whitespace-nowrap sehingga TIDAK bisa menyusut — di layar lebih
               sempit ia mendorong blok kanan (flex-shrink-0) keluar layar dan
               membuat SELURUH halaman bisa digeser menyamping. Di bawah ambang
@@ -971,10 +977,18 @@ export function Navbar() {
               ini tidak terbatas — kalau melebihi ruang, yang bergeser cukup
               deretan menunya, bukan seluruh halaman.
 
-              Diukur di SIDAKO: logo 211 + menu 857 + blok kanan (saat login) 270
-              + padding 64 + gap ≈ 1426px. Angkanya BEDA dari TIDORE (ambang
-              1360) karena deretan menu SIDAKO lebih panjang — jangan disamakan
-              begitu saja bila menunya berubah; ukur ulang.
+              Diukur ulang 8 Agu 2026 setelah menu "Pusat Bantuan" ditambahkan
+              (permintaan dinas): logo 211 + isi menu 719 + blok kanan (saat
+              login) 270 + padding 64 + gap ≈ 1451px (terukur) → ambang 1460.
+              Angkanya BEDA dari TIDORE (1360) karena deretan menu SIDAKO lebih
+              panjang — jangan disamakan begitu saja; ukur ulang tiap kali menu
+              berubah.
+
+              ⚠️ Deret desktop ini SENGAJA tanpa ikon. Ikon per menu memakan
+              ± 22px × 6 = 132px, dan dengan ikon kebutuhannya jadi ± 1573px —
+              laptop 1536px pun jatuh ke hamburger. Ikon tetap ada di panel
+              hamburger (navigationIcons masih dipakai di sana). Menambah ikon
+              kembali ke sini = menaikkan ambang lagi.
 
               ⚠️ Karena kotak ini ber-overflow, panel dropdown TIDAK boleh jadi
               anaknya (pasti ter-clip & tak bisa diklik) — lihat portal di
@@ -982,11 +996,10 @@ export function Navbar() {
 
               Menu "Beranda" sengaja tidak ada di deret desktop (logo di kiri
               sudah menuju "/"); ia tetap tersedia di panel hamburger. */}
-          <div className="hidden min-[1440px]:flex items-center flex-nowrap gap-0.5 flex-1 min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden justify-center px-2">
+          <div className="hidden min-[1460px]:flex items-center flex-nowrap gap-0.5 flex-1 min-w-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden justify-center px-2">
             {menuItems.map((item) => {
               // Menu tanpa dropdown → link langsung (mis. Pelayanan Online).
               if (!item.items?.length && item.href) {
-                const Icon = navigationIcons[item.title];
                 const external = isExternalHref(item.href);
                 const linkClassName = cn(
                   "relative px-2.5 py-2 text-sm font-medium flex items-center gap-1.5 rounded-md whitespace-nowrap text-white/90",
@@ -1005,37 +1018,30 @@ export function Navbar() {
                       rel="noopener noreferrer"
                       className={linkClassName}
                     >
-                      {Icon && <Icon className="h-4 w-4 flex-shrink-0" strokeWidth={2} />}
                       {item.title}
                     </a>
                   );
                 }
                 return (
                   <Link key={item.title} href={item.href} className={linkClassName}>
-                    {Icon && <Icon className="h-4 w-4 flex-shrink-0" strokeWidth={2} />}
                     {item.title}
                   </Link>
                 );
               }
               return (
-                <DropdownMenu
-                  key={item.title}
-                  title={item.title}
-                  items={item.items}
-                  icon={navigationIcons[item.title]}
-                />
+                <DropdownMenu key={item.title} title={item.title} items={item.items} />
               );
             })}
           </div>
 
           {/* Desktop Auth Buttons */}
-          <div className="hidden min-[1440px]:flex items-center gap-1.5 flex-shrink-0">
+          <div className="hidden min-[1460px]:flex items-center gap-1.5 flex-shrink-0">
             <NotificationBell tone="onDark" />
             <AuthArea />
           </div>
 
           {/* Mobile & tablet: lonceng notifikasi + hamburger */}
-          <div className="flex items-center gap-1 min-[1440px]:hidden">
+          <div className="flex items-center gap-1 min-[1460px]:hidden">
             <NotificationBell tone="onDark" />
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
