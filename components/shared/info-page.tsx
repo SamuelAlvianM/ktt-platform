@@ -20,6 +20,13 @@ export interface InfoPageContent {
   downloadLabel?: string;
   /** Gambar/infografis (path di public/), tampil di atas body. */
   image?: string;
+  /**
+   * Gambar/infografis unggahan admin, tampil DI BAWAH body & daftar poin.
+   * Beda dari `image` yang satu gambar di atas: ini banyak, bisa diberi judul,
+   * dan diisi lewat editor (Dashboard → Konten Halaman) — dipakai untuk
+   * Alur Pelayanan, Standar Pelayanan, Inovasi, dst.
+   */
+  gambar?: { judul?: string; gambar?: string }[];
 }
 
 export interface InfoBerkas {
@@ -142,6 +149,30 @@ export function InfoPage({
                 </li>
               ))}
             </ul>
+          )}
+
+          {/* Infografis unggahan admin — judul opsional di atas tiap gambar,
+              mengikuti contoh yang diberikan dinas (judul + gambar alur). */}
+          {content.gambar && content.gambar.filter((g) => g?.gambar).length > 0 && (
+            <div className="space-y-6 pt-2">
+              {content.gambar
+                .filter((g) => g?.gambar)
+                .map((g, i) => (
+                  <figure key={i} className="space-y-2">
+                    {g.judul && (
+                      <figcaption className="text-sm font-semibold text-slate-900">
+                        {g.judul}
+                      </figcaption>
+                    )}
+                    {/* eslint-disable-next-line @next/next/no-img-element -- gambar diunggah admin, dimensi tak diketahui */}
+                    <img
+                      src={g.gambar}
+                      alt={g.judul || content.title}
+                      className="h-auto w-full rounded-xl border border-slate-100"
+                    />
+                  </figure>
+                ))}
+            </div>
           )}
 
           {content.links && content.links.length > 0 && (

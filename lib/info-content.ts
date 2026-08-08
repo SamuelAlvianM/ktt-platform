@@ -51,6 +51,36 @@ export const produkContent: Record<string, InfoPageContent> = {
       'SOP pelayanan disusun untuk menjamin kepastian waktu, biaya (gratis), dan prosedur dalam setiap layanan adminduk.',
     ],
   },
+
+  // ── Tiga sub-menu tambahan (permintaan dinas poin 1) ──
+  // Ketiganya menerima DUA macam unggahan sekaligus:
+  //   • dokumen PDF  → lewat kategori di lib/dokumen-registry.ts
+  //   • gambar/infografis → lewat field `gambar` (blok info.produk.*)
+  // Isi `body` sengaja singkat & netral; materi resminya menyusul dari dinas.
+  'standar-pelayanan': {
+    title: 'Standar Pelayanan (SP)',
+    description:
+      'Standar pelayanan publik Disdukcapil Tana Tidung — jenis layanan, persyaratan, jangka waktu, dan biaya.',
+    body: [
+      'Standar Pelayanan memuat ketentuan penyelenggaraan pelayanan publik: persyaratan, sistem dan prosedur, jangka waktu penyelesaian, biaya, produk layanan, serta penanganan pengaduan. Dokumen dan infografis resminya dapat dilihat atau diunduh di bawah ini.',
+    ],
+  },
+  'alur-pelayanan': {
+    title: 'Alur Pelayanan',
+    description:
+      'Tahapan pelayanan administrasi kependudukan dari pendaftaran sampai dokumen diserahkan.',
+    body: [
+      'Berikut alur pelayanan pada Disdukcapil Kabupaten Tana Tidung beserta perkiraan waktu tiap tahapannya.',
+    ],
+  },
+  inovasi: {
+    title: 'Inovasi',
+    description:
+      'Inovasi layanan Disdukcapil Tana Tidung untuk mempermudah dan mempercepat pelayanan kepada masyarakat.',
+    body: [
+      'Inovasi layanan dikembangkan agar pelayanan administrasi kependudukan makin dekat, cepat, dan mudah dijangkau masyarakat.',
+    ],
+  },
 };
 
 export const ppidContent: Record<string, InfoPageContent> = {

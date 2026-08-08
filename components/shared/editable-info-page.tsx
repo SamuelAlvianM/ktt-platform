@@ -39,6 +39,7 @@ export function EditableInfoPage({
     body?: string[];
     list?: string[];
     image?: string;
+    gambar?: { judul?: string; gambar?: string }[];
   };
 
   const content: InfoPageContent = {
@@ -48,6 +49,10 @@ export function EditableInfoPage({
     body: Array.isArray(data.body) && data.body.length > 0 ? data.body : fallback.body,
     list: Array.isArray(data.list) && data.list.length > 0 ? data.list : fallback.list,
     image: data.image || fallback.image,
+    gambar:
+      Array.isArray(data.gambar) && data.gambar.length > 0
+        ? data.gambar
+        : fallback.gambar,
   };
 
   return (

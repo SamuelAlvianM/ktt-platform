@@ -41,7 +41,25 @@ export const DOKUMEN_KATEGORI: DokumenKategori[] = [
     key: "STANDAR_PELAYANAN",
     label: "Standar Pelayanan",
     group: "Produk Layanan",
-    halaman: [{ label: "PPID → Standar Pelayanan", href: "/ppid/standar-pelayanan" }],
+    // Satu kategori, dua halaman: dokumen yang diunggah sekali tampil di jalur
+    // PPID maupun Informasi Produk (permintaan dinas poin 1). Sengaja TIDAK
+    // dibuat kategori kedua supaya admin tidak perlu mengunggah berkas sama
+    // dua kali dan tidak ada risiko dua daftar yang isinya beda.
+    halaman: [
+      { label: "PPID → Standar Pelayanan", href: "/ppid/standar-pelayanan" },
+      {
+        label: "Informasi Produk → Standar Pelayanan",
+        href: "/produk/standar-pelayanan",
+      },
+    ],
+  },
+  {
+    key: "ALUR_PELAYANAN",
+    label: "Alur Pelayanan",
+    group: "Produk Layanan",
+    halaman: [
+      { label: "Informasi Produk → Alur Pelayanan", href: "/produk/alur-pelayanan" },
+    ],
   },
 
   // ── PPID / transparansi ──
@@ -297,7 +315,11 @@ export const DOKUMEN_KATEGORI: DokumenKategori[] = [
     key: "INOVASI_LAYANAN",
     label: "Inovasi Layanan",
     group: "PPID / Transparansi",
-    halaman: [{ label: "PPID → Inovasi Layanan", href: "/ppid/inovasi-layanan" }],
+    // Sama seperti STANDAR_PELAYANAN: satu kategori, tampil di dua halaman.
+    halaman: [
+      { label: "PPID → Inovasi Layanan", href: "/ppid/inovasi-layanan" },
+      { label: "Informasi Produk → Inovasi", href: "/produk/inovasi" },
+    ],
   },
 ];
 

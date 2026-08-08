@@ -687,12 +687,28 @@ for (const { seksi, label, content } of INFO_SECTIONS) {
         { name: "description", label: "Deskripsi Singkat", type: "textarea" },
         { name: "body", label: "Paragraf Isi", type: "list" },
         { name: "list", label: "Daftar Poin", type: "list" },
+        // Gambar/infografis unggahan admin — tampil di bawah paragraf & daftar
+        // poin. Ditambahkan untuk Standar Pelayanan / Alur Pelayanan / Inovasi
+        // (permintaan dinas poin 1), tapi sengaja dipasang GENERIK supaya
+        // halaman info mana pun bisa memuat infografis tanpa ubah kode lagi.
+        {
+          name: "gambar",
+          label: "Gambar / Infografis",
+          type: "items",
+          catatan:
+            "Boleh lebih dari satu. Judul opsional — dikosongkan pun gambarnya tetap tampil.",
+          itemFields: [
+            { name: "judul", label: "Judul (opsional)" },
+            { name: "gambar", label: "Gambar", type: "image" },
+          ],
+        },
       ],
       defaults: {
         title: c.title,
         description: c.description,
         body: c.body ?? [],
         list: c.list ?? [],
+        gambar: c.gambar ?? [],
       },
     });
   }
@@ -791,6 +807,17 @@ function blokInfoHalaman(kunci: string): StaticBlock | undefined {
       { name: 'image', label: 'Gambar/Infografis', type: 'image' },
       { name: 'body', label: 'Paragraf Isi', type: 'list' },
       { name: 'list', label: 'Daftar Poin', type: 'list' },
+      // Disamakan dengan blok info bawaan (lihat INFO_SECTIONS) supaya halaman
+      // buatan admin pun bisa memuat beberapa infografis, bukan cuma satu.
+      {
+        name: 'gambar',
+        label: 'Gambar / Infografis (bisa lebih dari satu)',
+        type: 'items',
+        itemFields: [
+          { name: 'judul', label: 'Judul (opsional)' },
+          { name: 'gambar', label: 'Gambar', type: 'image' },
+        ],
+      },
     ],
     defaults: {},
   };

@@ -78,12 +78,36 @@ export default function HeroSection() {
 
   return (
     <section className="relative overflow-hidden">
-      {/* Latar gradient brand */}
+      {/* Latar gradient brand — tetap dipasang sebagai DASAR, bukan diganti:
+          ia yang mengisi layar saat gambar latar belum termuat, dan yang
+          menutup sisi kiri-kanan di layar sangat lebar. */}
       <div
         className="absolute inset-0"
         style={{
           background:
             "linear-gradient(135deg, #92400e 0%, #b45309 45%, #f59e0b 100%)",
+        }}
+      />
+      {/* Latar motif Upun Taka (materi dinas — "Opsi 2", yang lembut).
+          🔴 Berkasnya 1600×900; di monitor ≥1920 ia diregangkan. Karena itu
+          ditumpuk gradien peneduh di atasnya: perenggangan jadi tak kentara
+          DAN teks putih tetap terbaca di atas motif yang ramai. Kalau dinas
+          mengirim berkas resolusi asli, cukup timpa public/latar-upun-taka.jpg
+          — tidak ada kode yang perlu diubah. */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url('/latar-upun-taka.jpg')" }}
+      />
+      {/* Peneduh. Kekuatannya dipilih dari dua percobaan: cukup ringan supaya
+          motifnya benar-benar terlihat (itu gunanya dipasang), tapi masih
+          menahan kontras teks putih di SISI KIRI — tempat judul & paragraf
+          berada — di ± 5,5:1, di atas ambang WCAG AA 4,5:1. Menurunkannya lagi
+          akan membuat paragraf kecil mulai sulit dibaca. */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(135deg, rgba(120,53,15,0.60) 0%, rgba(180,83,9,0.45) 45%, rgba(245,158,11,0.32) 100%)",
         }}
       />
       {/* Pola titik halus */}

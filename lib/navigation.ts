@@ -53,6 +53,24 @@ export const navigationItems: NavMenu[] = [
         href: "/produk/sop",
         description: "Standar operasional prosedur pelayanan",
       },
+      // Tiga sub-menu tambahan (permintaan dinas poin 1). Ketiganya menerima
+      // dokumen PDF (lewat kategori di lib/dokumen-registry.ts) sekaligus
+      // gambar/infografis (field `gambar` pada blok info.produk.*).
+      {
+        title: "Standar Pelayanan (SP)",
+        href: "/produk/standar-pelayanan",
+        description: "Standar pelayanan publik: persyaratan, waktu, dan biaya",
+      },
+      {
+        title: "Alur Pelayanan",
+        href: "/produk/alur-pelayanan",
+        description: "Tahapan pelayanan dari pendaftaran sampai dokumen diserahkan",
+      },
+      {
+        title: "Inovasi",
+        href: "/produk/inovasi",
+        description: "Inovasi layanan Disdukcapil Tana Tidung",
+      },
     ],
   },
   {
