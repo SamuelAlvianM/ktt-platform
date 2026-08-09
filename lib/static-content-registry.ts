@@ -585,6 +585,21 @@ STATIC_BLOCKS.push({
   defaults: { layanan: SYARAT_LAYANAN },
 });
 
+// Pengaturan tampilan halaman /galeri. Sekarang hanya jumlah kolom grid, yang
+// diubah admin lewat segmented control di halaman itu (Mode Edit) — pola sama
+// dengan galeri PPID. WAJIB terdaftar di sini: PUT /api/admin/static-content
+// menolak kunci yang tidak dikenal ("Kunci konten tidak dikenal").
+// Nilainya tetap dijepit 2–4 di sisi halaman (`clampKolom`), jadi isian ngawur
+// dari dashboard tidak merusak tata letak.
+STATIC_BLOCKS.push({
+  kunci: "galeri.tampilan",
+  judul: "Galeri — Tampilan",
+  deskripsi:
+    "Jumlah foto per baris di halaman Galeri (2–4). Lebih mudah diubah langsung dari halaman Galeri lewat Mode Edit.",
+  fields: [{ name: "kolom", label: "Jumlah Kolom (2–4)", type: "text" }],
+  defaults: { kolom: 4 },
+});
+
 // Daftar tanya-jawab halaman /pusat-bantuan/faq (permintaan dinas poin 3).
 // Dipisah dari blok `info.pusat-bantuan.faq` (yang mengatur judul/deskripsi/
 // paragraf) karena bentuknya pasangan tanya-jawab, bukan paragraf lepas.

@@ -1,18 +1,46 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import Image from 'next/image';
 import { toast } from 'sonner';
 import { Footer } from '@/components/shared/footer';
-import { Images, X, Plus, Trash2, Loader2 } from 'lucide-react';
+import { Images, X, Plus, Trash2, Loader2, ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { ImagePickerField } from '@/components/media/image-picker-field';
 import { useInlineEdit } from '@/components/konten/inline-edit';
+import { useStaticContent, refreshStaticContent } from '@/lib/use-static-content';
 
-/** Kategori bawaan; admin tetap boleh mengetik kategori lain. */
+/** Kategori bawaan; admin tetap boleh membuat kategori lain. */
 const KATEGORI_BAWAAN = ['PELAYANAN', 'BUPATI'];
+
+/** Radix SelectItem tidak boleh bernilai "" → pakai sentinel. */
+const SENTINEL_TANPA = '__tanpa__';
+const SENTINEL_BARU = '__baru__';
+
+/** Urutan tampilan galeri. */
+const URUTAN = [
+  { nilai: 'terbaru', label: 'Terbaru' },
+  { nilai: 'terlama', label: 'Terlama' },
+  { nilai: 'judul', label: 'Judul A–Z' },
+] as const;
+type Urutan = (typeof URUTAN)[number]['nilai'];
+
+/**
+ * Jumlah kolom grid, disimpan sebagai StaticContent supaya pilihan admin
+ * berlaku juga untuk pengunjung — bukan cuma di layar admin.
+ * Pola & rentangnya mengikuti galeri PPID (components/ppid/galeri-profil.tsx).
+ */
+const KUNCI_TAMPILAN = 'galeri.tampilan';
+const KOLOM_PILIHAN = [2, 3, 4] as const;
+const clampKolom = (n: unknown) => Math.min(4, Math.max(2, Number(n) || 4));
 
 interface GalleryItem {
   id: number;
@@ -27,6 +55,7 @@ export default function GaleriPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [selected, setSelected] = useState<GalleryItem | null>(null);
   const [filter, setFilter] = useState<string>('Semua');
+  const [urutan, setUrutan] = useState<Urutan>('terbaru');
 
   // ── Mode Edit: tambah/hapus foto langsung dari halaman ini ──
   // Sebelumnya foto HANYA bisa diunggah lewat Dashboard → Galeri, sehingga di
@@ -36,12 +65,32 @@ export default function GaleriPage() {
   const { editMode } = useInlineEdit();
   const [formBuka, setFormBuka] = useState(false);
   const [judul, setJudul] = useState('');
-  const [kategori, setKategori] = useState(KATEGORI_BAWAAN[0]);
+  const [kategori, setKategori] = useState('');
   /** true = admin sedang mengetik kategori baru, bukan memilih yang sudah ada. */
   const [kategoriLain, setKategoriLain] = useState(false);
   const [gambar, setGambar] = useState('');
   const [menyimpan, setMenyimpan] = useState(false);
   const [menghapusId, setMenghapusId] = useState<number | null>(null);
+
+  // Jumlah kolom grid — tersimpan, jadi pilihan admin ikut terlihat pengunjung.
+  const tampilan = useStaticContent([KUNCI_TAMPILAN])[KUNCI_TAMPILAN] as
+    | { kolom?: number }
+    | undefined;
+  const kolom = clampKolom(tampilan?.kolom);
+
+  const gantiKolom = async (k: number) => {
+    const res = await fetch('/api/admin/static-content', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kunci: KUNCI_TAMPILAN, konten: { ...tampilan, kolom: k } }),
+    });
+    const j = await res.json();
+    if (j.error?.length) {
+      toast.error(j.error[0]);
+      return;
+    }
+    refreshStaticContent();
+  };
 
   const muat = useCallback(() => {
     setIsLoading(true);
@@ -57,7 +106,7 @@ export default function GaleriPage() {
 
   const bukaForm = () => {
     setJudul('');
-    setKategori(KATEGORI_BAWAAN[0]);
+    setKategori('');
     setKategoriLain(false);
     setGambar('');
     setFormBuka(true);
@@ -68,16 +117,23 @@ export default function GaleriPage() {
       toast.error('Judul dan foto wajib diisi');
       return;
     }
-    if (!kategori.trim()) {
-      toast.error('Kategori wajib diisi');
-      return;
-    }
     setMenyimpan(true);
     try {
       const res = await fetch('/api/galeri', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ judul: judul.trim(), kategori: kategori.trim(), gambar }),
+        // "Tanpa kategori" dikirim sebagai STRING KOSONG, bukan null.
+        // Kolom `Gallery.kategori` di skema NOT NULL (`String @default("PELAYANAN")`),
+        // jadi null ditolak Prisma → 500. Mengosongkannya juga tidak boleh
+        // dihilangkan dari payload, karena default skema akan diam-diam
+        // menandainya "PELAYANAN" — foto tanpa kategori jadi salah kelompok.
+        // String kosong disaring di sisi tampilan (lihat `kategoriTerpakai`),
+        // sehingga foto itu hanya muncul di "Semua".
+        body: JSON.stringify({
+          judul: judul.trim(),
+          kategori: kategori.trim(),
+          gambar,
+        }),
       });
       const j = await res.json();
       if (j.error?.length) {
@@ -109,11 +165,26 @@ export default function GaleriPage() {
     }
   };
 
-  const categories = ['Semua', ...Array.from(new Set(items.map((i) => i.kategori ?? 'Umum')))];
-  const filtered = filter === 'Semua' ? items : items.filter((i) => (i.kategori ?? 'Umum') === filter);
+  // Foto TANPA kategori tidak lagi membentuk kelompok "Umum" sendiri — ia cukup
+  // ikut "Semua". Kategori memang cuma alat pengelompokan, bukan keharusan.
+  const kategoriTerpakai = Array.from(
+    new Set(items.map((i) => i.kategori?.trim()).filter(Boolean) as string[]),
+  ).sort((a, b) => a.localeCompare(b, 'id'));
+  const categories = ['Semua', ...kategoriTerpakai];
+
+  const disaring =
+    filter === 'Semua' ? items : items.filter((i) => (i.kategori ?? '') === filter);
+
+  const filtered = [...disaring].sort((a, b) => {
+    if (urutan === 'judul') return a.judul.localeCompare(b.judul, 'id');
+    const selisih =
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    return urutan === 'terbaru' ? selisih : -selisih;
+  });
+
   // Pilihan kategori di form: bawaan + yang sudah dipakai, tanpa duplikat.
   const saranKategori = Array.from(
-    new Set([...KATEGORI_BAWAAN, ...items.map((i) => i.kategori).filter(Boolean) as string[]]),
+    new Set([...KATEGORI_BAWAAN, ...kategoriTerpakai]),
   );
 
   return (
@@ -143,34 +214,94 @@ export default function GaleriPage() {
               <span className="font-semibold text-primary">Mode Edit aktif.</span>{' '}
               Tambah foto dokumentasi kegiatan langsung dari halaman ini.
             </p>
-            <Button
-              onClick={bukaForm}
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              <Plus className="h-4 w-4" />
-              <span className="ml-1">Tambah Foto</span>
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Jumlah kolom per baris — pola & rentang sama dengan galeri PPID. */}
+              {items.length > 0 && (
+                <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white p-0.5">
+                  <span className="px-1.5 text-[0.7rem] font-medium text-slate-400">
+                    Kolom
+                  </span>
+                  {KOLOM_PILIHAN.map((k) => (
+                    <button
+                      key={k}
+                      type="button"
+                      onClick={() => gantiKolom(k)}
+                      title={`Tampilkan ${k} foto per baris`}
+                      className={`h-6 w-6 rounded-md text-xs font-semibold transition-colors ${
+                        kolom === k
+                          ? 'bg-primary text-primary-foreground'
+                          : 'text-slate-500 hover:bg-slate-100'
+                      }`}
+                    >
+                      {k}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <Button
+                onClick={bukaForm}
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                <Plus className="h-4 w-4" />
+                <span className="ml-1">Tambah Foto</span>
+              </Button>
+            </div>
           </div>
         )}
 
-        {/* Filter tabs */}
-        {categories.length > 1 && (
-          <div className="flex flex-wrap gap-2 mb-8">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setFilter(cat)}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-                  filter === cat
-                    ? 'text-white shadow-md'
-                    : 'bg-white/60 text-slate-600 border border-slate-200 hover:border-primary/40'
-                }`}
-                style={filter === cat ? { background: 'linear-gradient(90deg, #2e6da4, #1b4b72)' } : {}}
-              >
-                {cat}
-              </button>
-            ))}
+        {/* Penyaring kategori + pengurutan. Ditampilkan selama masih ada foto —
+            pengurutan tetap berguna walau kategorinya cuma satu. */}
+        {items.length > 0 && (
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setFilter(cat)}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+                    filter === cat
+                      ? 'text-white shadow-md'
+                      : 'bg-white/60 text-slate-600 border border-slate-200 hover:border-primary/40'
+                  }`}
+                  style={filter === cat ? { background: 'linear-gradient(90deg, #2e6da4, #1b4b72)' } : {}}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                <ArrowUpDown className="h-3.5 w-3.5" />
+                Urutkan
+              </span>
+              <Select value={urutan} onValueChange={(v) => setUrutan(v as Urutan)}>
+                <SelectTrigger className="h-9 w-[150px] bg-white text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {URUTAN.map((u) => (
+                    <SelectItem key={u.nilai} value={u.nilai}>
+                      {u.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+        )}
+
+        {/* Jumlah yang sedang tampil — supaya jelas penyaringnya berpengaruh. */}
+        {!isLoading && items.length > 0 && (
+          <p className="-mt-4 mb-6 text-xs text-slate-500">
+            Menampilkan <span className="font-semibold text-slate-700">{filtered.length}</span> foto
+            {filter !== 'Semua' && (
+              <>
+                {' '}pada kategori <span className="font-semibold text-slate-700">{filter}</span>
+              </>
+            )}
+            {' '}dari total {items.length}.
+          </p>
         )}
 
         {isLoading ? (
@@ -194,24 +325,33 @@ export default function GaleriPage() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          /* Grid mengikuti pola galeri PPID: jumlah kolom dari var `--k`
+             (2/3/4), tetap 1 kolom di ponsel & 2 di tablet. */
+          <div
+            className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:[grid-template-columns:repeat(var(--k),minmax(0,1fr))]"
+            style={{ ['--k' as string]: kolom } as React.CSSProperties}
+          >
             {filtered.map((item) => (
-              <div
+              <figure
                 key={item.id}
-                className="glass-card rounded-xl overflow-hidden cursor-pointer group hover:shadow-lg transition-all"
+                className="group relative cursor-zoom-in overflow-hidden rounded-md border border-slate-200/70 bg-white shadow-sm transition-shadow hover:shadow-md"
                 onClick={() => setSelected(item)}
               >
-                <div className="relative aspect-[4/3] overflow-hidden bg-slate-50">
-                  <Image
+                <div className="relative">
+                  {/* Gambar tampil apa adanya (tinggi mengikuti rasio aslinya),
+                      BUKAN dipaksa ke kotak 4:3 dengan object-contain — pola
+                      lama itu menyisakan bidang putih di kiri-kanan/atas-bawah
+                      setiap foto yang rasionya beda. Sama seperti galeri PPID. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element -- gambar unggahan admin, dimensi tak diketahui */}
+                  <img
                     src={item.gambar.startsWith('/') ? item.gambar : `/uploads/gallery/${item.gambar}`}
                     alt={item.judul}
-                    fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    className="object-contain p-1.5 group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                    className="h-auto w-full"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                    <p className="text-white text-xs font-medium line-clamp-2">{item.judul}</p>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                  <div className="absolute bottom-0 left-0 right-0 translate-y-full p-3 transition-transform duration-300 group-hover:translate-y-0">
+                    <p className="line-clamp-2 text-xs font-medium text-white">{item.judul}</p>
                   </div>
 
                   {/* Hapus — stopPropagation supaya tidak ikut membuka lightbox. */}
@@ -234,7 +374,7 @@ export default function GaleriPage() {
                     </button>
                   )}
                 </div>
-              </div>
+              </figure>
             ))}
           </div>
         )}
@@ -274,43 +414,38 @@ export default function GaleriPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label>Kategori</Label>
-                {/* Pilihan pil, bukan <datalist>: dropdown bawaan browser
-                    tampilannya mentah (kotak hitam OS) dan tidak mengikuti
-                    desain situs. Pola pil ini sama dengan Dashboard → Galeri. */}
-                <div className="flex flex-wrap gap-2">
-                  {saranKategori.map((k) => (
-                    <button
-                      key={k}
-                      type="button"
-                      onClick={() => {
-                        setKategoriLain(false);
-                        setKategori(k);
-                      }}
-                      className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
-                        !kategoriLain && kategori === k
-                          ? 'border-transparent bg-primary text-primary-foreground'
-                          : 'border-slate-200 bg-white text-slate-600 hover:border-primary/40'
-                      }`}
-                    >
-                      {k}
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => {
+                <Label>Kategori <span className="font-normal text-slate-400">(opsional)</span></Label>
+                {/* Dropdown, bukan deretan pil: kategori bisa tumbuh banyak dan
+                    pil akan meluber. Memakai Select milik aplikasi (Radix), BUKAN
+                    <input list=datalist> — dropdown bawaan browser tampil sebagai
+                    kotak hitam OS yang keluar dari desain situs.
+                    Radix melarang SelectItem bernilai "" → dipakai sentinel. */}
+                <Select
+                  value={kategoriLain ? SENTINEL_BARU : kategori || SENTINEL_TANPA}
+                  onValueChange={(v) => {
+                    if (v === SENTINEL_BARU) {
                       setKategoriLain(true);
                       setKategori('');
-                    }}
-                    className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
-                      kategoriLain
-                        ? 'border-transparent bg-primary text-primary-foreground'
-                        : 'border-dashed border-slate-300 bg-white text-slate-500 hover:border-primary/40'
-                    }`}
-                  >
-                    + Lainnya
-                  </button>
-                </div>
+                      return;
+                    }
+                    setKategoriLain(false);
+                    setKategori(v === SENTINEL_TANPA ? '' : v);
+                  }}
+                >
+                  <SelectTrigger className="w-full bg-white">
+                    <SelectValue placeholder="Pilih kategori" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={SENTINEL_TANPA}>Tanpa kategori</SelectItem>
+                    {saranKategori.map((k) => (
+                      <SelectItem key={k} value={k}>
+                        {k}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value={SENTINEL_BARU}>+ Buat kategori baru…</SelectItem>
+                  </SelectContent>
+                </Select>
+
                 {kategoriLain && (
                   <Input
                     autoFocus
@@ -320,8 +455,11 @@ export default function GaleriPage() {
                     className="mt-2"
                   />
                 )}
-                <p className="text-[0.7rem] text-slate-500">
-                  Kategori jadi tombol penyaring di atas galeri.
+
+                <p className="text-[0.7rem] leading-relaxed text-slate-500">
+                  Kategori hanya untuk mengelompokkan foto — ia muncul sebagai tombol
+                  penyaring di atas galeri. Dikosongkan pun tidak apa-apa; fotonya
+                  tetap tampil di &ldquo;Semua&rdquo;.
                 </p>
               </div>
 
@@ -368,18 +506,18 @@ export default function GaleriPage() {
             <X className="w-5 h-5" />
           </button>
           <div
-            className="max-w-4xl w-full glass-card rounded-2xl overflow-hidden"
+            className="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-2xl sm:max-w-4xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative aspect-video">
-              <Image
-                src={selected.gambar.startsWith('/') ? selected.gambar : `/uploads/gallery/${selected.gambar}`}
-                alt={selected.judul}
-                fill
-                className="object-contain"
-              />
-            </div>
-            <div className="p-4 bg-white/80">
+            {/* Sama seperti kartunya: gambar apa adanya, bukan dipaksa 16:9
+                dengan object-contain yang menyisakan bidang kosong. */}
+            {/* eslint-disable-next-line @next/next/no-img-element -- gambar unggahan admin */}
+            <img
+              src={selected.gambar.startsWith('/') ? selected.gambar : `/uploads/gallery/${selected.gambar}`}
+              alt={selected.judul}
+              className="max-h-[75vh] w-full object-contain"
+            />
+            <div className="p-4">
               <h3 className="font-semibold text-slate-900">{selected.judul}</h3>
               {selected.kategori && (
                 <span className="text-xs text-primary font-medium">{selected.kategori}</span>
