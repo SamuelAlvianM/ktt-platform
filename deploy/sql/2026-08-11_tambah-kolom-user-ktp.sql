@@ -1,0 +1,22 @@
+-- SIDAKO — tambah kolom Foto KTP pada tabel users.
+--
+-- WAJIB DIJALANKAN SEBELUM deploy build yang memuat field Foto KTP.
+-- Tanpa kolom ini Prisma meng-SELECT kolom yang tidak ada → SEMUA query User
+-- balas 500 dan warga tidak bisa login.
+--
+-- Aditif & nullable: tidak menyentuh data yang sudah ada, tidak mengunci tabel
+-- lama-lama, dan aman dijalankan saat aplikasi hidup.
+--
+-- Jalankan di server produksi (VPS 76.13.19.247), BUKAN dari laptop lewat
+-- `mysql < file.sql` — berkas ini tidak pernah ikut bundle deploy.
+-- Paste sebagai heredoc berkuota di shell server:
+--
+--   set -a; . /root/ktt-platform/.env; set +a
+--   mysql -u"$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" <<'SQL'
+--   ALTER TABLE users ADD COLUMN user_ktp VARCHAR(255) NULL AFTER user_foto;
+--   SQL
+--
+-- Verifikasi sesudahnya:
+--   SHOW COLUMNS FROM users LIKE 'user\_ktp';
+
+ALTER TABLE users ADD COLUMN user_ktp VARCHAR(255) NULL AFTER user_foto;
