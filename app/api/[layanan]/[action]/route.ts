@@ -8,6 +8,7 @@ import { createNotifikasi, notifyPetugas, safeNotify } from "@/lib/notifikasi";
 import { cekJamLayananSekarang } from "@/lib/jam-layanan-server";
 import { payloadBerkasEntries } from "@/lib/permohonan-display";
 import { catatAktivitas } from "@/lib/log-aktivitas";
+import { getLayananForm, validateLayananPayload } from "@/lib/layanan-forms";
 
 /**
  * Catch-all kompatibilitas untuk modal permohonan (warisan struktur Laravel).
@@ -46,7 +47,21 @@ const SUBMIT_ACTIONS = ["create", "update", "postdata", "insertdata", "store"];
  * field NIK/No.KK lain hanya dicek formatnya bila terisi (beberapa layanan
  * memang membolehkan NIK kosong, mis. akta kelahiran NIK belum ada).
  */
-function validatePayload(payload: Record<string, unknown>): string[] {
+function validatePayload(
+  layanan: string,
+  payload: Record<string, unknown>,
+): string[] {
+  // Aturannya diambil dari skema lib/layanan-forms.ts - sumber yang sama
+  // yang dipakai form di layar - jadi apa pun yang lolos di form pasti
+  // lolos di sini. Sebelumnya validasi menebak dari NAMA kolom (akhiran
+  // "nik"/"kk") dan itu memblokir layanan yang kolomnya kebetulan
+  // berakhiran begitu padahal isinya bukan nomor identitas - mis.
+  // `alasannumpangkk` = "Pekerjaan" dan `nikygnumpangkk` (banyak NIK per
+  // baris) membuat KK Numpang MUSTAHIL diajukan siapa pun.
+  const skema = getLayananForm(layanan);
+  if (skema) return validateLayananPayload(skema, payload);
+
+  // Layanan tanpa skema (tak seharusnya ada, tapi jaga-jaga): cek seadanya.
   const errors: string[] = [];
   const val = (k: string) => String(payload?.[k] ?? "").trim();
 
@@ -69,14 +84,9 @@ function validatePayload(payload: Record<string, unknown>): string[] {
     errors.push("Format email pemohon tidak valid");
   }
 
-  // Semua field bernuansa NIK/No.KK yang terisi harus 16 digit angka.
-  for (const [k, v] of Object.entries(payload ?? {})) {
-    if (k.startsWith("file")) continue;
-    const s = String(v ?? "").trim();
-    if (!s) continue;
-    if (/(nik|nokk|kk)$/i.test(k) && !/^\d{16}$/.test(s)) {
-      errors.push(`Kolom ${k} harus berupa 16 digit angka`);
-    }
+  const nik = val("pemohonnik");
+  if (nik && !/^\d{16}$/.test(nik)) {
+    errors.push("NIK pemohon harus 16 digit angka");
   }
 
   return errors;
@@ -150,7 +160,10 @@ export async function POST(
 
     const payload = await req.json().catch(() => ({}));
 
-    const kekurangan = validatePayload(payload as Record<string, unknown>);
+    const kekurangan = validatePayload(
+      layanan,
+      payload as Record<string, unknown>,
+    );
     if (kekurangan.length > 0) return fail(kekurangan, 422);
 
     const jenis = await prisma.jenisPermohonan.findUnique({

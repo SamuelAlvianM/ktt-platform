@@ -31,7 +31,7 @@ import {
   OcrUploadButton,
   type OcrUploadResult,
 } from '@/components/permohonan-online/ocr-upload-button';
-import type { LayananForm, FieldDef } from '@/lib/layanan-forms';
+import { validateFieldValue, type LayananForm, type FieldDef } from '@/lib/layanan-forms';
 import {
   useStatusJamLayanan,
   PanelJamTutup,
@@ -53,25 +53,9 @@ interface Props {
 
 type Values = Record<string, string>;
 
-// ── Validasi per tipe ──
-function validateField(fd: FieldDef, value: string): string | null {
-  const v = (value ?? '').trim();
-  if (fd.required && !v) return `${fd.label} wajib diisi`;
-  if (!v) return null;
-  switch (fd.type) {
-    case 'nik':
-    case 'kk':
-      if (!/^\d{16}$/.test(v)) return `${fd.label} harus 16 digit angka`;
-      break;
-    case 'phone':
-      if (!/^0\d{9,12}$/.test(v)) return `${fd.label} harus 10–13 digit dan diawali 0`;
-      break;
-    case 'email':
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return `Format ${fd.label} tidak valid`;
-      break;
-  }
-  return null;
-}
+// Validasi dipinjam dari skema — SATU sumber kebenaran dengan server,
+// supaya form di layar dan API tidak pernah berbeda pendapat.
+const validateField = validateFieldValue;
 
 export function StaffPengajuanForm({
   layanan,
@@ -90,7 +74,7 @@ export function StaffPengajuanForm({
   const [dragField, setDragField] = useState<string | null>(null);
   // Penampil berkas layar penuh (zoom + maju/mundur antar dokumen terunggah).
   const { viewer, bukaGambar, tutupGambar } = useImageViewer();
-  // Status jam pelayanan (WIB) — form dinonaktifkan bila di luar jam aktif.
+  // Status jam pelayanan (WITA) — form dinonaktifkan bila di luar jam aktif.
   const { loading: loadingJam, status: statusJam, tertutup: jamTutup } =
     useStatusJamLayanan();
 
