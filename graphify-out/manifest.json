@@ -905,18 +905,6 @@
     "ast_hash": "199ecd90bf2a41bfea9934d88ea7b98e",
     "semantic_hash": "199ecd90bf2a41bfea9934d88ea7b98e"
   },
-  "app/uploads/[...path]/route.ts": {
-    "mtime": 1784873187.9307344,
-    "seen": 1788252628.4636974,
-    "ast_hash": "3f1dd7405679416e0ff30aa5d74e6924",
-    "semantic_hash": "3f1dd7405679416e0ff30aa5d74e6924"
-  },
-  "app/uploads/media/[...path]/route.ts": {
-    "mtime": 1784094266.6440845,
-    "seen": 1788252628.4636981,
-    "ast_hash": "5bdadee8fdcf7788f1bc2fe4785baad3",
-    "semantic_hash": "5bdadee8fdcf7788f1bc2fe4785baad3"
-  },
   "app/user/pengajuan/baru/PilihLayananClient.tsx": {
     "mtime": 1784564713.8549623,
     "seen": 1788252628.4636993,
@@ -1307,12 +1295,6 @@
     "ast_hash": "700964378e90cfc65d17e16b6216b529",
     "semantic_hash": "700964378e90cfc65d17e16b6216b529"
   },
-  "components/ppid/prosedur-informasi-images.tsx": {
-    "mtime": 1784658037.2054384,
-    "seen": 1788252628.4637952,
-    "ast_hash": "7b7eec4126892a64d035b063d6fd2a3a",
-    "semantic_hash": "7b7eec4126892a64d035b063d6fd2a3a"
-  },
   "components/produk/produk-disdukcapil-view.tsx": {
     "mtime": 1784094267.2804093,
     "seen": 1788252628.4637964,
@@ -1354,12 +1336,6 @@
     "seen": 1788252628.4638026,
     "ast_hash": "b2a5e9e6c205ecb805de8be0762b027e",
     "semantic_hash": "b2a5e9e6c205ecb805de8be0762b027e"
-  },
-  "components/shared/demografi-chart.tsx": {
-    "mtime": 1784094267.3224077,
-    "seen": 1788252628.463804,
-    "ast_hash": "75e74eace1f174963afc82a1ed58e19d",
-    "semantic_hash": "75e74eace1f174963afc82a1ed58e19d"
   },
   "components/shared/editable-info-page.tsx": {
     "mtime": 1786209965.3342738,
@@ -1613,42 +1589,6 @@
     "ast_hash": "aa8ed9a4fce51e81c7cf07c9b7f5f649",
     "semantic_hash": "aa8ed9a4fce51e81c7cf07c9b7f5f649"
   },
-  "deploy/deploy.sh": {
-    "mtime": 1786495737.2534175,
-    "seen": 1788252628.4638505,
-    "ast_hash": "d5b56e6d6f9c935983e5380683273f0f",
-    "semantic_hash": "d5b56e6d6f9c935983e5380683273f0f"
-  },
-  "deploy/ecosystem.config.cjs": {
-    "mtime": 1784108334.578943,
-    "seen": 1788252628.4638517,
-    "ast_hash": "65c03200b64e66c193462bcf060c3db7",
-    "semantic_hash": "65c03200b64e66c193462bcf060c3db7"
-  },
-  "deploy/server-bootstrap.sh": {
-    "mtime": 1784108334.615941,
-    "seen": 1788252628.463853,
-    "ast_hash": "2c46e6da5a6edc9f9422ab8874e30624",
-    "semantic_hash": "2c46e6da5a6edc9f9422ab8874e30624"
-  },
-  "deploy/server-db-setup.sh": {
-    "mtime": 1784108334.626942,
-    "seen": 1788252628.4638538,
-    "ast_hash": "6d238540e7accdf5860feb330a693e29",
-    "semantic_hash": "6d238540e7accdf5860feb330a693e29"
-  },
-  "deploy/sql/2026-07-29_kecamatan-tanatidung.sql": {
-    "mtime": 1785289875.6556025,
-    "seen": 1788252628.4638548,
-    "ast_hash": "74088a7cfa09bd06aba5f2d4805d9e4b",
-    "semantic_hash": "74088a7cfa09bd06aba5f2d4805d9e4b"
-  },
-  "deploy/sql/2026-08-11_tambah-kolom-user-ktp.sql": {
-    "mtime": 1786454095.0754576,
-    "seen": 1788252628.463856,
-    "ast_hash": "07942f6b67c4ec645926bb3805abfb4c",
-    "semantic_hash": "07942f6b67c4ec645926bb3805abfb4c"
-  },
   "eslint.config.mjs": {
     "mtime": 1782712148.9999874,
     "seen": 1788252628.463857,
@@ -1806,10 +1746,10 @@
     "semantic_hash": "fb8a02124dd6d98305f184c4f807c0a4"
   },
   "lib/notifikasi-wa.ts": {
-    "mtime": 1785232512.784621,
-    "seen": 1788252628.463886,
-    "ast_hash": "4bd99c0f51d73881af36b3d9ce8ffe29",
-    "semantic_hash": "4bd99c0f51d73881af36b3d9ce8ffe29"
+    "mtime": 1788254318.4272108,
+    "seen": 1788254456.6483636,
+    "ast_hash": "9db161ad3c1a154bd7082484ee79f1c1",
+    "semantic_hash": "9db161ad3c1a154bd7082484ee79f1c1"
   },
   "lib/notifikasi.ts": {
     "mtime": 1784094267.585471,
@@ -2057,27 +1997,9 @@
     "ast_hash": "3a3127d3e5ad2311dbd11cee502ed539",
     "semantic_hash": ""
   },
-  "deploy/README.md": {
-    "mtime": 1784110021.107677,
-    "seen": 1788253753.34349,
-    "ast_hash": "95029aad41cd38c724ff311b6adafc49",
-    "semantic_hash": ""
-  },
   "PANDUAN-UI-SIDAKO.pdf": {
     "mtime": 1784125138.451272,
     "seen": 1788253753.343491,
-    "ast_hash": "e9af44c92bdc25cae54bc3c709893184",
-    "semantic_hash": ""
-  },
-  "public/uploads/produk/1_1783587415369.pdf": {
-    "mtime": 1783587415.3717372,
-    "seen": 1788253753.3434923,
-    "ast_hash": "0f57bfc49ba3a851daaa2012231d7435",
-    "semantic_hash": ""
-  },
-  "public/uploads/produk/1_1784566434291.pdf": {
-    "mtime": 1784566434.3128793,
-    "seen": 1788253753.3434937,
     "ast_hash": "e9af44c92bdc25cae54bc3c709893184",
     "semantic_hash": ""
   },
@@ -2085,366 +2007,6 @@
     "mtime": 1784112711.545,
     "seen": 1788253753.3434951,
     "ast_hash": "b820690c8479af1080747dafce46e053",
-    "semantic_hash": ""
-  },
-  "public/LOGO-dinas_sidako.png": {
-    "mtime": 1784093917.292937,
-    "seen": 1788253753.3434968,
-    "ast_hash": "497397abea4294d7b8042c86ebad3cc3",
-    "semantic_hash": ""
-  },
-  "public/file.svg": {
-    "mtime": 1782714100.2169771,
-    "seen": 1788253753.343498,
-    "ast_hash": "d09f95206c3fa0bb9bd9fefabfd0ea71",
-    "semantic_hash": ""
-  },
-  "public/globe.svg": {
-    "mtime": 1782714100.2308156,
-    "seen": 1788253753.3434994,
-    "ast_hash": "2aaafa6a49b6563925fe440891e32717",
-    "semantic_hash": ""
-  },
-  "public/highlights/berita-info.jpg": {
-    "mtime": 1782876710.4578018,
-    "seen": 1788253753.3435009,
-    "ast_hash": "1979fde0cfd07565d68befd6e5c2273e",
-    "semantic_hash": ""
-  },
-  "public/highlights/layanan-online.jpg": {
-    "mtime": 1782876710.1944335,
-    "seen": 1788253753.343502,
-    "ast_hash": "c748b57a1bf81a412c7581442dab92d4",
-    "semantic_hash": ""
-  },
-  "public/highlights/pantau-status.png": {
-    "mtime": 1782876710.271511,
-    "seen": 1788253753.3435037,
-    "ast_hash": "98e610f663c5d899f0b19cabb6d362ce",
-    "semantic_hash": ""
-  },
-  "public/highlights/unduh-bukti.png": {
-    "mtime": 1782876710.3603692,
-    "seen": 1788253753.343505,
-    "ast_hash": "4cf316ecdfb23a77e58759cebb666d73",
-    "semantic_hash": ""
-  },
-  "public/latar-upun-taka.jpg": {
-    "mtime": 1786210047.4201126,
-    "seen": 1788253753.3435063,
-    "ast_hash": "49630a096750cbdd6897405ac9efb381",
-    "semantic_hash": ""
-  },
-  "public/next.svg": {
-    "mtime": 1782714100.242351,
-    "seen": 1788253753.343508,
-    "ast_hash": "8e061864f388b47f33a1c3780831193e",
-    "semantic_hash": ""
-  },
-  "public/og-sidako.png": {
-    "mtime": 1784112711.531,
-    "seen": 1788253753.3435092,
-    "ast_hash": "b563864e9944399659bb0114ee49e75c",
-    "semantic_hash": ""
-  },
-  "public/ppid/mekanisme-pengajuan-keberatan.jpg": {
-    "mtime": 1784657726.6590006,
-    "seen": 1788253753.3435109,
-    "ast_hash": "c00bea7a6acf5fa8c61b1a64986c190b",
-    "semantic_hash": ""
-  },
-  "public/ppid/profil-pejabat-kepala-dinas-v2.jpg": {
-    "mtime": 1784659934.9279308,
-    "seen": 1788253753.343512,
-    "ast_hash": "fbeb327225dba15f342e8a787e206b53",
-    "semantic_hash": ""
-  },
-  "public/ppid/prosedur-permohonan-informasi.jpg": {
-    "mtime": 1784657726.6204681,
-    "seen": 1788253753.3435133,
-    "ast_hash": "3b41b2e63c7f2594fc8ec0864ee3200c",
-    "semantic_hash": ""
-  },
-  "public/ppid/sejarah-disdukcapil.jpg": {
-    "mtime": 1784657726.7694917,
-    "seen": 1788253753.3435147,
-    "ast_hash": "51ffc90bf77ffada47176d7985e247d2",
-    "semantic_hash": ""
-  },
-  "public/ppid/tata-cara-sengketa-informasi.jpg": {
-    "mtime": 1784657726.6969998,
-    "seen": 1788253753.3435159,
-    "ast_hash": "5c2e61a56cd55616409242f9e7721272",
-    "semantic_hash": ""
-  },
-  "public/produk-layanan/catatanpinggir.png": {
-    "mtime": 1783602215.298391,
-    "seen": 1788253753.343517,
-    "ast_hash": "184ca5531b54b6e0737a9854d15382fa",
-    "semantic_hash": ""
-  },
-  "public/produk-layanan/catatanpinggirkewarganegaraan.png": {
-    "mtime": 1783602215.3144612,
-    "seen": 1788253753.3435185,
-    "ast_hash": "7a9ed0fbf3728aa2c3e72af061ca2ab3",
-    "semantic_hash": ""
-  },
-  "public/produk-layanan/catatanpinggirpengangkatananak.png": {
-    "mtime": 1783602215.3240552,
-    "seen": 1788253753.3435197,
-    "ast_hash": "e417f496a4db80a28c2ff60058dd3cd8",
-    "semantic_hash": ""
-  },
-  "public/produk-layanan/catatanpinggirperubahannama.png": {
-    "mtime": 1783602215.334583,
-    "seen": 1788253753.343521,
-    "ast_hash": "ec856d206b4d833d1b39710867747ec5",
-    "semantic_hash": ""
-  },
-  "public/produk-layanan/kelahiran.png": {
-    "mtime": 1783602215.3462622,
-    "seen": 1788253753.3435223,
-    "ast_hash": "eb1b3267e4922441c3e56b86a0484415",
-    "semantic_hash": ""
-  },
-  "public/produk-layanan/kematian.png": {
-    "mtime": 1783602215.3582935,
-    "seen": 1788253753.3435235,
-    "ast_hash": "bd86b7046643fd500edc650b0050e836",
-    "semantic_hash": ""
-  },
-  "public/produk-layanan/kutipankedua.png": {
-    "mtime": 1783602215.3688097,
-    "seen": 1788253753.3435252,
-    "ast_hash": "adfc7f282528f9ab383de8ff4391315d",
-    "semantic_hash": ""
-  },
-  "public/produk-layanan/layanan.png": {
-    "mtime": 1783602215.379347,
-    "seen": 1788253753.3435264,
-    "ast_hash": "3e6b45780f00a0c94afae80eccdebf7a",
-    "semantic_hash": ""
-  },
-  "public/produk-layanan/legalisasidokumen.png": {
-    "mtime": 1783602215.3918822,
-    "seen": 1788253753.3435278,
-    "ast_hash": "d3e2d48ff1b53f4725e70c4419ab3c45",
-    "semantic_hash": ""
-  },
-  "public/produk-layanan/pengakuananak.png": {
-    "mtime": 1783602215.4049199,
-    "seen": 1788253753.343529,
-    "ast_hash": "7970fd4a4e689e5b326fe212638ee1a5",
-    "semantic_hash": ""
-  },
-  "public/produk-layanan/perceraian.png": {
-    "mtime": 1783602215.4159904,
-    "seen": 1788253753.3435304,
-    "ast_hash": "56a2af3b0ba7898d4d0dcbf35fd14a1d",
-    "semantic_hash": ""
-  },
-  "public/produk-layanan/perkawinan.png": {
-    "mtime": 1783602215.433626,
-    "seen": 1788253753.3435318,
-    "ast_hash": "05d59045def1912f492916d29ac1c359",
-    "semantic_hash": ""
-  },
-  "public/produk-layanan/suratketerangan.png": {
-    "mtime": 1783602215.4446795,
-    "seen": 1788253753.3435333,
-    "ast_hash": "26c45f8d97ab59308f7e8308a45b3ad6",
-    "semantic_hash": ""
-  },
-  "public/pusat-bantuan/alur-pengaduan-konsultasi.jpg": {
-    "mtime": 1786207694.9956434,
-    "seen": 1788253753.3435347,
-    "ast_hash": "07bc17f245ed27d96a3118424d9a49e6",
-    "semantic_hash": ""
-  },
-  "public/pusat-bantuan/penipuan-ikd-landscape.jpg": {
-    "mtime": 1786207695.031836,
-    "seen": 1788253753.3435361,
-    "ast_hash": "52f46981fecb19e34b4cbff59fff573e",
-    "semantic_hash": ""
-  },
-  "public/pusat-bantuan/penipuan-ikd-portrait.jpg": {
-    "mtime": 1786207695.0717201,
-    "seen": 1788253753.3435373,
-    "ast_hash": "01d6b6dcc44c5d24007f3307b7caae76",
-    "semantic_hash": ""
-  },
-  "public/relasi/dinas.png": {
-    "mtime": 1782876156.103859,
-    "seen": 1788253753.343539,
-    "ast_hash": "14698180e65193ab6113e5a1f9005932",
-    "semantic_hash": ""
-  },
-  "public/relasi/kemendagri.png": {
-    "mtime": 1782876156.1470077,
-    "seen": 1788253753.3435402,
-    "ast_hash": "39e1d26da0396489a46fcdd392624cfc",
-    "semantic_hash": ""
-  },
-  "public/relasi/kotaku.png": {
-    "mtime": 1782876156.1881528,
-    "seen": 1788253753.3435416,
-    "ast_hash": "615dbcc0dc5fc78f333d76ad9618a5cf",
-    "semantic_hash": ""
-  },
-  "public/relasi/lapor.png": {
-    "mtime": 1782876156.2294257,
-    "seen": 1788253753.3435428,
-    "ast_hash": "a84fb6ecc42493f78ab0fa95f04a585b",
-    "semantic_hash": ""
-  },
-  "public/relasi/lpse.png": {
-    "mtime": 1782876156.2681572,
-    "seen": 1788253753.3435442,
-    "ast_hash": "895c014ef5420c2078f5608f257592a0",
-    "semantic_hash": ""
-  },
-  "public/relasi/ombudsman.jpg": {
-    "mtime": 1782876156.309752,
-    "seen": 1788253753.343546,
-    "ast_hash": "1432d23be4676f2d7adcc2f2e46eeb29",
-    "semantic_hash": ""
-  },
-  "public/relasi/panrb.png": {
-    "mtime": 1782876156.3538444,
-    "seen": 1788253753.343547,
-    "ast_hash": "abb9250fbf640dc09303d0a3b8b82303",
-    "semantic_hash": ""
-  },
-  "public/relasi/siapp.svg": {
-    "mtime": 1782876156.3999267,
-    "seen": 1788253753.3435488,
-    "ast_hash": "dd98b4fa41daa32929737d8854455432",
-    "semantic_hash": ""
-  },
-  "public/uploads/berita/adminduk-online-sidako.jpg": {
-    "mtime": 1784121063.9573553,
-    "seen": 1788253753.3435502,
-    "ast_hash": "e4f6876df25db7a1ccd8049e2d3724b4",
-    "semantic_hash": ""
-  },
-  "public/uploads/berita/akta-pekon-marang-sidako.jpg": {
-    "mtime": 1784121064.0158489,
-    "seen": 1788253753.3435516,
-    "ast_hash": "5189d21f89d90e0a1cbae3f29fc8b983",
-    "semantic_hash": ""
-  },
-  "public/uploads/berita/jemput-bola-lansia-sidako.jpg": {
-    "mtime": 1784121064.0678556,
-    "seen": 1788253753.343553,
-    "ast_hash": "4615b335f302b833a0c19156f9277827",
-    "semantic_hash": ""
-  },
-  "public/uploads/berita/perekaman-disabilitas-sidako.jpg": {
-    "mtime": 1784121064.1246557,
-    "seen": 1788253753.3435543,
-    "ast_hash": "f3292d1fd070dc571b7d2ad0214d5289",
-    "semantic_hash": ""
-  },
-  "public/uploads/berita/perekaman-pekon-kuripan-sidako.jpg": {
-    "mtime": 1784121064.1690967,
-    "seen": 1788253753.343556,
-    "ast_hash": "0d4f039be0c660aa3663b20b48c196a2",
-    "semantic_hash": ""
-  },
-  "public/uploads/berita/tips-persyaratan-sidako.jpg": {
-    "mtime": 1784121064.2153916,
-    "seen": 1788253753.3435571,
-    "ast_hash": "f8cd5abfabdb7692a05ba62da4de6489",
-    "semantic_hash": ""
-  },
-  "public/uploads/galeri/1_1782833186938.jpeg": {
-    "mtime": 1782833186.946479,
-    "seen": 1788253753.3435583,
-    "ast_hash": "52553ae68ecfc3f449467c8fce8c024b",
-    "semantic_hash": ""
-  },
-  "public/uploads/galeri/1_1782919225900.png": {
-    "mtime": 1782919225.9027467,
-    "seen": 1788253753.34356,
-    "ast_hash": "07900742200cf6eed3ecf04e8dd8f1c7",
-    "semantic_hash": ""
-  },
-  "public/uploads/konsolidasi-update-data/3_1782919644568.jpeg": {
-    "mtime": 1782919644.5734746,
-    "seen": 1788253753.3435612,
-    "ast_hash": "52553ae68ecfc3f449467c8fce8c024b",
-    "semantic_hash": ""
-  },
-  "public/uploads/konsolidasi-update-data/3_1782919647441.png": {
-    "mtime": 1782919647.4432354,
-    "seen": 1788253753.3435626,
-    "ast_hash": "07900742200cf6eed3ecf04e8dd8f1c7",
-    "semantic_hash": ""
-  },
-  "public/uploads/konsolidasi-update-data/3_1782919650946.jpeg": {
-    "mtime": 1782919650.9484286,
-    "seen": 1788253753.343564,
-    "ast_hash": "b462e3e877f0909e5f77e391ffada8f6",
-    "semantic_hash": ""
-  },
-  "public/uploads/media/2026/07/a1b2c3d4-0001-4001-8001-media000001-ktt.webp": {
-    "mtime": 1784114821.9787726,
-    "seen": 1788253753.3435652,
-    "ast_hash": "8e58cc141803499c92463fba07294108",
-    "semantic_hash": ""
-  },
-  "public/uploads/media/2026/07/a1b2c3d4-0002-4002-8002-media000002-ktt.webp": {
-    "mtime": 1784114822.0137718,
-    "seen": 1788253753.3435667,
-    "ast_hash": "ca920e0442569e2760b67cad7852604f",
-    "semantic_hash": ""
-  },
-  "public/uploads/media/2026/07/a1b2c3d4-0003-4003-8003-media000003-ktt.webp": {
-    "mtime": 1784114822.0487692,
-    "seen": 1788253753.3435678,
-    "ast_hash": "ad902e782481e309f8cf90d570102c37",
-    "semantic_hash": ""
-  },
-  "public/uploads/media/2026/07/a1b2c3d4-0004-4004-8004-media000004-ktt.webp": {
-    "mtime": 1784114822.0827823,
-    "seen": 1788253753.343569,
-    "ast_hash": "7a74beeb8a798ca124a383e62ed970b3",
-    "semantic_hash": ""
-  },
-  "public/uploads/ppid/1_1784966414359.png": {
-    "mtime": 1784966414.3637125,
-    "seen": 1788253753.3435705,
-    "ast_hash": "ce153a597fc095b4c7bcdbdc261c85ff",
-    "semantic_hash": ""
-  },
-  "public/uploads/ppid/1_1785229241512.jpg": {
-    "mtime": 1785229241.5177772,
-    "seen": 1788253753.343572,
-    "ast_hash": "073a60b88edd932021f6b79bbdbf3efe",
-    "semantic_hash": ""
-  },
-  "public/uploads/ppid/1_1785229246928.png": {
-    "mtime": 1785229246.93226,
-    "seen": 1788253753.3435733,
-    "ast_hash": "1fb5fbb848563c18a7c36656f7cce790",
-    "semantic_hash": ""
-  },
-  "public/vercel.svg": {
-    "mtime": 1782714100.2532976,
-    "seen": 1788253753.3435748,
-    "ast_hash": "c0af2f507b369b085b35ef4bbe3bcf1e",
-    "semantic_hash": ""
-  },
-  "public/wbs/tata-cara-pengaduan-wbs.png": {
-    "mtime": 1784657726.806497,
-    "seen": 1788253753.343576,
-    "ast_hash": "e4b7c098815df93aec0dfb49b7c0fead",
-    "semantic_hash": ""
-  },
-  "public/window.svg": {
-    "mtime": 1782714100.2653496,
-    "seen": 1788253753.3435774,
-    "ast_hash": "a2760511c65806022ad20adf74370ff3",
     "semantic_hash": ""
   }
 }
