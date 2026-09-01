@@ -46,7 +46,10 @@ interface AktaNikahModalProps {
   permohonanId?: string;
 }
 
-// Adjusted to match PHP structure - AktaNikahController.php
+// Bentuknya mengikuti struktur controller PHP aplikasi lama
+// (AktaNikahController.php). Berkas PHP-nya sudah DIBUANG dari repo
+// 1 Sep 2026 — tidak pernah dieksekusi di project Next.js ini.
+// Kalau perlu melihat aslinya: git show 0f559e1:components/permohonan-online/Permohonans/AktaNikahController.php
 interface FormData {
   // Setup fields (from PHP setup 1)
   permohonanType: string;
