@@ -1,16 +1,16 @@
 # Graph Report - sidako-platform  (2026-09-02)
 
 ## Corpus Check
-- 335 files · ~225,760 words
+- 339 files · ~228,524 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1801 nodes · 5052 edges · 164 communities (68 shown, 89 thin omitted)
+- 1824 nodes · 5116 edges · 168 communities (72 shown, 89 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 12 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `489664fe`
+- Built from commit: `5b0ebfe9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -19,36 +19,36 @@
 - AdminUsers.tsx
 - useStaticContent
 - AdminPermohonan.tsx
-- users/route.ts
+- permohonan/[id]/route.ts
 - devDependencies
-- staff-pengajuan-form.tsx
-- getSession
+- PengajuanBaruClient.tsx
+- prisma.ts
 - auth.ts
 - ok
 - dialog.tsx
-- AdminBerita.tsx
-- KIAModal.tsx
+- KKPerubahanBiodataModal.tsx
+- AktaNikahModal.tsx
 - statistik-kartu-editor.tsx
 - profile-tabs.tsx
-- input.tsx
+- KIAModal.tsx
 - cn
 - footer.tsx
-- informasi-index.tsx
+- ppid/[...slug]/page.tsx
 - compilerOptions
 - authSlice.ts
 - Journal — SIDAKO (`sidako-platform`)
 - App\Http\Controllers\Controller
 - send/route.ts
 - Illuminate\Http\Request
-- KTPELModal.tsx
-- PengajuanBaruClient.tsx
+- AktaPerceraianModal.tsx
+- getSession
 - Auth
 - accessibility-widget.tsx
 - [layanan]/page.tsx
 - ktp/route.ts
 - navigasi-tambahan.ts
 - LoginContent.tsx
-- profil-terhubung.tsx
+- inline-edit.tsx
 - useAppSelector
 - Validator
 - parse/route.ts
@@ -58,17 +58,17 @@
 - dashboard-sidebar.tsx
 - formulir-ppid/page.tsx
 - App\Models\Fronts\Permohonans\KedatanganModel
-- users/[id]/route.ts
+- users/route.ts
 - app/page.tsx
-- admin/demografi/export/route.ts
+- demografi-view.tsx
 - RegisterContent.tsx
 - navbar.tsx
 - scripts
 - notification-bell.tsx
 - halaman/[slug]/page.tsx
-- inline-edit.tsx
-- office-map.tsx
-- ppid/[...slug]/page.tsx
+- galeri-profil.tsx
+- input.tsx
+- jam-layanan.ts
 - peta-demografi.tsx
 - stats.tsx
 - CLAUDE.md
@@ -78,10 +78,10 @@
 - static-content-registry.ts
 - AdminPengaduan.tsx
 - skm/page.tsx
-- pengaturan-pelayanan.tsx
+- berita/[id]/route.ts
 - admin/skm/route.ts
-- prisma.ts
-- KKPerubahanBiodataModal.tsx
+- prisma
+- kelola-kartu.tsx
 - navigasi/page.tsx
 - eslint-config-next
 - dashboard/kritik-saran/page.tsx
@@ -172,6 +172,10 @@
 - @types/react
 - @types/react-dom
 - typescript
+- app/layout.tsx
+- profil/page.tsx
+- relasi-terkait.tsx
+- AdminMedia.tsx
 
 ## God Nodes (most connected - your core abstractions)
 1. `cn()` - 202 edges
@@ -186,105 +190,105 @@
 10. `notifyError()` - 35 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `LabelSidebar()` --calls--> `cn()`  [EXTRACTED]
-  components/shared/dashboard-sidebar.tsx → lib/utils.ts
 - `ProfilPage()` --calls--> `getSession()`  [EXTRACTED]
   app/profil/page.tsx → lib/auth.ts
-- `DashboardDemografiPage()` --calls--> `getSession()`  [EXTRACTED]
-  app/dashboard/demografi/page.tsx → lib/auth.ts
 - `DialogOverlay()` --calls--> `cn()`  [EXTRACTED]
   components/ui/dialog.tsx → lib/utils.ts
+- `NotFound()` --calls--> `cn()`  [EXTRACTED]
+  app/not-found.tsx → lib/utils.ts
+- `Toggle()` --calls--> `cn()`  [EXTRACTED]
+  components/dashboard/jam-layanan-editor.tsx → lib/utils.ts
 - `ScrollColumn()` --calls--> `cn()`  [EXTRACTED]
   components/ui/time-picker.tsx → lib/utils.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (164 total, 89 thin omitted)
+## Communities (168 total, 89 thin omitted)
 
 ### Community 0 - "statistik-export.ts"
-Cohesion: 0.08
-Nodes (46): dynamic, GET(), runtime, dynamic, GET(), POST(), runtime, ONLINE_WINDOW_MS (+38 more)
+Cohesion: 0.10
+Nodes (39): dynamic, GET(), runtime, BAGIAN_STATISTIK, BagianStatistik, bagianValid(), barisBernomor(), buatWorkbookStatistik() (+31 more)
 
 ### Community 1 - "AdminUsers.tsx"
-Cohesion: 0.05
-Nodes (48): dynamic, POST(), CekStatusClient(), Hasil, IKON, metadata, AdminUser, AdminUsers() (+40 more)
+Cohesion: 0.11
+Nodes (18): AdminUser, AdminUsers(), DetailUser, EMPTY_FORM, fmtTanggal(), GRUP_AKUN, GrupKey, IsiDetail() (+10 more)
 
 ### Community 2 - "useStaticContent"
-Cohesion: 0.10
-Nodes (18): HalamanTambahanClient(), EditableBlock(), ProdukDisdukcapilView(), ProdukItem, FaqItem, FaqList(), KebijakanPrivasiView(), BAGIAN (+10 more)
+Cohesion: 0.07
+Nodes (29): HalamanTambahanClient(), EditableBlock(), CarouselSlide, DEFAULT_SLIDES, ElegantCarousel(), ElegantCarouselProps, TODO: ganti `image` dengan foto asli SIDAKO/Disdukcapil Tana Tidung —, TEXT_VARIANTS (+21 more)
 
 ### Community 3 - "AdminPermohonan.tsx"
-Cohesion: 0.07
-Nodes (44): AdminPermohonan(), ALASAN_TOLAK, BerkasItem, Detail, FINAL_STATUS, Item, STATUS, STATUS_KEYS (+36 more)
+Cohesion: 0.06
+Nodes (46): AdminPermohonan(), ALASAN_TOLAK, BerkasItem, Detail, FINAL_STATUS, Item, STATUS, STATUS_KEYS (+38 more)
 
-### Community 4 - "users/route.ts"
-Cohesion: 0.18
-Nodes (25): PATCH(), STATUS_VALID, GET(), NAMA_LEVEL, PATCH(), POST(), requireAdmin(), POST() (+17 more)
+### Community 4 - "permohonan/[id]/route.ts"
+Cohesion: 0.12
+Nodes (32): GET(), PATCH(), STATUS_VALID, POST(), formDariKode(), appUrl(), getTransporter(), mailEnabled() (+24 more)
 
 ### Community 5 - "devDependencies"
 Cohesion: 0.15
 Nodes (13): eslint, devDependencies, eslint, @tailwindcss/typography, tsx, tw-animate-css, @types/bcryptjs, @types/node (+5 more)
 
-### Community 6 - "staff-pengajuan-form.tsx"
+### Community 6 - "PengajuanBaruClient.tsx"
 Cohesion: 0.06
-Nodes (50): dynamic, GET(), validatePayload(), FormPageClient(), Props, StaffPengajuanForm(), Values, formatTanggalId() (+42 more)
+Nodes (40): ICONS, PengaturanPelayanan(), Props, Sheet(), SheetContent(), SheetDescription(), SheetFooter(), SheetHeader() (+32 more)
 
-### Community 7 - "getSession"
-Cohesion: 0.10
-Nodes (27): GET(), GET(), GET(), GET(), dynamic, GET(), runtime, GET() (+19 more)
+### Community 7 - "prisma.ts"
+Cohesion: 0.24
+Nodes (13): dynamic, findTiketFor(), GET(), PATCH(), POST(), Session, dynamic, GET() (+5 more)
 
 ### Community 8 - "auth.ts"
 Cohesion: 0.09
-Nodes (32): DELETE(), PUT(), requireAdmin(), uniqueSlug(), GET(), POST(), requireAdmin(), uniqueSlug() (+24 more)
+Nodes (32): dynamic, maxDuration, POST(), runtime, DELETE(), dynamic, passwordCocok(), POST() (+24 more)
 
 ### Community 9 - "ok"
 Cohesion: 0.07
-Nodes (47): cekPetugas(), DELETE(), dynamic, GET(), PUT(), SaveRow, dynamic, GET() (+39 more)
+Nodes (45): cekPetugas(), DELETE(), dynamic, GET(), PUT(), SaveRow, dynamic, GET() (+37 more)
 
 ### Community 10 - "dialog.tsx"
 Cohesion: 0.16
-Nodes (15): AdminDemografi(), downloadFile(), AdminMedia(), fmtSize(), ImageCropperDialog(), ImageCropperDialogProps, MediaPickerProps, MediaItem (+7 more)
+Nodes (16): DemografiMetric(), fmt(), Row, ImageCropperDialog(), ImageCropperDialogProps, MediaPickerProps, MediaItem, MediaUpload() (+8 more)
 
-### Community 11 - "AdminBerita.tsx"
-Cohesion: 0.15
-Nodes (11): AdminBerita(), EMPTY, FormState, News, ImagePickerField(), ImagePickerFieldProps, MediaPicker(), RichEditor() (+3 more)
+### Community 11 - "KKPerubahanBiodataModal.tsx"
+Cohesion: 0.13
+Nodes (12): EMPTY, FormState, News, MediaPicker(), FormData, JenisBiodataOption, KKPerubahanBiodataModalProps, UploadedFile (+4 more)
 
-### Community 12 - "KIAModal.tsx"
-Cohesion: 0.07
-Nodes (50): AktaKelahiranNikAdaModalProps, FormData, UploadedFile, AktaNikahModalProps, FormData, UploadedFile, d(), FORM_PERMOHONAN (+42 more)
+### Community 12 - "AktaNikahModal.tsx"
+Cohesion: 0.09
+Nodes (49): AktaNikahModalProps, FormData, UploadedFile, d(), FORM_PERMOHONAN, FormPermohonanProps, memuat(), Dialog() (+41 more)
 
 ### Community 13 - "statistik-kartu-editor.tsx"
 Cohesion: 0.13
-Nodes (25): BULAN_PENDEK, GET(), Conflict, DemografiEditor(), digits(), EditGrid(), EditRow, nid() (+17 more)
+Nodes (26): BULAN_PENDEK, GET(), AdminDemografi(), downloadFile(), Conflict, DemografiEditor(), digits(), EditGrid() (+18 more)
 
 ### Community 14 - "profile-tabs.tsx"
-Cohesion: 0.13
-Nodes (16): BulletItem(), CONTENT, easeCustom, fadeUp(), GAMBAR_OVERRIDE_TABS, MaklumatPanel(), MottoPanel(), NumberedItem() (+8 more)
+Cohesion: 0.12
+Nodes (17): BulletItem(), CONTENT, easeCustom, fadeUp(), GAMBAR_OVERRIDE_TABS, MaklumatPanel(), MottoPanel(), NumberedItem() (+9 more)
 
-### Community 15 - "input.tsx"
-Cohesion: 0.13
-Nodes (23): Foto, KATEGORI, ProfilInitial, FormData, KKNumpangModalProps, UploadedFile, FormData, KKPisahKKModalProps (+15 more)
+### Community 15 - "KIAModal.tsx"
+Cohesion: 0.15
+Nodes (13): ProfilInitial, EMPTY_FORM, FILE_FIELDS, FormData, KIAModalProps, NIK_FIELDS, UploadedFile, ASPEK (+5 more)
 
 ### Community 16 - "cn"
-Cohesion: 0.12
-Nodes (35): AktaKelahiranNikAdaModal(), AktaKelahiranNikTidakAdaModal(), AktaKematianModal(), AktaNikahModal(), AktaPerceraianModal(), KedatanganPendudukModal(), KIAModal(), KKCetakUlangModal() (+27 more)
+Cohesion: 0.09
+Nodes (42): FieldEditor(), IconColumnInput(), ImageColumnInput(), AktaKelahiranNikAdaModal(), AktaKelahiranNikTidakAdaModal(), AktaKematianModal(), AktaNikahModal(), AktaPerceraianModal() (+34 more)
 
 ### Community 17 - "footer.tsx"
-Cohesion: 0.12
-Nodes (12): ArticleCard(), BeritaListPage(), News, tglID(), News, metadata, dynamic, TiketPage() (+4 more)
+Cohesion: 0.08
+Nodes (20): ArticleCard(), BeritaListPage(), News, tglID(), News, metadata, dynamic, TiketPage() (+12 more)
 
-### Community 18 - "informasi-index.tsx"
-Cohesion: 0.12
-Nodes (19): dynamic, metadata, dynamic, metadata, PpidInformasiIndex(), PpidTambahKartu(), PpidSubnav(), HalamanIndeksKartu() (+11 more)
+### Community 18 - "ppid/[...slug]/page.tsx"
+Cohesion: 0.08
+Nodes (31): dynamic, metadata, dynamic, metadata, bacaKonfigTab(), dynamic, LAYANAN_PPID_SLUGS, PpidPage() (+23 more)
 
 ### Community 19 - "compilerOptions"
 Cohesion: 0.07
 Nodes (28): dom, dom.iterable, esnext, **/*.mts, .next/dev/types/**/*.ts, next-env.d.ts, .next/types/**/*.ts, node_modules (+20 more)
 
 ### Community 20 - "authSlice.ts"
-Cohesion: 0.14
-Nodes (14): ForgotPasswordPage(), LoginPage(), SessionHydrator(), InlineEditProvider(), isPublicPage(), useAppDispatch(), authSlice, AuthState (+6 more)
+Cohesion: 0.17
+Nodes (12): ForgotPasswordPage(), LoginPage(), SessionHydrator(), useAppDispatch(), authSlice, AuthState, checkNikKk, forgotPassword (+4 more)
 
 ### Community 21 - "Journal — SIDAKO (`sidako-platform`)"
 Cohesion: 0.12
@@ -294,21 +298,21 @@ Nodes (16): 1. Identitas project, 2. Keadaan repo per 8 Agu 2026, 3. Status depl
 Cohesion: 0.11
 Nodes (26): dynamic, POST(), runtime, terakhirKirim, dynamic, POST(), runtime, INFO (+18 more)
 
-### Community 25 - "KTPELModal.tsx"
-Cohesion: 0.11
-Nodes (28): AKSI_STYLE, fmtWaktu(), LogAktivitasClient(), LogItem, Petugas, KOSONG, GROUPS, Produk (+20 more)
-
-### Community 26 - "PengajuanBaruClient.tsx"
+### Community 25 - "AktaPerceraianModal.tsx"
 Cohesion: 0.15
-Nodes (15): ICONS, Sheet(), SheetContent(), SheetDescription(), SheetFooter(), SheetHeader(), SheetOverlay(), SheetTitle() (+7 more)
+Nodes (22): AKSI_STYLE, LogItem, Petugas, KOSONG, GROUPS, Produk, GalleryItem, KATEGORI_BAWAAN (+14 more)
+
+### Community 26 - "getSession"
+Cohesion: 0.13
+Nodes (20): dynamic, GET(), PUT(), dynamic, GET(), PUT(), VALID, GET() (+12 more)
 
 ### Community 28 - "accessibility-widget.tsx"
-Cohesion: 0.21
-Nodes (14): AccessibilityWidget(), SPACING_LABEL, TileButton(), A11Y_INIT_SCRIPT, A11Y_STORAGE_KEY, A11yPrefs, applyPrefs(), DEFAULT_PREFS (+6 more)
+Cohesion: 0.23
+Nodes (13): AccessibilityWidget(), SPACING_LABEL, TileButton(), A11Y_STORAGE_KEY, A11yPrefs, applyPrefs(), DEFAULT_PREFS, FONT_DEFAULT_IDX (+5 more)
 
 ### Community 29 - "[layanan]/page.tsx"
-Cohesion: 0.17
-Nodes (12): AjukanPermohonanPage(), dynamic, generateMetadata(), dynamic, metadata, PilihLayananPage(), PilihLayananClient(), getLayanan() (+4 more)
+Cohesion: 0.16
+Nodes (14): FormPageClient(), AjukanPermohonanPage(), dynamic, generateMetadata(), dynamic, metadata, PilihLayananPage(), PilihLayananClient() (+6 more)
 
 ### Community 30 - "ktp/route.ts"
 Cohesion: 0.14
@@ -322,17 +326,17 @@ Nodes (16): AdminKonten(), flatten(), Leaf, MenuEntry, DashboardKontenPage(), dy
 Cohesion: 0.23
 Nodes (12): ResetPasswordPage(), MenuItem, menuItems, MenuPopuler(), Card(), CardAction(), CardContent(), CardDescription() (+4 more)
 
-### Community 33 - "profil-terhubung.tsx"
-Cohesion: 0.10
-Nodes (18): StatCard(), FormKartu(), simpan(), keSlug(), PpidAksiKartu(), hapus(), simpanDaftar(), IKON_JENIS (+10 more)
+### Community 33 - "inline-edit.tsx"
+Cohesion: 0.08
+Nodes (25): clampKolom(), GaleriPage(), BlockEditorDialog(), Ctx, EditModeToggle(), InlineEditCtx, InlineEditProvider(), isPublicPage() (+17 more)
 
 ### Community 34 - "useAppSelector"
 Cohesion: 0.27
 Nodes (10): useAppSelector, useAuth(), useGuestOnly(), useRequireAuth(), useUser(), AppDispatch, AppStore, makeStore() (+2 more)
 
 ### Community 36 - "parse/route.ts"
-Cohesion: 0.15
-Nodes (17): dynamic, maxDuration, POST(), runtime, Conflict, dynamic, maxDuration, POST() (+9 more)
+Cohesion: 0.20
+Nodes (13): Conflict, dynamic, maxDuration, POST(), runtime, sig(), Variant, cellNum() (+5 more)
 
 ### Community 37 - "components.json"
 Cohesion: 0.10
@@ -344,7 +348,7 @@ Nodes (18): EditorBox(), nextId(), parse(), Row, serialize(), StrukturEditor(), 
 
 ### Community 39 - "back-button.tsx"
 Cohesion: 0.11
-Nodes (15): DashboardBeritaPage(), dynamic, DashboardDemografiPage(), dynamic, AdminGaleri(), DashboardGaleriPage(), dynamic, DashboardLogPage() (+7 more)
+Nodes (16): AdminBerita(), DashboardBeritaPage(), dynamic, DashboardDemografiPage(), dynamic, AdminGaleri(), DashboardGaleriPage(), dynamic (+8 more)
 
 ### Community 40 - "dashboard-sidebar.tsx"
 Cohesion: 0.18
@@ -354,29 +358,29 @@ Nodes (16): ADMIN_ONLY_GROUPS, ADMIN_ONLY_HREFS, DesktopSidebar(), GROUPS, group
 Cohesion: 0.22
 Nodes (5): dynamic, metadata, dynamic, metadata, PpidLayananHalaman()
 
-### Community 43 - "users/[id]/route.ts"
-Cohesion: 0.19
-Nodes (15): DELETE(), dynamic, GET(), DELETE(), dynamic, PUT(), adalahDataUrlGambar(), DIR_KTP (+7 more)
+### Community 43 - "users/route.ts"
+Cohesion: 0.14
+Nodes (22): DELETE(), dynamic, GET(), GET(), NAMA_LEVEL, PATCH(), POST(), requireAdmin() (+14 more)
 
 ### Community 44 - "app/page.tsx"
-Cohesion: 0.08
-Nodes (22): smoothEase, AlurLayanan(), ease, STEPS, CarouselSlide, DEFAULT_SLIDES, ElegantCarousel(), ElegantCarouselProps (+14 more)
+Cohesion: 0.21
+Nodes (8): smoothEase, AlurLayanan(), ease, STEPS, ProfileTabs(), News, QuickHighlights(), tglID()
 
-### Community 45 - "admin/demografi/export/route.ts"
-Cohesion: 0.25
-Nodes (11): dynamic, GET(), runtime, dynamic, GET(), runtime, addSheet(), buildDemografiWorkbook() (+3 more)
+### Community 45 - "demografi-view.tsx"
+Cohesion: 0.14
+Nodes (22): dynamic, GET(), runtime, dynamic, GET(), runtime, DemografiKategoriPage(), DemografiView() (+14 more)
 
 ### Community 46 - "RegisterContent.tsx"
-Cohesion: 0.22
-Nodes (4): Kecamatan, namaWilayah, RegisterPage(), registerUser
+Cohesion: 0.13
+Nodes (9): CekStatusClient(), Hasil, IKON, metadata, Kecamatan, namaWilayah, RegisterPage(), labelKolom() (+1 more)
 
 ### Community 47 - "navbar.tsx"
-Cohesion: 0.12
-Nodes (17): cormorant, geistMono, geistSans, metadata, montserrat, Providers(), KunjunganPing(), AuthArea() (+9 more)
+Cohesion: 0.21
+Nodes (11): AuthArea(), DropdownItem(), DropdownMenu(), isExternalHref(), MobileItemIcon(), MobileMenuItem(), Navbar(), navigationIcons (+3 more)
 
 ### Community 48 - "scripts"
-Cohesion: 0.18
-Nodes (11): scripts, build, db:generate, db:migrate, db:push, db:seed, db:studio, dev (+3 more)
+Cohesion: 0.17
+Nodes (12): scripts, build, db:generate, db:migrate, db:push, db:seed, db:studio, dev (+4 more)
 
 ### Community 49 - "notification-bell.tsx"
 Cohesion: 0.43
@@ -386,25 +390,25 @@ Nodes (7): getAudioCtx(), NotificationBell(), Notifikasi, playDing(), TIPE_ICON,
 Cohesion: 0.38
 Nodes (6): cariMenu(), dynamic, generateMetadata(), HalamanTambahanPage(), KUNCI_NAVIGASI, MenuTambahan
 
-### Community 51 - "inline-edit.tsx"
-Cohesion: 0.11
-Nodes (24): clampKolom(), GaleriPage(), BlockEditorDialog(), Ctx, EditModeToggle(), InlineEditCtx, useInlineEdit(), clampKolom() (+16 more)
+### Community 51 - "galeri-profil.tsx"
+Cohesion: 0.13
+Nodes (15): clampKolom(), fmtTanggal(), GaleriItem, GaleriProfilPpid(), idBaru(), KOLOM_PILIHAN, Lebar, LinkItem (+7 more)
 
-### Community 52 - "office-map.tsx"
-Cohesion: 0.29
-Nodes (4): OFFICE_LAT, OFFICE_LNG, pulseIcon, OfficeMap
+### Community 52 - "input.tsx"
+Cohesion: 0.15
+Nodes (18): StaffPengajuanForm(), Values, AktaKelahiranNikAdaModalProps, FormData, UploadedFile, useStatusJamLayanan(), KkScanFieldProps, OcrUploadButton() (+10 more)
 
-### Community 53 - "ppid/[...slug]/page.tsx"
-Cohesion: 0.11
-Nodes (22): bacaKonfigTab(), dynamic, LAYANAN_PPID_SLUGS, PpidPage(), PROFIL_TERHUBUNG, TENTANG_PPID_SLUGS, dynamic, ProdukPage() (+14 more)
+### Community 53 - "jam-layanan.ts"
+Cohesion: 0.16
+Nodes (16): dynamic, GET(), formatTanggalId(), hariIniZona(), PanelJamTutup(), StatusJamLayanan, URUTAN_HARI, cekJamLayanan() (+8 more)
 
 ### Community 54 - "peta-demografi.tsx"
 Cohesion: 0.16
 Nodes (14): metadata, fmt(), PetaDemografi, PetaDemografiLoader(), Marker, PetaDemografi(), Row, GEO_BY_NAMA (+6 more)
 
 ### Community 55 - "stats.tsx"
-Cohesion: 0.10
-Nodes (25): DemografiKategoriPage(), DemografiMetric(), fmt(), Row, DemografiView(), fmt(), KOLOM_LABEL, labelKolom() (+17 more)
+Cohesion: 0.11
+Nodes (14): OFFICE_LAT, OFFICE_LNG, pulseIcon, FALLBACK, KartuDemografi, MapCard(), OfficeMap, PelayananStat (+6 more)
 
 ### Community 57 - "package.json"
 Cohesion: 0.33
@@ -412,7 +416,7 @@ Nodes (5): name, prisma, seed, private, version
 
 ### Community 58 - "dashboard/page.tsx"
 Cohesion: 0.06
-Nodes (45): GET(), GET(), DashboardLayout(), dynamic, BULAN_PENDEK, DashboardPage(), dynamic, fmt() (+37 more)
+Nodes (42): dynamic, GET(), POST(), runtime, DashboardLayout(), dynamic, BULAN_PENDEK, DashboardPage() (+34 more)
 
 ### Community 59 - "dependencies"
 Cohesion: 0.18
@@ -420,7 +424,7 @@ Nodes (11): animejs, bcryptjs, dependencies, animejs, bcryptjs, react-advanced-c
 
 ### Community 60 - "static-content-registry.ts"
 Cohesion: 0.10
-Nodes (24): GET(), HubungiKamiPage(), PusatBantuanPage(), sections, WbsPage(), PosterIkd(), WbsForm(), hubungiKamiContent (+16 more)
+Nodes (25): HubungiKamiPage(), dynamic, ProdukPage(), PusatBantuanPage(), sections, WbsPage(), PpidSeksi, EditableInfoPage() (+17 more)
 
 ### Community 61 - "AdminPengaduan.tsx"
 Cohesion: 0.28
@@ -430,21 +434,21 @@ Nodes (6): AdminPengaduan(), FILTERS, Item, pisahBukti(), DashboardPengaduanPage
 Cohesion: 0.28
 Nodes (7): DashboardSkmPage(), dynamic, AspekRata, Data, mutu(), Responden, SkmDashboard()
 
-### Community 63 - "pengaturan-pelayanan.tsx"
-Cohesion: 0.31
-Nodes (6): PengaturanPelayanan(), Checkbox(), PELAYANAN_KATEGORI, PELAYANAN_LIST, PELAYANAN_VISIBILITY_KEY, PelayananItem
+### Community 63 - "berita/[id]/route.ts"
+Cohesion: 0.32
+Nodes (9): DELETE(), PUT(), requireAdmin(), uniqueSlug(), GET(), POST(), requireAdmin(), uniqueSlug() (+1 more)
 
 ### Community 64 - "admin/skm/route.ts"
 Cohesion: 0.60
 Nodes (3): GET(), SKM_ASPEK, SKM_SKALA_MAX
 
-### Community 65 - "prisma.ts"
-Cohesion: 0.11
-Nodes (27): PATCH(), STATUS_VALID, dynamic, POST(), POST(), POST(), POST(), ALLOWED_EXT (+19 more)
+### Community 65 - "prisma"
+Cohesion: 0.10
+Nodes (34): PATCH(), STATUS_VALID, dynamic, POST(), dynamic, POST(), POST(), POST() (+26 more)
 
-### Community 66 - "KKPerubahanBiodataModal.tsx"
-Cohesion: 0.40
-Nodes (4): FormData, JenisBiodataOption, KKPerubahanBiodataModalProps, UploadedFile
+### Community 66 - "kelola-kartu.tsx"
+Cohesion: 0.26
+Nodes (10): StatCard(), FormKartu(), simpan(), keSlug(), PpidAksiKartu(), hapus(), simpanDaftar(), getIcon() (+2 more)
 
 ### Community 67 - "navigasi/page.tsx"
 Cohesion: 0.50
@@ -471,28 +475,44 @@ Cohesion: 0.50
 Nodes (4): BERITA, main(), prisma, slugify()
 
 ### Community 103 - "utils.ts"
-Cohesion: 0.10
-Nodes (30): NotFound(), JamLayananEditor(), Toggle(), URUTAN_HARI, AktaKelahiranNikTidakAdaModalProps, FormData, UploadedFile, AktaKematianModalProps (+22 more)
+Cohesion: 0.07
+Nodes (39): Foto, KATEGORI, NotFound(), JamLayananEditor(), Toggle(), URUTAN_HARI, AktaKelahiranNikTidakAdaModalProps, FormData (+31 more)
+
+### Community 164 - "app/layout.tsx"
+Cohesion: 0.20
+Nodes (8): cormorant, geistMono, geistSans, metadata, montserrat, Providers(), KunjunganPing(), A11Y_INIT_SCRIPT
+
+### Community 165 - "profil/page.tsx"
+Cohesion: 0.24
+Nodes (8): ChangePasswordForm(), FotoProfilCard(), dynamic, ProfilPage(), ProfilForm(), CameraCapture(), CameraCaptureProps, keDataUrl()
+
+### Community 166 - "relasi-terkait.tsx"
+Cohesion: 0.38
+Nodes (4): RelasiTerkait(), SectionHeading(), Relasi, relasiTerkait
+
+### Community 167 - "AdminMedia.tsx"
+Cohesion: 0.47
+Nodes (4): AdminMedia(), fmtSize(), DashboardMediaPage(), dynamic
 
 ## Knowledge Gaps
-- **552 isolated node(s):** `LAYANAN_KODE`, `SUBMIT_ACTIONS`, `FETCH_ACTIONS`, `ALLOWED_EXT`, `STATUS_VALID` (+547 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 685 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **558 isolated node(s):** `SUBMIT_ACTIONS`, `FETCH_ACTIONS`, `ALLOWED_EXT`, `STATUS_VALID`, `dynamic` (+553 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 692 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **89 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `cn()` connect `cn` to `AdminUsers.tsx`, `useStaticContent`, `AdminPermohonan.tsx`, `staff-pengajuan-form.tsx`, `dialog.tsx`, `AdminBerita.tsx`, `KIAModal.tsx`, `statistik-kartu-editor.tsx`, `profile-tabs.tsx`, `input.tsx`, `informasi-index.tsx`, `KTPELModal.tsx`, `PengajuanBaruClient.tsx`, `accessibility-widget.tsx`, `[layanan]/page.tsx`, `navigasi-tambahan.ts`, `LoginContent.tsx`, `profil-terhubung.tsx`, `struktur-editor.tsx`, `dashboard-sidebar.tsx`, `formulir-ppid/page.tsx`, `app/page.tsx`, `navbar.tsx`, `notification-bell.tsx`, `inline-edit.tsx`, `ppid/[...slug]/page.tsx`, `stats.tsx`, `pengaturan-pelayanan.tsx`, `KKPerubahanBiodataModal.tsx`, `utils.ts`?**
-  _High betweenness centrality (0.151) - this node is a cross-community bridge._
-- **Why does `getSession()` connect `getSession` to `statistik-export.ts`, `AdminUsers.tsx`, `AdminPermohonan.tsx`, `users/route.ts`, `auth.ts`, `ok`, `footer.tsx`, `informasi-index.tsx`, `[layanan]/page.tsx`, `ktp/route.ts`, `navigasi-tambahan.ts`, `parse/route.ts`, `back-button.tsx`, `users/[id]/route.ts`, `admin/demografi/export/route.ts`, `dashboard/page.tsx`, `AdminPengaduan.tsx`, `skm/page.tsx`, `admin/skm/route.ts`, `prisma.ts`, `navigasi/page.tsx`, `dashboard/kritik-saran/page.tsx`, `produk/page.tsx`?**
-  _High betweenness centrality (0.083) - this node is a cross-community bridge._
-- **Why does `prisma` connect `prisma.ts` to `admin/skm/route.ts`, `AdminUsers.tsx`, `statistik-export.ts`, `AdminPermohonan.tsx`, `parse/route.ts`, `users/route.ts`, `staff-pengajuan-form.tsx`, `getSession`, `auth.ts`, `ok`, `users/[id]/route.ts`, `statistik-kartu-editor.tsx`, `admin/demografi/export/route.ts`, `halaman/[slug]/page.tsx`, `informasi-index.tsx`, `ppid/[...slug]/page.tsx`, `dashboard/page.tsx`, `static-content-registry.ts`?**
-  _High betweenness centrality (0.058) - this node is a cross-community bridge._
-- **What connects `LAYANAN_KODE`, `SUBMIT_ACTIONS`, `FETCH_ACTIONS` to the rest of the system?**
-  _552 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Why does `cn()` connect `cn` to `useStaticContent`, `AdminPermohonan.tsx`, `PengajuanBaruClient.tsx`, `dialog.tsx`, `KKPerubahanBiodataModal.tsx`, `AktaNikahModal.tsx`, `statistik-kartu-editor.tsx`, `profile-tabs.tsx`, `KIAModal.tsx`, `ppid/[...slug]/page.tsx`, `AktaPerceraianModal.tsx`, `accessibility-widget.tsx`, `[layanan]/page.tsx`, `navigasi-tambahan.ts`, `LoginContent.tsx`, `inline-edit.tsx`, `struktur-editor.tsx`, `back-button.tsx`, `dashboard-sidebar.tsx`, `formulir-ppid/page.tsx`, `app/page.tsx`, `demografi-view.tsx`, `navbar.tsx`, `notification-bell.tsx`, `input.tsx`, `jam-layanan.ts`, `stats.tsx`, `static-content-registry.ts`, `kelola-kartu.tsx`, `utils.ts`?**
+  _High betweenness centrality (0.142) - this node is a cross-community bridge._
+- **Why does `getSession()` connect `getSession` to `statistik-export.ts`, `AdminPermohonan.tsx`, `permohonan/[id]/route.ts`, `prisma.ts`, `auth.ts`, `ok`, `footer.tsx`, `ppid/[...slug]/page.tsx`, `[layanan]/page.tsx`, `ktp/route.ts`, `navigasi-tambahan.ts`, `parse/route.ts`, `profil/page.tsx`, `back-button.tsx`, `AdminMedia.tsx`, `users/route.ts`, `demografi-view.tsx`, `dashboard/page.tsx`, `AdminPengaduan.tsx`, `skm/page.tsx`, `berita/[id]/route.ts`, `admin/skm/route.ts`, `prisma`, `navigasi/page.tsx`, `dashboard/kritik-saran/page.tsx`, `produk/page.tsx`?**
+  _High betweenness centrality (0.072) - this node is a cross-community bridge._
+- **Why does `prisma` connect `prisma` to `admin/skm/route.ts`, `statistik-export.ts`, `AdminPermohonan.tsx`, `parse/route.ts`, `permohonan/[id]/route.ts`, `dashboard/page.tsx`, `prisma.ts`, `auth.ts`, `ok`, `profil/page.tsx`, `users/route.ts`, `statistik-kartu-editor.tsx`, `demografi-view.tsx`, `halaman/[slug]/page.tsx`, `ppid/[...slug]/page.tsx`, `getSession`, `static-content-registry.ts`, `berita/[id]/route.ts`?**
+  _High betweenness centrality (0.051) - this node is a cross-community bridge._
+- **What connects `SUBMIT_ACTIONS`, `FETCH_ACTIONS`, `ALLOWED_EXT` to the rest of the system?**
+  _558 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `statistik-export.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.08244897959183674 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10365853658536585 - nodes in this community are weakly interconnected._
 - **Should `AdminUsers.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.05096153846153846 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.11462450592885376 - nodes in this community are weakly interconnected._
 - **Should `useStaticContent` be split into smaller, more focused modules?**
-  _Cohesion score 0.10416666666666667 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06845513413506013 - nodes in this community are weakly interconnected._
