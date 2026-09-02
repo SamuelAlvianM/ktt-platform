@@ -4,7 +4,8 @@ import { join, extname } from "path";
 import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
 import { getSession } from "@/lib/auth";
-import { isWarga } from "@/lib/peran";
+import { isAdmin, isWarga } from "@/lib/peran";
+import { layananTersembunyi } from "@/lib/visibilitas-server";
 import { LAYANAN_KODE } from "@/lib/layanan-kode";
 import { createNotifikasi, notifyPetugas, safeNotify } from "@/lib/notifikasi";
 import { cekJamLayananSekarang } from "@/lib/jam-layanan-server";
@@ -139,7 +140,36 @@ export async function POST(
 
   // ── Submit permohonan ──
   if (SUBMIT_ACTIONS.includes(action)) {
-    // Jam layanan berlaku untuk semua pembuat permohonan (warga & staff).
+    /*
+     * 🔴 LAYANAN YANG DITUTUP DINAS DITOLAK DI SINI, bukan cuma
+     * disembunyikan tombolnya.
+     *
+     * Sampai sekarang endpoint ini tidak pernah memeriksa visibilitas sama
+     * sekali. Layanan yang sudah dimatikan tetap menerima permohonan bagi
+     * siapa pun yang menyimpan tautannya, menekan Kembali, atau membuka
+     * bookmark lama — dan permohonan itu masuk ke antrean petugas seolah
+     * layanannya masih buka.
+     *
+     * ⚠️ Super Admin dikecualikan: ia yang menutup layanan, dan tetap perlu
+     * bisa memasukkan permohonan susulan atau menguji sebelum membuka
+     * kembali. Staf TIDAK dikecualikan — kalau ia masih bisa mengirim,
+     * layanan itu belum benar-benar tertutup.
+     */
+    const tersembunyi = await layananTersembunyi();
+    if (tersembunyi.has(layanan) && !isAdmin(session.level)) {
+      return fail([
+        "Layanan ini sedang tidak dibuka. Silakan hubungi Disdukcapil untuk informasi lebih lanjut.",
+      ], 403);
+    }
+
+    /*
+     * Jam layanan diperiksa SESUDAH visibilitas, bukan sebelumnya.
+     *
+     * Keduanya menolak dengan 403, tapi alasannya jauh berbeda: "buka
+     * pukul 08.00" menyuruh warga kembali lagi nanti, sementara layanan
+     * yang ditutup dinas tidak akan terbuka jam berapa pun. Menjawab
+     * dengan jam lebih dulu mengirim orang menunggu sia-sia.
+     */
     const jam = await cekJamLayananSekarang();
     if (!jam.open) return fail([jam.message], 403);
 

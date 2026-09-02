@@ -9,7 +9,9 @@ import { cn } from '@/lib/utils';
 import {
   LAYANAN_PERMOHONAN,
   KATEGORI_LAYANAN,
+  ROUTE_KE_FORM_SLUG,
 } from '@/lib/permohonan-layanan';
+import { slugTersembunyi } from '@/lib/pelayanan-list';
 
 /**
  * Pemilih layanan permohonan untuk warga/OPD di dashboard.
@@ -34,7 +36,7 @@ export function PilihLayananClient({
         const res = await fetch('/api/static-content?keys=pelayanan.visibilitas');
         const j = await res.json();
         const hidden = j.data?.items?.['pelayanan.visibilitas']?.hidden;
-        if (!batal && Array.isArray(hidden)) setTersembunyi(new Set(hidden));
+        if (!batal) setTersembunyi(slugTersembunyi(hidden));
       } catch {
         // Gagal memuat = tampilkan semua layanan; bukan kondisi fatal.
       }
@@ -47,7 +49,15 @@ export function PilihLayananClient({
   const hasil = useMemo(() => {
     const cari = q.trim().toLowerCase();
     return LAYANAN_PERMOHONAN.filter((l) => {
-      if (tersembunyi.has(l.slug) || tersembunyi.has(l.title)) return false;
+      /*
+       * 🔴 Dicocokkan lewat SLUG FORMULIR, bukan slug rute.
+       *
+       * Sebelumnya baris ini berbunyi `tersembunyi.has(l.slug) ||
+       * tersembunyi.has(l.title)`, sementara yang tersimpan adalah `modalType`.
+       * Tidak satu pun dari 15 layanan pernah cocok: layanan yang dimatikan
+       * dinas tetap tampil di sini, tanpa satu pun galat.
+       */
+      if (tersembunyi.has(ROUTE_KE_FORM_SLUG[l.slug] ?? l.slug)) return false;
       if (kategori !== 'all' && l.category !== kategori) return false;
       if (!cari) return true;
       return (

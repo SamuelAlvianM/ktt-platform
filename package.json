@@ -14,7 +14,8 @@
     "db:studio": "prisma studio",
     "peran:periksa": "tsx scripts/periksa-peran.ts",
     "tolak:uji": "tsx scripts/uji-tolak.ts",
-    "opd:uji": "tsx scripts/buat-opd-uji.ts"
+    "opd:uji": "tsx scripts/buat-opd-uji.ts",
+    "visibilitas:uji": "tsx scripts/uji-visibilitas.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

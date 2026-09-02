@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FileText,
   Baby,
@@ -18,6 +18,7 @@ import {
   ArrowRight,
   FilePlus2,
   SlidersHorizontal,
+  EyeOff,
   Clock,
   ListChecks,
 } from "lucide-react";
@@ -35,6 +36,9 @@ import { useAppSelector } from "@/store/hooks";
 import { LAYANAN_FORMS, type LayananForm } from "@/lib/layanan-forms";
 import { StaffPengajuanForm } from "@/components/dashboard/staff-pengajuan-form";
 import { PengaturanPelayanan } from "@/components/dashboard/pengaturan-pelayanan";
+import { cn } from "@/lib/utils";
+import { slugTersembunyi } from "@/lib/pelayanan-list";
+import { isAdmin, isPetugas } from "@/lib/peran";
 import { JamLayananEditor } from "@/components/dashboard/jam-layanan-editor";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
@@ -57,9 +61,40 @@ export function PengajuanBaruClient() {
   const [selected, setSelected] = useState<LayananForm | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [q, setQ] = useState("");
-  // Pengaturan pelayanan (visibilitas + jam) hanya untuk admin (level 1).
   const { user } = useAppSelector((s) => s.auth);
-  const isAdmin = (user?.level ?? 3) === 1;
+  const level = user?.level ?? 3;
+  /*
+   * Pengaturan layanan kini dibuka untuk STAF juga, bukan admin saja —
+   * merekalah yang tahu lebih dulu saat blangko habis atau server SIAK padam,
+   * dan menunggu admin berarti warga tetap mengirim permohonan yang sudah
+   * pasti tidak bisa diproses.
+   *
+   * ⚠️ Yang tetap milik admin adalah MENEROBOS layanan yang tertutup — lihat
+   * `bolehTerobos` di bawah dan penjagaan di API.
+   */
+  const bolehAtur = isPetugas(level);
+  const bolehTerobos = isAdmin(level);
+
+  // Layanan yang dimatikan dinas. Petugas tetap melihat kartunya — berwarna
+  // abu-abu — supaya ia tahu layanan itu ADA dan sedang ditutup, bukan
+  // mengira daftarnya berubah tanpa sebab.
+  const [mati, setMati] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    let batal = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/static-content?keys=pelayanan.visibilitas');
+        const j = await res.json();
+        if (!batal) setMati(slugTersembunyi(j.data?.items?.['pelayanan.visibilitas']?.hidden));
+      } catch {
+        // Gagal memuat = tampilkan semua; bukan keadaan fatal.
+      }
+    })();
+    return () => {
+      batal = true;
+    };
+  }, []);
 
   const filtered = q.trim()
     ? LAYANAN_FORMS.filter(
@@ -100,7 +135,7 @@ export function PengajuanBaruClient() {
               className="pl-9"
             />
           </div>
-          {isAdmin && (
+          {bolehAtur && (
             <Button
               variant="outline"
               onClick={() => setShowSettings(true)}
@@ -115,7 +150,7 @@ export function PengajuanBaruClient() {
       </div>
 
       {/* Drawer pengaturan: meluncur dari kanan dengan overlay gelap */}
-      {isAdmin && (
+      {bolehAtur && (
         <Sheet open={showSettings} onOpenChange={setShowSettings}>
           <SheetContent
             side="right"
@@ -164,25 +199,65 @@ export function PengajuanBaruClient() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((l, i) => {
             const Icon = ICONS[l.icon] ?? FileText;
+            const nonaktif = mati.has(l.slug);
+            // Layanan tertutup tetap bisa dibuka Super Admin — ia yang
+            // menutupnya, dan tetap perlu memasukkan permohonan susulan.
+            const terkunci = nonaktif && !bolehTerobos;
             return (
               <button
                 key={l.slug}
-                onClick={() => setSelected(l)}
+                onClick={() => !terkunci && setSelected(l)}
+                disabled={terkunci}
+                title={
+                  nonaktif
+                    ? terkunci
+                      ? `${l.title} — sedang ditutup; hanya Super Admin yang masih bisa membukanya`
+                      : `${l.title} — sedang ditutup untuk warga & staf; Anda masih bisa membukanya`
+                    : l.title
+                }
                 style={{ animationDelay: `${i * 35}ms` }}
-                className="group flex animate-in fade-in slide-in-from-bottom-2 items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+                className={cn(
+                  'group flex animate-in fade-in slide-in-from-bottom-2 items-center gap-3 rounded-2xl border p-4 text-left shadow-sm transition-all duration-200',
+                  /*
+                   * 🔴 Kartu nonaktif ABU-ABU dan bergaris putus-putus.
+                   * Itu satu-satunya penanda yang terbaca sekilas; teks kecil
+                   * di bawah judul saja akan terlewat, dan petugas menekan
+                   * layanan yang sudah pasti ditolak server.
+                   */
+                  nonaktif
+                    ? 'border-dashed border-slate-300 bg-slate-50'
+                    : 'border-slate-200 bg-white hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md',
+                  terkunci && 'cursor-not-allowed opacity-80',
+                )}
               >
-                <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform group-hover:scale-105">
+                <div className={cn(
+                  'flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl transition-transform',
+                  nonaktif
+                    ? 'bg-slate-200 text-slate-500'
+                    : 'bg-primary/10 text-primary group-hover:scale-105',
+                )}>
                   <Icon className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-slate-900 group-hover:text-primary">
+                  <p className={cn(
+                    'truncate text-sm font-semibold',
+                    nonaktif ? 'text-slate-500' : 'text-slate-900 group-hover:text-primary',
+                  )}>
                     {l.title}
                   </p>
-                  <p className="line-clamp-1 text-xs text-slate-500">
-                    {l.desc}
-                  </p>
+                  {nonaktif ? (
+                    <p className="flex items-center gap-1 text-xs font-medium text-slate-400">
+                      <EyeOff className="h-3 w-3" />
+                      Layanan sedang ditutup
+                    </p>
+                  ) : (
+                    <p className="line-clamp-1 text-xs text-slate-500">{l.desc}</p>
+                  )}
                 </div>
-                <ArrowRight className="h-4 w-4 flex-shrink-0 text-slate-300 transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
+                <ArrowRight className={cn(
+                  'h-4 w-4 flex-shrink-0 text-slate-300 transition-all',
+                  !nonaktif && 'group-hover:translate-x-0.5 group-hover:text-primary',
+                )} />
               </button>
             );
           })}
