@@ -4,11 +4,14 @@
  * - Tanggal libur khusus (YYYY-MM-DD) yang menutup layanan penuh.
  * - Master switch `enabled`; bila false, permohonan bisa dibuat kapan pun.
  * Disimpan di StaticContent kunci `pelayanan.jam`; berlaku untuk warga & staff.
- * Zona waktu acuan: WITA (Asia/Makassar).
+ * Zona waktu acuan: WITA (Asia/Makassar) — Kab. Tana Tidung ada di Kalimantan
+ * Utara, UTC+8. Dipaku di sini supaya tidak ikut zona server.
  */
 
 export const JAM_LAYANAN_KEY = "pelayanan.jam";
 export const JAM_TIMEZONE = "Asia/Makassar";
+/** Singkatan zona untuk ditampilkan ke user — selalu ikut JAM_TIMEZONE. */
+export const JAM_TIMEZONE_LABEL = "WITA";
 
 export interface JamHari {
   /** Hari buka atau tutup penuh. */
@@ -83,8 +86,8 @@ export function sanitizeJamLayanan(raw: unknown): JamLayananConfig {
   return { enabled: o.enabled === true, days, holidays };
 }
 
-/** Tanggal & menit saat ini pada zona WITA. */
-function nowInWib(now = new Date()): { ymd: string; day: number; minutes: number } {
+/** Tanggal & menit saat ini pada zona JAM_TIMEZONE (WITA). */
+function nowInZona(now = new Date()): { ymd: string; day: number; minutes: number } {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: JAM_TIMEZONE,
     year: "numeric",
@@ -122,7 +125,7 @@ export interface StatusJam {
 export function cekJamLayanan(cfg: JamLayananConfig, now = new Date()): StatusJam {
   if (!cfg.enabled) return { open: true, message: "" };
 
-  const { ymd, day, minutes } = nowInWib(now);
+  const { ymd, day, minutes } = nowInZona(now);
 
   if (cfg.holidays.includes(ymd)) {
     return {
@@ -144,12 +147,12 @@ export function cekJamLayanan(cfg: JamLayananConfig, now = new Date()): StatusJa
   if (minutes < start || minutes >= end) {
     return {
       open: false,
-      message: `Layanan permohonan online hari ${HARI_LABEL[day]} hanya buka pukul ${jam.mulai}–${jam.selesai} WITA.`,
+      message: `Layanan permohonan online hari ${HARI_LABEL[day]} hanya buka pukul ${jam.mulai}–${jam.selesai} ${JAM_TIMEZONE_LABEL}.`,
     };
   }
 
   return {
     open: true,
-    message: `Buka hari ${HARI_LABEL[day]} pukul ${jam.mulai}–${jam.selesai} WITA`,
+    message: `Buka hari ${HARI_LABEL[day]} pukul ${jam.mulai}–${jam.selesai} ${JAM_TIMEZONE_LABEL}`,
   };
 }
