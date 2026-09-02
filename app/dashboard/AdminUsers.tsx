@@ -34,8 +34,10 @@ import {
   Trash2,
   AlertTriangle,
   IdCard,
+  ZoomIn,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { ImageViewer, type GambarItem } from '@/components/shared/image-viewer';
 import { CameraCapture } from '@/components/shared/camera-capture';
 import { ImageUploadField } from '@/components/shared/image-upload-field';
 import { SearchSelect } from '@/components/shared/search-select';
@@ -196,6 +198,9 @@ function IsiDetail({
   onTolak: () => void;
   onNonaktif: () => void;
 }) {
+  // Indeks foto identitas yang sedang dibuka di penampil layar penuh.
+  const [lihatFoto, setLihatFoto] = useState<number | null>(null);
+
   if (memuat || !detail) {
     return (
       <div className="flex justify-center py-16">
@@ -205,27 +210,45 @@ function IsiDetail({
   }
 
   const info = infoStatus(detail.status);
+  const nama = detail.userFullname ?? detail.userId;
+
+  // Foto identitas akun, urutan tetap: KTP dulu (yang diperiksa petugas), lalu
+  // foto profil. Dipakai bersama oleh thumbnail KTP dan avatar di atas supaya
+  // keduanya membuka penampil yang sama dan bisa dibolak-balik dengan ←/→.
+  const fotoIdentitas: GambarItem[] = [
+    ...(detail.userKtp ? [{ src: detail.userKtp, judul: `Foto KTP — ${nama}` }] : []),
+    ...(detail.userFoto ? [{ src: detail.userFoto, judul: `Foto Profil — ${nama}` }] : []),
+  ];
+  const idxFotoProfil = detail.userKtp ? 1 : 0;
 
   return (
     <div className="space-y-5">
       {/* Identitas ringkas */}
       <div className="flex items-start gap-4">
         {detail.userFoto ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={detail.userFoto}
-            alt={`Foto ${detail.userFullname ?? detail.userId}`}
-            className="h-20 w-20 shrink-0 rounded-xl border border-slate-200 object-cover"
-          />
+          <button
+            type="button"
+            onClick={() => setLihatFoto(idxFotoProfil)}
+            className="group relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-slate-200 transition-colors hover:border-primary/50"
+            title="Klik untuk perbesar"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={detail.userFoto}
+              alt={`Foto ${nama}`}
+              className="h-full w-full object-cover"
+            />
+            <span className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/30">
+              <ZoomIn className="h-5 w-5 text-white opacity-0 transition-opacity group-hover:opacity-100" />
+            </span>
+          </button>
         ) : (
           <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 text-slate-300">
             <UserRound className="h-8 w-8" />
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold text-slate-900">
-            {detail.userFullname ?? detail.userId}
-          </p>
+          <p className="truncate font-semibold text-slate-900">{nama}</p>
           <p className="font-mono text-xs text-slate-500">{detail.userId}</p>
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
             <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[0.68rem] font-medium text-slate-600">
@@ -269,28 +292,34 @@ function IsiDetail({
 
       {/* Foto KTP — ditaruh SEBELUM Data Diri karena inilah yang dicocokkan
           petugas dengan NIK/nama di bawahnya saat memverifikasi pendaftaran.
-          Dibuka di tab baru untuk melihat versi penuhnya (tulisan KTP kecil). */}
+          Thumbnail sengaja KECIL: gambar setinggi panel mendorong Data Diri —
+          yang justru harus dibandingkan dengannya — turun ke luar layar.
+          Klik membuka penampil yang sama dengan berkas permohonan (zoom, putar,
+          geser, unduh), bukan tab baru yang memutus alur verifikasi. */}
       {detail.userKtp && (
         <div>
-          <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+          <h4 className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
             Foto KTP
           </h4>
-          <a
-            href={detail.userKtp}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block overflow-hidden rounded-xl border border-slate-200 transition-colors hover:border-primary/50"
-            title="Buka ukuran penuh di tab baru"
+          <button
+            type="button"
+            onClick={() => setLihatFoto(0)}
+            className="group relative w-40 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 text-left transition-colors hover:border-primary/50"
+            title="Klik untuk perbesar, zoom & putar"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={detail.userKtp}
-              alt={`Foto KTP ${detail.userFullname ?? detail.userId}`}
-              className="h-auto w-full object-contain"
+              alt={`Foto KTP ${nama}`}
+              loading="lazy"
+              className="h-24 w-full object-cover transition-transform group-hover:scale-105"
             />
-          </a>
+            <span className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/30">
+              <ZoomIn className="h-5 w-5 text-white opacity-0 transition-opacity group-hover:opacity-100" />
+            </span>
+          </button>
           <p className="mt-1 text-[0.7rem] text-muted-foreground">
-            Klik gambar untuk membukanya dalam ukuran penuh.
+            Klik untuk memperbesar, memutar, dan menggeser.
           </p>
         </div>
       )}
@@ -399,6 +428,15 @@ function IsiDetail({
           </div>
         )}
       </div>
+
+      {/* Penampil layar penuh — komponen yang sama dengan berkas permohonan. */}
+      {lihatFoto !== null && fotoIdentitas.length > 0 && (
+        <ImageViewer
+          items={fotoIdentitas}
+          indexAwal={Math.min(lihatFoto, fotoIdentitas.length - 1)}
+          onClose={() => setLihatFoto(null)}
+        />
+      )}
     </div>
   );
 }
