@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
 import { getSession } from "@/lib/auth";
 import { isWarga } from "@/lib/peran";
+import { LAYANAN_KODE } from "@/lib/layanan-kode";
 import { createNotifikasi, notifyPetugas, safeNotify } from "@/lib/notifikasi";
 import { cekJamLayananSekarang } from "@/lib/jam-layanan-server";
 import { payloadBerkasEntries } from "@/lib/permohonan-display";
@@ -21,23 +22,6 @@ import { getLayananForm, validateLayananPayload } from "@/lib/layanan-forms";
  *
  * <layanan> dipetakan ke kode JenisPermohonan di DB.
  */
-const LAYANAN_KODE: Record<string, string> = {
-  "akta-kelahiran-nik-ada": "AKTA_KELAHIRAN_NIK_ADA",
-  "akta-kelahiran-nik-tidak-ada": "AKTA_KELAHIRAN_NIK_BLM_ADA",
-  "akta-kematian": "AKTA_KEMATIAN",
-  "akta-nikah": "AKTA_NIKAH",
-  "akta-perceraian": "AKTA_PERCERAIAN",
-  kia: "KIA",
-  ktpel: "KTP_EL",
-  "perpindahan-penduduk": "PINDAH",
-  kedatangan: "KEDATANGAN",
-  "konsolidasi-update-data": "KONSOLIDASI",
-  "kk-tambah-anak": "KK_TAMBAH_ANAK",
-  "kk-pisah": "KK_PISAH",
-  "kk-numpang": "KK_NUMPANG",
-  "kk-perubahan-biodata": "KK_UBAH_BIODATA",
-  "kk-cetak-ulang": "KK_CETAK_ULANG",
-};
 
 const SUBMIT_ACTIONS = ["create", "update", "postdata", "insertdata", "store"];
 

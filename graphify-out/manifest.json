@@ -11,17 +11,11 @@
     "ast_hash": "253253763abc277eadebf55f4db5dc7f",
     "semantic_hash": "253253763abc277eadebf55f4db5dc7f"
   },
-  "Document from S.A.M": {
-    "mtime": 1786204189.2607658,
-    "seen": 1788252628.463485,
-    "ast_hash": "0228eb6385ea494e9fbf5a9e879543eb",
-    "semantic_hash": "0228eb6385ea494e9fbf5a9e879543eb"
-  },
   "app/api/[layanan]/[action]/route.ts": {
-    "mtime": 1786593150.5459247,
-    "seen": 1788252628.4634867,
-    "ast_hash": "e105187ecd5af5400f7f3b26dc021682",
-    "semantic_hash": "e105187ecd5af5400f7f3b26dc021682"
+    "mtime": 1788356532.468218,
+    "seen": 1788356571.9975948,
+    "ast_hash": "0f1a420b50e36768b63ec89003ca6e57",
+    "semantic_hash": ""
   },
   "app/api/admin/berita/[id]/route.ts": {
     "mtime": 1784572470.417631,
@@ -102,16 +96,16 @@
     "semantic_hash": "881c8399afcbfcb7adc2c2c4eb9227d7"
   },
   "app/api/admin/permohonan/[id]/route.ts": {
-    "mtime": 1784572470.4322073,
-    "seen": 1788252628.4635098,
-    "ast_hash": "4726616079f482a9452fe7fa8d674a4c",
-    "semantic_hash": "4726616079f482a9452fe7fa8d674a4c"
+    "mtime": 1788356445.7078538,
+    "seen": 1788356571.997614,
+    "ast_hash": "0bad9a967ffb1bedea97a4a3484b888a",
+    "semantic_hash": ""
   },
   "app/api/admin/permohonan/route.ts": {
-    "mtime": 1785559396.263461,
-    "seen": 1788252628.4635108,
-    "ast_hash": "99ed7ae8ca4cad4ab6d9d116748e79b8",
-    "semantic_hash": "99ed7ae8ca4cad4ab6d9d116748e79b8"
+    "mtime": 1788356412.502828,
+    "seen": 1788356571.9976156,
+    "ast_hash": "f906f997ed9d9040b90fa8501f98952a",
+    "semantic_hash": ""
   },
   "app/api/admin/produk/[id]/route.ts": {
     "mtime": 1784572470.4344864,
@@ -492,10 +486,10 @@
     "semantic_hash": "405b78cf858d5e99d18df8251b38c7e8"
   },
   "app/dashboard/layout.tsx": {
-    "mtime": 1784094266.2400959,
-    "seen": 1788252628.4635932,
-    "ast_hash": "29b2af9873f29265681eb4ef28272516",
-    "semantic_hash": "29b2af9873f29265681eb4ef28272516"
+    "mtime": 1788356309.6166496,
+    "seen": 1788356571.99769,
+    "ast_hash": "ff92a03cb159fb1f3c3077eedd4a8854",
+    "semantic_hash": ""
   },
   "app/dashboard/log/LogAktivitasClient.tsx": {
     "mtime": 1784572470.442485,
@@ -540,10 +534,10 @@
     "semantic_hash": "fb486021993066f5af40ca861d195ba9"
   },
   "app/dashboard/page.tsx": {
-    "mtime": 1786598668.313156,
-    "seen": 1788252628.4636054,
-    "ast_hash": "487e3da98fee70487ce3821bc8f29947",
-    "semantic_hash": "487e3da98fee70487ce3821bc8f29947"
+    "mtime": 1788356490.672438,
+    "seen": 1788356571.997699,
+    "ast_hash": "f5b4b67aca749fba575a07b69b613fe2",
+    "semantic_hash": ""
   },
   "app/dashboard/pengaduan/AdminPengaduan.tsx": {
     "mtime": 1784667747.1191218,
@@ -564,10 +558,10 @@
     "semantic_hash": "b6a8b626af3f6f4db475684e11241b01"
   },
   "app/dashboard/pengajuan-baru/page.tsx": {
-    "mtime": 1784094266.2996469,
-    "seen": 1788252628.463611,
-    "ast_hash": "24388c565f22081c152f64f740af8524",
-    "semantic_hash": "24388c565f22081c152f64f740af8524"
+    "mtime": 1788356466.4520786,
+    "seen": 1788356571.9977033,
+    "ast_hash": "ab62bfe3920c7ea3c310bb3df955154f",
+    "semantic_hash": ""
   },
   "app/dashboard/permohonan/AdminPermohonan.tsx": {
     "mtime": 1785561890.6146855,
@@ -576,10 +570,10 @@
     "semantic_hash": "0af0867a4b8ed9604a9d135cce83ad00"
   },
   "app/dashboard/permohonan/page.tsx": {
-    "mtime": 1784094266.3226502,
-    "seen": 1788252628.4636135,
-    "ast_hash": "46073418dd250e949e69cef76efca91d",
-    "semantic_hash": "46073418dd250e949e69cef76efca91d"
+    "mtime": 1788356466.453078,
+    "seen": 1788356571.9977055,
+    "ast_hash": "4787f4c9753523696b22fd7f1bd74ecc",
+    "semantic_hash": ""
   },
   "app/dashboard/produk/AdminProduk.tsx": {
     "mtime": 1784559768.4018633,
@@ -930,10 +924,10 @@
     "semantic_hash": "7ec4056b250e4b69c7650c22ee4f6589"
   },
   "app/user/pengajuan/page.tsx": {
-    "mtime": 1784564693.764023,
-    "seen": 1788252628.4637043,
-    "ast_hash": "43351097f135836a2f6c8c72367684d6",
-    "semantic_hash": "43351097f135836a2f6c8c72367684d6"
+    "mtime": 1788356490.6734443,
+    "seen": 1788356571.9977703,
+    "ast_hash": "5ae122b9e47a74447ac420ee1c986870",
+    "semantic_hash": ""
   },
   "app/wbs/[...slug]/page.tsx": {
     "mtime": 1784662596.580997,
@@ -1332,10 +1326,10 @@
     "semantic_hash": "4ec8f8be413b0598b2900b77310abebe"
   },
   "components/shared/dashboard-sidebar.tsx": {
-    "mtime": 1784870512.755137,
-    "seen": 1788252628.4638026,
-    "ast_hash": "b2a5e9e6c205ecb805de8be0762b027e",
-    "semantic_hash": "b2a5e9e6c205ecb805de8be0762b027e"
+    "mtime": 1788356292.6335866,
+    "seen": 1788356571.9978437,
+    "ast_hash": "f4bbbb76d8c8c6ebc9a7f62888b24099",
+    "semantic_hash": ""
   },
   "components/shared/editable-info-page.tsx": {
     "mtime": 1786209965.3342738,
@@ -1710,10 +1704,10 @@
     "semantic_hash": "933c7fb47f3bdd2bfa1bb055624f4454"
   },
   "lib/log-aktivitas.ts": {
-    "mtime": 1784572470.4574702,
-    "seen": 1788252628.4638793,
-    "ast_hash": "e6344622d9a71dfb8655aed20a3431ee",
-    "semantic_hash": "e6344622d9a71dfb8655aed20a3431ee"
+    "mtime": 1788356521.6700988,
+    "seen": 1788356571.9979155,
+    "ast_hash": "98ffa4e70f8449807358f230029df32d",
+    "semantic_hash": ""
   },
   "lib/mail-templates.ts": {
     "mtime": 1784120596.8010333,
@@ -1908,10 +1902,10 @@
     "semantic_hash": "cbe1d72e43f8a3860312661b1b886cf3"
   },
   "package.json": {
-    "mtime": 1786642608.4610398,
-    "seen": 1788252628.4639342,
-    "ast_hash": "14cb759339a8abc7068b8673a9bd58be",
-    "semantic_hash": "14cb759339a8abc7068b8673a9bd58be"
+    "mtime": 1788356206.8908546,
+    "seen": 1788356571.9979768,
+    "ast_hash": "10b5afc86eab5092694366ee838f920a",
+    "semantic_hash": ""
   },
   "postcss.config.mjs": {
     "mtime": 1782712146.6448045,
@@ -2007,6 +2001,24 @@
     "mtime": 1784112711.545,
     "seen": 1788253753.3434951,
     "ast_hash": "b820690c8479af1080747dafce46e053",
+    "semantic_hash": ""
+  },
+  "lib/lingkup-permohonan.ts": {
+    "mtime": 1788356354.1025455,
+    "seen": 1788356571.997914,
+    "ast_hash": "d7ec1a9cdd99c151e7b683f976e7f2ec",
+    "semantic_hash": ""
+  },
+  "lib/peran.ts": {
+    "mtime": 1788356178.6157749,
+    "seen": 1788356571.9979274,
+    "ast_hash": "14dbc2d928d71b398c673264d2eec059",
+    "semantic_hash": ""
+  },
+  "scripts/periksa-peran.ts": {
+    "mtime": 1788356206.8117151,
+    "seen": 1788356571.9979842,
+    "ast_hash": "f400cdc893ff63f5cf525d3d09ffd778",
     "semantic_hash": ""
   }
 }
