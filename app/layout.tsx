@@ -30,7 +30,7 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3300",
+    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3102",
   ),
   title: "SIDAKO - Disdukcapil Tana Tidung",
   description:
