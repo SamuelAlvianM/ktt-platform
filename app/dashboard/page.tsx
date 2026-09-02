@@ -9,6 +9,7 @@ import {
   LayananPopulerChart,
   PermohonanHarianChart,
 } from '@/components/dashboard/dashboard-charts';
+import { ExportStatistikButton } from '@/components/dashboard/export-statistik-button';
 import {
   FileText,
   Users,
@@ -86,23 +87,31 @@ function SectionCard({
   title,
   icon: Icon,
   action,
+  ekspor,
   children,
 }: {
   title: string;
   icon: React.ElementType;
   action?: React.ReactNode;
+  /** Kunci bagian statistik → memunculkan tombol unduh Excel di kanan atas. */
+  ekspor?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm">
       <div className="mb-4 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
             <Icon className="h-4 w-4" />
           </span>
-          <h2 className="text-sm font-bold text-slate-900">{title}</h2>
+          <h2 className="truncate text-sm font-bold text-slate-900">{title}</h2>
         </div>
-        {action}
+        {(action || ekspor) && (
+          <div className="flex shrink-0 items-center gap-1.5">
+            {action}
+            {ekspor && <ExportStatistikButton bagian={ekspor} />}
+          </div>
+        )}
       </div>
       {children}
     </div>
@@ -273,10 +282,17 @@ export default async function DashboardPage() {
               Ringkasan statistik &amp; progress pelayanan
             </p>
           </div>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
-            <TrendingUp className="h-3.5 w-3.5" />
-            {BULAN_PENDEK[now.getMonth()]} {now.getFullYear()}
-          </span>
+          <div className="flex items-center gap-2">
+            {/* Tanpa `bagian` = seluruh kartu statistik, satu sheet per kartu. */}
+            <ExportStatistikButton
+              label="Export Excel"
+              judul="Unduh SELURUH statistik dashboard (satu sheet per kartu)"
+            />
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
+              <TrendingUp className="h-3.5 w-3.5" />
+              {BULAN_PENDEK[now.getMonth()]} {now.getFullYear()}
+            </span>
+          </div>
         </div>
 
         {/* ── KPI pelayanan ── */}
@@ -304,6 +320,7 @@ export default async function DashboardPage() {
           <SectionCard
             title="Progress Permohonan"
             icon={ClipboardList}
+            ekspor="progress"
             action={
               <Link href="/dashboard/permohonan" className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary/80">
                 Kelola <ArrowRight className="h-3 w-3" />
@@ -324,11 +341,12 @@ export default async function DashboardPage() {
             )}
           </SectionCard>
 
-          <SectionCard title="Tren Permohonan · 6 Bulan" icon={TrendingUp}>
+          <SectionCard title="Tren Permohonan · 6 Bulan" icon={TrendingUp} ekspor="tren">
             <TrenBulananChart data={trend.map((t) => ({ label: t.label, count: t.count }))} />
           </SectionCard>
 
-          <SectionCard title="Layanan Terpopuler" icon={Gauge}>
+          {/* Kartunya hanya memuat 5 teratas; ekspornya SELURUH jenis layanan. */}
+          <SectionCard title="Layanan Terpopuler" icon={Gauge} ekspor="layanan">
             {topJenis.length === 0 ? (
               <p className="py-6 text-center text-sm text-slate-400">Belum ada data.</p>
             ) : (
@@ -342,6 +360,7 @@ export default async function DashboardPage() {
           <SectionCard
             title="Permohonan per Tanggal · 30 Hari Terakhir"
             icon={CalendarDays}
+            ekspor="harian"
             action={
               <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold tabular-nums text-slate-500">
                 {fmt(totalDaily)} permohonan
@@ -414,6 +433,7 @@ export default async function DashboardPage() {
           <SectionCard
             title="Aspirasi Warga"
             icon={MessageSquare}
+            ekspor="aspirasi"
             action={
               <Link href="/dashboard/pengaduan" className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary/80">
                 Kelola <ArrowRight className="h-3 w-3" />
@@ -455,6 +475,7 @@ export default async function DashboardPage() {
           <SectionCard
             title="Akun Pengguna"
             icon={Users}
+            ekspor="akun"
             action={
               <Link href="/dashboard/users" className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary/80">
                 Kelola <ArrowRight className="h-3 w-3" />
@@ -491,7 +512,7 @@ export default async function DashboardPage() {
             </div>
           </SectionCard>
 
-          <SectionCard title="Pengunjung Situs" icon={Eye}>
+          <SectionCard title="Pengunjung Situs" icon={Eye} ekspor="pengunjung">
             <p className="mb-3 text-sm leading-relaxed text-slate-600">
               Saat ini ada{' '}
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 font-bold text-emerald-600">
@@ -523,7 +544,7 @@ export default async function DashboardPage() {
             </p>
           </SectionCard>
 
-          <SectionCard title="Konten Situs" icon={Newspaper}>
+          <SectionCard title="Konten Situs" icon={Newspaper} ekspor="konten">
             <div className="grid grid-cols-2 gap-2">
               {konten.map((k) => (
                 <Link
