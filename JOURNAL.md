@@ -1,6 +1,6 @@
 # Journal — SIDAKO (`sidako-platform`)
 
-> **Terakhir diperbarui: 2026-08-08** · anak dari [`../journal.md`](../journal.md) §3.2
+> **Terakhir diperbarui: 2026-09-02** · anak dari [`../journal.md`](../journal.md) §3.2
 >
 > Berkas ini **keadaan sekarang** khusus SIDAKO: status, antrean, jebakan lokal.
 > Riwayat per-sesi tetap di [`sync-sam-journals/ssj_*.md`](sync-sam-journals/)
@@ -335,3 +335,60 @@ background opsi tegas, tidak dipakai.
 | `PROMPT-DISABILITAS.md` | prompt widget a11y — **sudah dieksekusi**, arsip |
 | [`../journal.md`](../journal.md) | keadaan seluruh workspace |
 | [`../HISTORY.md`](../HISTORY.md) | arsip pekerjaan selesai (§2.12-L, §2.12-N.4 menyangkut SIDAKO) |
+
+## 10. Sembilan poin rapat — SELESAI 2 Sep 2026
+
+Branch `feat/pendaftaran-foto-manajemen-akun`, 8 commit. Diambil dari insight
+TTU Sulat Manekat, disesuaikan ke lingkungan Next.js SIDAKO.
+
+| # | Poin | Berkas utama |
+|---|---|---|
+| 1,3,5 | Sidebar & header Operator OPD, dua menu | `lib/peran.ts`, `components/shared/dashboard-sidebar.tsx`, `app/dashboard/layout.tsx` |
+| 2 | Halaman detail permohonan tersendiri | `app/dashboard/permohonan/[id]/` |
+| 4 | Penolakan wajib alasan + rincian + keterangan | `lib/tolak-permohonan.ts`, `components/dashboard/pilih-rincian.tsx` |
+| 6 | Saringan jenis (semua) & wilayah (bukan OPD) | `app/api/admin/permohonan/route.ts` |
+| 7 | Zoom foto lepas dari sidebar | `components/shared/image-viewer.tsx` |
+| 8 | Sunting profil & setel sandi | `app/api/admin/users/[id]/`, `lib/validasi-akun.ts` |
+| 9 | Tutup-buka jenis layanan + kartu abu-abu | `lib/pelayanan-list.ts`, `lib/visibilitas-server.ts` |
+| — | Warna per kategori layanan | `lib/kategori.ts` |
+
+### Tiga cacat senyap yang ditemukan sambil jalan
+
+1. 🔴 **Peran OPD tidak pernah dipakai.** Barisnya ada di `m_userlevels` sejak
+   seeder pertama, tapi `session.level > 2` — yang dimaksudkan "bukan petugas" —
+   ikut menyingkirkannya. Akun OPD masuk dashboard tanpa sidebar sama sekali.
+
+2. 🔴 **Fitur tutup-buka layanan MATI TOTAL.** Pengaturan menyimpan `modalType`
+   (`kartuKeluargaPisahKK`), pemilih layanan memeriksa slug (`kk-pisah-kk`).
+   Nol dari 15 pernah cocok. Basis data memuat **11 layanan bertanda
+   tersembunyi yang masih menerima permohonan**. Endpoint pengiriman tidak
+   memeriksa visibilitas sama sekali.
+
+3. 🔴 **Penolakan tidak pernah wajib beralasan di server.** Syaratnya hanya di
+   formulir petugas; PATCH tanpa `catatan` tetap diterima. Inilah sebab keluhan
+   warga yang ditolak berulang kali tanpa tahu apa yang kurang.
+
+### Perintah baru
+
+```
+npm run peran:periksa        # cocokkan lib/peran.ts dengan m_userlevels
+npm run tolak:uji            # 16 pemeriksaan bolak-balik penyandian penolakan
+npm run visibilitas:uji      # 10 pemeriksaan penerjemah kunci visibilitas
+npm run akun:uji             # buat akun OPD & staf uji LOKAL (jangan di produksi)
+```
+
+### Belum dikerjakan
+
+- 🔴 **Hydration mismatch & `key` prop hilang** di dashboard. **Pre-existing** —
+  dibuktikan dengan menyimpan pekerjaan ini ke stash lalu memuat ulang; galatnya
+  tetap muncul. Belum ditelusuri.
+- Warna kategori belum diterapkan ke TIDORE.
+- Branch belum di-merge ke `main`.
+
+### Jebakan yang terbukti lagi (lihat §7)
+
+- `next build` dijalankan saat dev server hidup → **dev server mati**. Terjadi
+  dua kali sesi ini. Matikan preview dulu.
+- Bundel dev basi membuat perbaikan yang benar terbaca seolah gagal. Kartu
+  abu-abu poin 9 sempat terlihat tidak bekerja; setelah dev server dimulai
+  ulang, benar.

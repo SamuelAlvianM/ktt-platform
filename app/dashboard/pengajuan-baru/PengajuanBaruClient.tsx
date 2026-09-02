@@ -38,6 +38,8 @@ import { StaffPengajuanForm } from "@/components/dashboard/staff-pengajuan-form"
 import { PengaturanPelayanan } from "@/components/dashboard/pengaturan-pelayanan";
 import { cn } from "@/lib/utils";
 import { slugTersembunyi } from "@/lib/pelayanan-list";
+import { KATEGORI_LAYANAN } from "@/lib/permohonan-layanan";
+import { kategoriSlug, warnaKategori, WARNA_MATI } from "@/lib/kategori";
 import { isAdmin, isPetugas } from "@/lib/peran";
 import { JamLayananEditor } from "@/components/dashboard/jam-layanan-editor";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -61,6 +63,7 @@ export function PengajuanBaruClient() {
   const [selected, setSelected] = useState<LayananForm | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [q, setQ] = useState("");
+  const [kat, setKat] = useState("all");
   const { user } = useAppSelector((s) => s.auth);
   const level = user?.level ?? 3;
   /*
@@ -96,13 +99,36 @@ export function PengajuanBaruClient() {
     };
   }, []);
 
-  const filtered = q.trim()
-    ? LAYANAN_FORMS.filter(
-        (l) =>
-          l.title.toLowerCase().includes(q.trim().toLowerCase()) ||
-          l.desc.toLowerCase().includes(q.trim().toLowerCase()),
-      )
-    : LAYANAN_FORMS;
+  const cocokCari = (l: LayananForm) => {
+    const cari = q.trim().toLowerCase();
+    if (!cari) return true;
+    return (
+      l.title.toLowerCase().includes(cari) || l.desc.toLowerCase().includes(cari)
+    );
+  };
+
+  const hasilCari = LAYANAN_FORMS.filter(cocokCari);
+
+  /*
+   * Hitungan tab dihitung dari HASIL PENCARIAN, bukan seluruh daftar.
+   *
+   * ⚠️ Kalau dihitung dari semuanya, tab bisa berbunyi "Akta 5" lalu terbuka
+   * kosong karena kata kuncinya tidak cocok satu pun — angka yang berbohong.
+   */
+  const jumlahKat: Record<string, number> = { all: hasilCari.length };
+  for (const l of hasilCari) {
+    const k = kategoriSlug(l.slug);
+    if (k) jumlahKat[k] = (jumlahKat[k] ?? 0) + 1;
+  }
+
+  const filtered =
+    kat === "all"
+      ? hasilCari
+      : hasilCari.filter((l) => kategoriSlug(l.slug) === kat);
+
+  // Tab kosong disembunyikan — tab yang tidak pernah bisa diklik hanya menambah
+  // yang harus dipindai mata.
+  const tabs = KATEGORI_LAYANAN.filter((k) => (jumlahKat[k.id] ?? 0) > 0);
 
   // ── Form inline (menu grid disembunyikan) ──
   if (selected) {
@@ -191,6 +217,40 @@ export function PengajuanBaruClient() {
         </Sheet>
       )}
 
+      {/* Tab kategori — warnanya dari `lib/kategori.ts`, satu peta dengan
+          pemilih layanan warga supaya keduanya tidak menyimpang. */}
+      {tabs.length > 1 && (
+        <div className="mb-4 flex flex-wrap gap-2">
+          {tabs.map((k) => {
+            const w = warnaKategori(k.id);
+            const aktif = kat === k.id;
+            return (
+              <button
+                key={k.id}
+                type="button"
+                onClick={() => setKat(k.id)}
+                className={cn(
+                  'inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors',
+                  aktif
+                    ? w.tab
+                    : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-50',
+                )}
+              >
+                {k.name}
+                <span
+                  className={cn(
+                    'inline-flex min-w-5 items-center justify-center rounded-full px-1.5 text-[0.65rem] font-semibold',
+                    aktif ? w.hitung : 'bg-slate-100 text-slate-500',
+                  )}
+                >
+                  {jumlahKat[k.id] ?? 0}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {filtered.length === 0 ? (
         <div className="py-16 text-center text-sm text-slate-500">
           Tidak ada layanan cocok "{q}".
@@ -200,6 +260,12 @@ export function PengajuanBaruClient() {
           {filtered.map((l, i) => {
             const Icon = ICONS[l.icon] ?? FileText;
             const nonaktif = mati.has(l.slug);
+            /*
+             * 🔴 Kartu nonaktif SELALU abu-abu, MENGABAIKAN warna kategorinya.
+             * Kalau ia ikut berwarna seperti yang lain, satu-satunya penanda
+             * "sedang ditutup" tinggal teks kecil — dan itu terlewat.
+             */
+            const w = nonaktif ? WARNA_MATI : warnaKategori(kategoriSlug(l.slug));
             // Layanan tertutup tetap bisa dibuka Super Admin — ia yang
             // menutupnya, dan tetap perlu memasukkan permohonan susulan.
             const terkunci = nonaktif && !bolehTerobos;
@@ -230,11 +296,15 @@ export function PengajuanBaruClient() {
                   terkunci && 'cursor-not-allowed opacity-80',
                 )}
               >
+                {/* ⚠️ Kotak di belakang ikon tetap `bg-primary/10` untuk SEMUA
+                    kategori; yang berbeda hanya warna glif ikonnya. Kartu
+                    berwarna penuh membuat halaman ramai dan melemahkan warna
+                    yang memang harus menonjol: penanda layanan ditutup. */}
                 <div className={cn(
                   'flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl transition-transform',
                   nonaktif
-                    ? 'bg-slate-200 text-slate-500'
-                    : 'bg-primary/10 text-primary group-hover:scale-105',
+                    ? `bg-slate-200 ${w.ikon}`
+                    : `bg-primary/10 ${w.ikon} group-hover:scale-105`,
                 )}>
                   <Icon className="h-5 w-5" />
                 </div>
