@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getSession } from '@/lib/auth';
+import { isOpd, isPetugas } from '@/lib/peran';
 import { prisma } from '@/lib/prisma';
 import { statsKunjungan } from '@/lib/kunjungan';
 import {
@@ -121,7 +122,16 @@ function SectionCard({
 export default async function DashboardPage() {
   const session = await getSession();
   if (!session) redirect('/login');
-  if (session.level > 2) redirect('/user/pengajuan');
+  /*
+   * Statistik Rekap seluruh kabupaten tetap milik petugas dinas.
+   *
+   * OPD dipulangkan ke daftar permohonannya sendiri, BUKAN ke halaman warga:
+   * ia kini punya kerangka dashboard, dan melemparnya ke `/user/pengajuan`
+   * berarti mengeluarkannya dari sidebar yang baru saja diberikan —
+   * berputar-putar antara dua tampilan tanpa pernah sampai.
+   */
+  if (isOpd(session.level)) redirect('/dashboard/permohonan');
+  if (!isPetugas(session.level)) redirect('/user/pengajuan');
 
   const now = new Date();
   const startBulanIni = new Date(now.getFullYear(), now.getMonth(), 1);

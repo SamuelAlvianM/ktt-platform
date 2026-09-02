@@ -4,6 +4,7 @@ import { join, extname } from "path";
 import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
 import { getSession } from "@/lib/auth";
+import { isWarga } from "@/lib/peran";
 import { createNotifikasi, notifyPetugas, safeNotify } from "@/lib/notifikasi";
 import { cekJamLayananSekarang } from "@/lib/jam-layanan-server";
 import { payloadBerkasEntries } from "@/lib/permohonan-display";
@@ -213,8 +214,10 @@ export async function POST(
       }),
     );
 
-    // Konfirmasi in-app untuk warga/OPD pengaju (petugas tidak perlu).
-    if (session.level > 2) {
+    // Konfirmasi in-app untuk pengaju yang mengurus permohonannya sendiri.
+    // Petugas & OPD tidak perlu: mereka melihat hasilnya langsung di
+    // dashboard, dan pemberitahuan ke diri sendiri hanya jadi derau.
+    if (isWarga(session.level)) {
       await safeNotify(() =>
         createNotifikasi({
           userId: session.uid,
@@ -228,8 +231,9 @@ export async function POST(
       );
     }
 
-    // Bila pembuatnya petugas (form "Pengajuan Baru" atas nama warga), catat ke
-    // log aktivitas. Warga/OPD (level > 2) diabaikan oleh helper.
+    // Bila pembuatnya memakai dashboard (petugas atau OPD, lewat form
+    // "Pengajuan Baru" atas nama warga), catat ke log aktivitas.
+    // Warga yang mengurus permohonannya sendiri diabaikan oleh helper.
     await catatAktivitas(
       session,
       "BUAT",

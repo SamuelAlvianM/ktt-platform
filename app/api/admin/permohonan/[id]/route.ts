@@ -2,6 +2,8 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ok, fail } from "@/lib/api-response";
 import { getSession } from "@/lib/auth";
+import { bolehDashboard, isPetugas } from "@/lib/peran";
+import { bolehLihatPermohonan } from "@/lib/lingkup-permohonan";
 import { sendMail } from "@/lib/mail";
 import {
   tplPermohonanSelesai,
@@ -18,20 +20,46 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getSession();
-  if (!session || session.level > 2) return fail(["Akses ditolak"], 403);
+  if (!session || !bolehDashboard(session.level)) {
+    return fail(["Akses ditolak"], 403);
+  }
 
   const { id } = await params;
   const permohonan = await prisma.permohonan.findUnique({
     where: { id: Number(id) },
     include: {
       jenis: true,
-      user: { select: { userId: true, userFullname: true, userHp: true, userEmail: true } },
+      user: {
+        select: {
+          userId: true,
+          userFullname: true,
+          userHp: true,
+          userEmail: true,
+          userKecamatan: true,
+        },
+      },
       berkas: true,
     },
   });
   if (!permohonan) return fail(["Permohonan tidak ditemukan"], 404);
 
-  return ok({ permohonan });
+  /*
+   * 🔴 404, BUKAN 403. "Terlarang" mengonfirmasi bahwa permohonan bernomor
+   * ini ada; "tidak ditemukan" tidak mengonfirmasi apa pun. Untuk data
+   * kependudukan, keberadaan sebuah permohonan pun bukan kabar yang boleh
+   * bocor ke instansi lain — nomor registrasi berurutan, jadi menebaknya
+   * mudah.
+   */
+  if (!bolehLihatPermohonan(session, permohonan.userId)) {
+    return fail(["Permohonan tidak ditemukan"], 404);
+  }
+
+  return ok({
+    permohonan,
+    // Panel proses hanya digambar untuk yang benar-benar boleh memproses;
+    // OPD membuka halaman ini untuk MEMBACA — terutama alasan penolakan.
+    bolehProses: isPetugas(session.level),
+  });
 }
 
 /** Ubah status & catatan petugas (admin/operator). */
@@ -40,7 +68,12 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getSession();
-  if (!session || session.level > 2) return fail(["Akses ditolak"], 403);
+  // ⚠️ Sengaja `isPetugas`, bukan `bolehDashboard`: Operator OPD MEMBACA
+  // permohonannya, tidak memprosesnya. Ia mengajukan atas nama warga di
+  // wilayahnya; keputusan menerima/menolak tetap di tangan dinas.
+  if (!session || !isPetugas(session.level)) {
+    return fail(["Akses ditolak"], 403);
+  }
 
   const { id } = await params;
   const body = await req.json().catch(() => ({}));
