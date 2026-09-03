@@ -1,7 +1,7 @@
-# Graph Report - sidako-platform  (2026-09-02)
+# Graph Report - sidako-platform  (2026-09-04)
 
 ## Corpus Check
-- 348 files · ~236,240 words
+- 348 files · ~236,282 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `9a8cc932`
+- Built from commit: `1e7e979e`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
