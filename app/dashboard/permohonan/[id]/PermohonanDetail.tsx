@@ -373,8 +373,17 @@ export function PermohonanDetail({
 
       {/* ── Aksi ──────────────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center justify-end gap-2 border-t border-slate-100 pt-4">
+        {/* ⚠️ Tab baru, bukan navigasi biasa. Balasannya berkas PDF — tanpa
+            `target`, peramban meninggalkan halaman detail ini dan petugas
+            kehilangan posisinya hanya untuk mengunduh satu berkas. `rel` wajib
+            menyertainya: tanpa `noopener`, halaman tujuan bisa menyentuh
+            `window.opener`. */}
         {detail.status === 'SELESAI' && (
-          <a href={`/api/permohonan/${detail.id}/pdf`}>
+          <a
+            href={`/api/permohonan/${detail.id}/pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <Button
               variant="outline"
               className="border-success/40 text-success hover:bg-success/10 hover:text-success"
