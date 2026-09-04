@@ -43,6 +43,7 @@ import { NotificationBell } from "@/components/shared/notification-bell";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logoutUser } from "@/store/slices/authSlice";
+import { bolehDashboard } from "@/lib/peran";
 
 /** Ambang navbar desktop (px). Di bawah ini navigasi memakai hamburger —
  *  samakan dengan kelas `min-[1460px]:` pada deretan menu di bawah. */
@@ -757,9 +758,22 @@ function AuthArea({
 
   const displayName = user?.name || user?.user_id || "Pengguna";
   // Petugas (level 1-2) ke dashboard admin; warga/OPD langsung ke pengajuan.
-  const isPetugas = (user?.level ?? 3) <= 2;
-  const areaHref = isPetugas ? "/dashboard" : "/user/pengajuan";
-  const areaLabel = isPetugas ? "Dashboard" : "Pengajuan Saya";
+  /*
+   * 🔴 `level <= 2` MENYINGKIRKAN OPD dari dashboardnya sendiri.
+   *
+   * Sejak akun instansi punya dashboard beserta sidebar-nya (Pengajuan Baru &
+   * Permohonan Saya), tautan "area saya" di header harus mengantar ke sana.
+   * Dengan syarat lama, OPD melihat header yang menunjuk `/user/pengajuan` —
+   * halaman warga — sementara sidebar-nya ada di tempat lain. Satu akun, dua
+   * pintu masuk berbeda, dan tak ada satu pun yang memberitahu mana yang benar.
+   *
+   * `bolehDashboard` adalah syarat yang SAMA dengan yang dipakai penjaga rute
+   * `/dashboard`. Menyalin ambang levelnya di sini berarti keduanya bisa
+   * berselisih diam-diam saat peran baru ditambahkan.
+   */
+  const punyaDashboard = bolehDashboard(user?.level);
+  const areaHref = punyaDashboard ? "/dashboard" : "/user/pengajuan";
+  const areaLabel = punyaDashboard ? "Dashboard" : "Pengajuan Saya";
   // Dropdown akun sengaja dijaga tetap ringkas: petugas → Dashboard, warga/OPD
   // → Pengajuan Saya, keduanya + Pengaturan Akun. Menu "Ajukan Permohonan"
   // TIDAK ditaruh di sini karena jalurnya sudah ada di tempat yang tepat:
