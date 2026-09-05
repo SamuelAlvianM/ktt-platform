@@ -47,6 +47,27 @@ async function main() {
       nama: 'Operator Staf (uji lokal)',
       kecamatan: null,
     },
+    {
+      id: 999003,
+      userId: 'admin.uji.lokal',
+      sandi: 'adm12345',
+      level: PERAN.ADMIN,
+      nama: 'Super Admin (uji lokal)',
+      kecamatan: null,
+    },
+    /*
+     * ⚠️ Warga masuk memakai NIK, bukan username — itulah sebabnya `userId`-nya
+     * 16 digit. NIK ini sengaja diawali angka yang mustahil dipakai wilayah
+     * mana pun, supaya tidak bertabrakan dengan warga sungguhan.
+     */
+    {
+      id: 999004,
+      userId: '9999000000000001',
+      sandi: 'warga12345',
+      level: PERAN.WARGA,
+      nama: 'Warga Uji (uji lokal)',
+      kecamatan: kec?.nama ?? null,
+    },
   ];
 
   for (const a of akun) {
