@@ -30,27 +30,27 @@
     "semantic_hash": "4d17f76ae71ca3f38e353ef9f48c3c69"
   },
   "app/api/admin/demografi/export/route.ts": {
-    "mtime": 1788513659.7488847,
-    "seen": 1788513884.2093217,
-    "ast_hash": "9ded3930931237a4d0251ecb37d11e37",
+    "mtime": 1788710274.2220976,
+    "seen": 1788712407.9819987,
+    "ast_hash": "bb6199523a1b52914a7f688a67b48e8e",
     "semantic_hash": ""
   },
   "app/api/admin/demografi/import/route.ts": {
-    "mtime": 1788513659.657535,
-    "seen": 1788513884.2093241,
-    "ast_hash": "3b6364ad74c085c949fdfc2a8d0627f0",
+    "mtime": 1788710274.2220976,
+    "seen": 1788712407.9820046,
+    "ast_hash": "599db8d64b76b2e3bdf55f1f7882c90d",
     "semantic_hash": ""
   },
   "app/api/admin/demografi/parse/route.ts": {
-    "mtime": 1788513659.7032926,
-    "seen": 1788513884.2093256,
-    "ast_hash": "3664f583fcc875f411edc41f655ac539",
+    "mtime": 1788710274.2231028,
+    "seen": 1788712407.9820147,
+    "ast_hash": "4edcf4e6fa1b4500766f952a215568ec",
     "semantic_hash": ""
   },
   "app/api/admin/demografi/route.ts": {
-    "mtime": 1788513659.610751,
-    "seen": 1788513884.2093265,
-    "ast_hash": "0de51c29a409de5f2e98d8996baaa2fc",
+    "mtime": 1788710274.2231028,
+    "seen": 1788712407.98202,
+    "ast_hash": "e50bfe27efa520b2f57487926034be31",
     "semantic_hash": ""
   },
   "app/api/admin/galeri/[id]/route.ts": {
@@ -228,15 +228,15 @@
     "semantic_hash": "2e99e5b0c0ea6db17fe5e3388cc3a764"
   },
   "app/api/demografi/export/route.ts": {
-    "mtime": 1788513659.8398416,
-    "seen": 1788513884.2093768,
-    "ast_hash": "31ee01528d057d2efa4774c4dfeb98d0",
+    "mtime": 1788710274.2241037,
+    "seen": 1788712407.9821675,
+    "ast_hash": "b32cf0675142aa7a1948ea540d69918a",
     "semantic_hash": ""
   },
   "app/api/demografi/route.ts": {
-    "mtime": 1788513659.7938032,
-    "seen": 1788513884.209378,
-    "ast_hash": "f37659b867d9790d26d67a27e1808988",
+    "mtime": 1788710274.2241037,
+    "seen": 1788712407.982176,
+    "ast_hash": "ae83e3692bbd05ecef89573b984748c8",
     "semantic_hash": ""
   },
   "app/api/galeri/route.ts": {
@@ -438,9 +438,9 @@
     "semantic_hash": ""
   },
   "app/dashboard/demografi/AdminDemografi.tsx": {
-    "mtime": 1788677766.153445,
-    "seen": 1788678596.9069734,
-    "ast_hash": "16b979d0478f178029308239c41b4411",
+    "mtime": 1788710639.697959,
+    "seen": 1788712407.9823146,
+    "ast_hash": "344692331f38e1cd09e0a32e2b3ade12",
     "semantic_hash": ""
   },
   "app/dashboard/demografi/page.tsx": {
@@ -690,10 +690,10 @@
     "semantic_hash": "9167db3b76faab380e83e45db043ea56"
   },
   "app/media/demografi/[slug]/page.tsx": {
-    "mtime": 1784121679.9893825,
-    "seen": 1788252628.4636402,
-    "ast_hash": "1be40cbf502878faece1961cd201d63b",
-    "semantic_hash": "1be40cbf502878faece1961cd201d63b"
+    "mtime": 1788710703.7600303,
+    "seen": 1788712407.9825113,
+    "ast_hash": "343f8a122893e71f77a7924c66e0c7b9",
+    "semantic_hash": ""
   },
   "app/media/demografi/page.tsx": {
     "mtime": 1784121683.2476027,
@@ -1014,9 +1014,9 @@
     "semantic_hash": "e5bc8a52d305cf253bb1d4ab5f67eb7f"
   },
   "components/landingpage/demografi-view.tsx": {
-    "mtime": 1788513659.982488,
-    "seen": 1788513884.2095768,
-    "ast_hash": "e0e1c76e394ac635ba200128a107cb22",
+    "mtime": 1788710675.1648028,
+    "seen": 1788712407.9827597,
+    "ast_hash": "72b98c290557ccd6778751eca5b4edf2",
     "semantic_hash": ""
   },
   "components/landingpage/hero-section.tsx": {
@@ -1632,9 +1632,9 @@
     "semantic_hash": "3be601ece46690c3d768e36e2ba22f9a"
   },
   "lib/demografi-export.ts": {
-    "mtime": 1788513681.6094153,
-    "seen": 1788513884.2097268,
-    "ast_hash": "e4308ebfa365dce23b9bef78316226df",
+    "mtime": 1788710352.3681455,
+    "seen": 1788712407.983201,
+    "ast_hash": "a73242798feae278e16c8f8122ca11a4",
     "semantic_hash": ""
   },
   "lib/demografi-import.ts": {
@@ -1644,9 +1644,9 @@
     "semantic_hash": "dd556c88a04a0186ac1168b75851eecd"
   },
   "lib/demografi-kategori.ts": {
-    "mtime": 1788677325.4176004,
-    "seen": 1788678596.908522,
-    "ast_hash": "a388885032fa01b0371c1d8b10f97cdb",
+    "mtime": 1788710405.7984056,
+    "seen": 1788712407.983207,
+    "ast_hash": "a68c7f9f23aebe3ee7f8fe2bbcbf4388",
     "semantic_hash": ""
   },
   "lib/dokumen-registry.ts": {
@@ -2121,6 +2121,24 @@
     "mtime": 1788513659.5551364,
     "seen": 1788513884.209814,
     "ast_hash": "9f4833a9e986f859ccec0e3f127c25cc",
+    "semantic_hash": ""
+  },
+  "app/api/admin/demografi/kategori/route.ts": {
+    "mtime": 1788710320.086663,
+    "seen": 1788712407.98201,
+    "ast_hash": "1271f75d70692f1eaae683c0062ed2a0",
+    "semantic_hash": ""
+  },
+  "app/api/demografi/kategori/route.ts": {
+    "mtime": 1788710255.9697595,
+    "seen": 1788712407.9821715,
+    "ast_hash": "3dd1f98c5c6040011df5b4ce25a2945a",
+    "semantic_hash": ""
+  },
+  "lib/demografi-registri.ts": {
+    "mtime": 1788710320.0876667,
+    "seen": 1788712407.983214,
+    "ast_hash": "04de409f1a4ede4467f5aba5dc14f39e",
     "semantic_hash": ""
   }
 }
