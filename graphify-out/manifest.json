@@ -30,28 +30,28 @@
     "semantic_hash": "4d17f76ae71ca3f38e353ef9f48c3c69"
   },
   "app/api/admin/demografi/export/route.ts": {
-    "mtime": 1784094265.929218,
-    "seen": 1788252628.463491,
-    "ast_hash": "d95db538edc3d62b8a037a240bad01bf",
-    "semantic_hash": "d95db538edc3d62b8a037a240bad01bf"
+    "mtime": 1788513659.7488847,
+    "seen": 1788513884.2093217,
+    "ast_hash": "9ded3930931237a4d0251ecb37d11e37",
+    "semantic_hash": ""
   },
   "app/api/admin/demografi/import/route.ts": {
-    "mtime": 1784572470.4201393,
-    "seen": 1788252628.4634924,
-    "ast_hash": "0fbd3d7e48ef4efb4fbe75876ad02592",
-    "semantic_hash": "0fbd3d7e48ef4efb4fbe75876ad02592"
+    "mtime": 1788513659.657535,
+    "seen": 1788513884.2093241,
+    "ast_hash": "3b6364ad74c085c949fdfc2a8d0627f0",
+    "semantic_hash": ""
   },
   "app/api/admin/demografi/parse/route.ts": {
-    "mtime": 1784094265.9362085,
-    "seen": 1788252628.4634933,
-    "ast_hash": "9737bca89cbaf5cc42163741e29f1e6f",
-    "semantic_hash": "9737bca89cbaf5cc42163741e29f1e6f"
+    "mtime": 1788513659.7032926,
+    "seen": 1788513884.2093256,
+    "ast_hash": "3664f583fcc875f411edc41f655ac539",
+    "semantic_hash": ""
   },
   "app/api/admin/demografi/route.ts": {
-    "mtime": 1784572470.4211478,
-    "seen": 1788252628.4634945,
-    "ast_hash": "0ec7d061629d97095aec06ede4608cce",
-    "semantic_hash": "0ec7d061629d97095aec06ede4608cce"
+    "mtime": 1788513659.610751,
+    "seen": 1788513884.2093265,
+    "ast_hash": "0de51c29a409de5f2e98d8996baaa2fc",
+    "semantic_hash": ""
   },
   "app/api/admin/galeri/[id]/route.ts": {
     "mtime": 1784572470.4232063,
@@ -168,16 +168,16 @@
     "semantic_hash": "274f607acdf33cf6f4086379209872e3"
   },
   "app/api/auth/forgot-password/route.ts": {
-    "mtime": 1784094266.0164237,
-    "seen": 1788252628.4635239,
-    "ast_hash": "1055169057f1ee73573788870316ff4d",
-    "semantic_hash": "1055169057f1ee73573788870316ff4d"
+    "mtime": 1788539581.2732475,
+    "seen": 1788539779.3158042,
+    "ast_hash": "8d9cb9475f113592578bf74a847ee036",
+    "semantic_hash": ""
   },
   "app/api/auth/login/route.ts": {
-    "mtime": 1785289594.4347546,
-    "seen": 1788252628.463525,
-    "ast_hash": "c46ec0a6ddfc16dfc8c3a7f120ecb588",
-    "semantic_hash": "c46ec0a6ddfc16dfc8c3a7f120ecb588"
+    "mtime": 1788539454.3975232,
+    "seen": 1788539779.3158064,
+    "ast_hash": "5fc07341daef717713b47fe6666dfdcb",
+    "semantic_hash": ""
   },
   "app/api/auth/logout/route.ts": {
     "mtime": 1784094266.0231383,
@@ -186,16 +186,16 @@
     "semantic_hash": "3c4852f5398f5e565fe7b497237c6310"
   },
   "app/api/auth/register/route.ts": {
-    "mtime": 1786453555.7689395,
-    "seen": 1788252628.4635274,
-    "ast_hash": "28eabc15d2489d7975ecc5159e6f4d96",
-    "semantic_hash": "28eabc15d2489d7975ecc5159e6f4d96"
+    "mtime": 1788539454.398517,
+    "seen": 1788539779.3158097,
+    "ast_hash": "a18a60f39f80ff7df4dcff85ae65ae3e",
+    "semantic_hash": ""
   },
   "app/api/auth/reset-password/route.ts": {
-    "mtime": 1784094266.0301416,
-    "seen": 1788252628.4635289,
-    "ast_hash": "1aa5d21b3b99717fb9f50ab1a601bf87",
-    "semantic_hash": "1aa5d21b3b99717fb9f50ab1a601bf87"
+    "mtime": 1788539454.400511,
+    "seen": 1788539779.3158114,
+    "ast_hash": "7cae0c225e0e3339d89112c4dbdb744b",
+    "semantic_hash": ""
   },
   "app/api/auth/session/route.ts": {
     "mtime": 1784094266.033138,
@@ -228,16 +228,16 @@
     "semantic_hash": "2e99e5b0c0ea6db17fe5e3388cc3a764"
   },
   "app/api/demografi/export/route.ts": {
-    "mtime": 1784094266.042811,
-    "seen": 1788252628.4635365,
-    "ast_hash": "2209ef537d1e370549efdbad97ca7a51",
-    "semantic_hash": "2209ef537d1e370549efdbad97ca7a51"
+    "mtime": 1788513659.8398416,
+    "seen": 1788513884.2093768,
+    "ast_hash": "31ee01528d057d2efa4774c4dfeb98d0",
+    "semantic_hash": ""
   },
   "app/api/demografi/route.ts": {
-    "mtime": 1784094266.0461566,
-    "seen": 1788252628.4635375,
-    "ast_hash": "f765238f2abd183998bba62c7b2dd048",
-    "semantic_hash": "f765238f2abd183998bba62c7b2dd048"
+    "mtime": 1788513659.7938032,
+    "seen": 1788513884.209378,
+    "ast_hash": "f37659b867d9790d26d67a27e1808988",
+    "semantic_hash": ""
   },
   "app/api/galeri/route.ts": {
     "mtime": 1784572470.4384856,
@@ -258,10 +258,10 @@
     "semantic_hash": "6eb529b409f8d0a023300c2b6feb2900"
   },
   "app/api/kritik-saran/route.ts": {
-    "mtime": 1784094266.0632625,
-    "seen": 1788252628.4635437,
-    "ast_hash": "4d8cdd5e2509f8b716c2e46d60465bb0",
-    "semantic_hash": "4d8cdd5e2509f8b716c2e46d60465bb0"
+    "mtime": 1788539454.400511,
+    "seen": 1788539779.3158402,
+    "ast_hash": "d1c4fe0010daf2bb7aaa24610090d0ee",
+    "semantic_hash": ""
   },
   "app/api/kunjungan/route.ts": {
     "mtime": 1784870802.2495444,
@@ -342,9 +342,9 @@
     "semantic_hash": "17d4e546607f3b8a38650bab565a69c0"
   },
   "app/api/permohonan/route.ts": {
-    "mtime": 1788356828.4644794,
-    "seen": 1788357028.7301016,
-    "ast_hash": "ce671cb89e8e38cc4c3817567a20b3cb",
+    "mtime": 1788539454.4025242,
+    "seen": 1788539779.3158653,
+    "ast_hash": "91604f1e7fba6c68c5a541c8dd41b0c8",
     "semantic_hash": ""
   },
   "app/api/profil/change-password/route.ts": {
@@ -378,10 +378,10 @@
     "semantic_hash": "4a34d428c20f174069afca6bd2bbe1a1"
   },
   "app/api/stats/route.ts": {
-    "mtime": 1784657788.7076173,
-    "seen": 1788252628.4635699,
-    "ast_hash": "36219acb07228f63b0c859acc8bb72db",
-    "semantic_hash": "36219acb07228f63b0c859acc8bb72db"
+    "mtime": 1788513659.8855653,
+    "seen": 1788513884.2094133,
+    "ast_hash": "839f555253c5abf3684d157c41b7f18a",
+    "semantic_hash": ""
   },
   "app/api/tiket/[id]/route.ts": {
     "mtime": 1784094266.1317613,
@@ -420,9 +420,9 @@
     "semantic_hash": "4c1cbe30f7dbf0ceae9d2eed89e75398"
   },
   "app/dashboard/AdminUsers.tsx": {
-    "mtime": 1788363168.9064877,
-    "seen": 1788363708.1575837,
-    "ast_hash": "a590da49a8e09d733abce49e0199f179",
+    "mtime": 1788587430.3985088,
+    "seen": 1788587680.1101253,
+    "ast_hash": "c00e16bffdb864777c047bfe1bcf2fa6",
     "semantic_hash": ""
   },
   "app/dashboard/berita/AdminBerita.tsx": {
@@ -432,22 +432,22 @@
     "semantic_hash": "6bac0126af7597a5e8e48bb907473bc5"
   },
   "app/dashboard/berita/page.tsx": {
-    "mtime": 1784094266.1912243,
-    "seen": 1788252628.4635813,
-    "ast_hash": "a69c31bdc7836e3e21430df4f998c6d8",
-    "semantic_hash": "a69c31bdc7836e3e21430df4f998c6d8"
+    "mtime": 1788588777.5375154,
+    "seen": 1788589783.5661318,
+    "ast_hash": "0de2ee772437591b1dfd31da1d310914",
+    "semantic_hash": ""
   },
   "app/dashboard/demografi/AdminDemografi.tsx": {
-    "mtime": 1784121704.533903,
-    "seen": 1788252628.4635828,
-    "ast_hash": "c1c837bb4da57c238a37b97e4f15bb8e",
-    "semantic_hash": "c1c837bb4da57c238a37b97e4f15bb8e"
+    "mtime": 1788677766.153445,
+    "seen": 1788678596.9069734,
+    "ast_hash": "16b979d0478f178029308239c41b4411",
+    "semantic_hash": ""
   },
   "app/dashboard/demografi/page.tsx": {
-    "mtime": 1784094266.2109022,
-    "seen": 1788252628.463584,
-    "ast_hash": "b4b6aa4dabcf96168afdacd7cd8e59f4",
-    "semantic_hash": "b4b6aa4dabcf96168afdacd7cd8e59f4"
+    "mtime": 1788588777.539524,
+    "seen": 1788589783.5661366,
+    "ast_hash": "61ba50735c7ecc20d98a5d25e5e2a0a5",
+    "semantic_hash": ""
   },
   "app/dashboard/galeri/AdminGaleri.tsx": {
     "mtime": 1784094266.21508,
@@ -456,10 +456,10 @@
     "semantic_hash": "39a09b0cdafe8c14a48f21e7bf10f665"
   },
   "app/dashboard/galeri/page.tsx": {
-    "mtime": 1784094266.2183914,
-    "seen": 1788252628.4635863,
-    "ast_hash": "9994ae51c0f7bbabfc6bd1a083135cc9",
-    "semantic_hash": "9994ae51c0f7bbabfc6bd1a083135cc9"
+    "mtime": 1788588777.5425239,
+    "seen": 1788589783.5661407,
+    "ast_hash": "c801dc427c65c95bdad0304b140bc5e6",
+    "semantic_hash": ""
   },
   "app/dashboard/konten/AdminKonten.tsx": {
     "mtime": 1784094266.222398,
@@ -480,10 +480,10 @@
     "semantic_hash": "955bd8dee73336b5d2a4e4d38f61666f"
   },
   "app/dashboard/kritik-saran/page.tsx": {
-    "mtime": 1784094266.2350202,
-    "seen": 1788252628.4635916,
-    "ast_hash": "405b78cf858d5e99d18df8251b38c7e8",
-    "semantic_hash": "405b78cf858d5e99d18df8251b38c7e8"
+    "mtime": 1788588777.544524,
+    "seen": 1788589783.5661485,
+    "ast_hash": "07ace2fb1c92e91b2cc223da296ad5ed",
+    "semantic_hash": ""
   },
   "app/dashboard/layout.tsx": {
     "mtime": 1788356309.6166496,
@@ -498,10 +498,10 @@
     "semantic_hash": "e343dda6ab57819110641f647aa45681"
   },
   "app/dashboard/log/page.tsx": {
-    "mtime": 1784572470.4438107,
-    "seen": 1788252628.463596,
-    "ast_hash": "29f5fb21199777284be0963c6fa03128",
-    "semantic_hash": "29f5fb21199777284be0963c6fa03128"
+    "mtime": 1788588777.545524,
+    "seen": 1788589783.566155,
+    "ast_hash": "3c77182ba09f986dbc2e9844e7b1fee8",
+    "semantic_hash": ""
   },
   "app/dashboard/master/page.tsx": {
     "mtime": 1784094266.2449393,
@@ -516,10 +516,10 @@
     "semantic_hash": "e73089bfed493bad81a4cbd1d4cd7513"
   },
   "app/dashboard/media/page.tsx": {
-    "mtime": 1784094266.252841,
-    "seen": 1788252628.463601,
-    "ast_hash": "51ea934c9124b641383a28817adaffe5",
-    "semantic_hash": "51ea934c9124b641383a28817adaffe5"
+    "mtime": 1788588777.548051,
+    "seen": 1788589783.5661607,
+    "ast_hash": "65dc283fec2340d733f91669e5b89757",
+    "semantic_hash": ""
   },
   "app/dashboard/navigasi/EditorNavigasi.tsx": {
     "mtime": 1784566226.7748125,
@@ -528,10 +528,10 @@
     "semantic_hash": "45bbbb584381cee2c681a7548ae4dd38"
   },
   "app/dashboard/navigasi/page.tsx": {
-    "mtime": 1784566237.1542506,
-    "seen": 1788252628.463604,
-    "ast_hash": "fb486021993066f5af40ca861d195ba9",
-    "semantic_hash": "fb486021993066f5af40ca861d195ba9"
+    "mtime": 1788588777.550065,
+    "seen": 1788589783.5661645,
+    "ast_hash": "ea30150a13c3417068fcf220e966e8bf",
+    "semantic_hash": ""
   },
   "app/dashboard/page.tsx": {
     "mtime": 1788356490.672438,
@@ -540,27 +540,27 @@
     "semantic_hash": ""
   },
   "app/dashboard/pengaduan/AdminPengaduan.tsx": {
-    "mtime": 1784667747.1191218,
-    "seen": 1788252628.4636068,
-    "ast_hash": "24865fb85345a97956858805569b633a",
-    "semantic_hash": "24865fb85345a97956858805569b633a"
+    "mtime": 1788537533.1747477,
+    "seen": 1788537957.5735607,
+    "ast_hash": "7aec0b44cadfd5c30e1d320e8f64bbdf",
+    "semantic_hash": ""
   },
   "app/dashboard/pengaduan/page.tsx": {
-    "mtime": 1784094266.2938316,
-    "seen": 1788252628.4636083,
-    "ast_hash": "1ed758fa8a6909151280894e610e8082",
-    "semantic_hash": "1ed758fa8a6909151280894e610e8082"
+    "mtime": 1788588777.5520625,
+    "seen": 1788589783.5661707,
+    "ast_hash": "320449ec4ab79e8131affd8a2829a62d",
+    "semantic_hash": ""
   },
   "app/dashboard/pengajuan-baru/PengajuanBaruClient.tsx": {
-    "mtime": 1788363808.9589348,
-    "seen": 1788367032.4676938,
-    "ast_hash": "cdfc1dee45d105617efcf1827bee1e7b",
+    "mtime": 1788590527.710081,
+    "seen": 1788590725.392446,
+    "ast_hash": "0121ffae8c866fc813bca33d234e9abe",
     "semantic_hash": ""
   },
   "app/dashboard/pengajuan-baru/page.tsx": {
-    "mtime": 1788356466.4520786,
-    "seen": 1788356571.9977033,
-    "ast_hash": "ab62bfe3920c7ea3c310bb3df955154f",
+    "mtime": 1788588777.5530605,
+    "seen": 1788589783.5661745,
+    "ast_hash": "4e803108e28f4d0f821b9d645d37e827",
     "semantic_hash": ""
   },
   "app/dashboard/permohonan/AdminPermohonan.tsx": {
@@ -570,9 +570,9 @@
     "semantic_hash": ""
   },
   "app/dashboard/permohonan/page.tsx": {
-    "mtime": 1788356466.453078,
-    "seen": 1788356571.9977055,
-    "ast_hash": "4787f4c9753523696b22fd7f1bd74ecc",
+    "mtime": 1788588777.5550714,
+    "seen": 1788589783.5661829,
+    "ast_hash": "73766d3d95b0af51f5466d48a389db58",
     "semantic_hash": ""
   },
   "app/dashboard/produk/AdminProduk.tsx": {
@@ -582,10 +582,10 @@
     "semantic_hash": "e6f45e3a6e54a3c8c5d98ea061803b74"
   },
   "app/dashboard/produk/page.tsx": {
-    "mtime": 1784094266.3427868,
-    "seen": 1788252628.463616,
-    "ast_hash": "a7f30712d1c90f3b06a420384b34caa4",
-    "semantic_hash": "a7f30712d1c90f3b06a420384b34caa4"
+    "mtime": 1788588777.5591984,
+    "seen": 1788589783.566187,
+    "ast_hash": "8cc05535faafa198e19dc764bb6c3035",
+    "semantic_hash": ""
   },
   "app/dashboard/skm/SkmDashboard.tsx": {
     "mtime": 1784094266.351598,
@@ -594,10 +594,10 @@
     "semantic_hash": "2a9746e11e8039974642c61db111cc08"
   },
   "app/dashboard/skm/page.tsx": {
-    "mtime": 1784094266.3472056,
-    "seen": 1788252628.4636188,
-    "ast_hash": "590215b763feeb4b1602c75829cf52c5",
-    "semantic_hash": "590215b763feeb4b1602c75829cf52c5"
+    "mtime": 1788588777.560205,
+    "seen": 1788589783.5661912,
+    "ast_hash": "ae5295f7c51f5c936035a962fcce5a40",
+    "semantic_hash": ""
   },
   "app/dashboard/tiket/page.tsx": {
     "mtime": 1784094266.356589,
@@ -612,10 +612,10 @@
     "semantic_hash": "8a6d6c58e8ebf588b32b79b653ba3181"
   },
   "app/forgot-password/page.tsx": {
-    "mtime": 1784122843.9985445,
-    "seen": 1788252628.4636226,
-    "ast_hash": "09b6f951700c3771754830abc09f26b7",
-    "semantic_hash": "09b6f951700c3771754830abc09f26b7"
+    "mtime": 1788539472.310512,
+    "seen": 1788539779.3159502,
+    "ast_hash": "54a52e8956c10f1986602dfc55661dda",
+    "semantic_hash": ""
   },
   "app/galeri/page.tsx": {
     "mtime": 1786291926.0055249,
@@ -642,10 +642,10 @@
     "semantic_hash": "bab5c9f81def331b55f9665201041937"
   },
   "app/hubungi-kami/kritik-saran/page.tsx": {
-    "mtime": 1784094266.3968494,
-    "seen": 1788252628.4636292,
-    "ast_hash": "8df9cdb586fe442c1f39d5461edc2641",
-    "semantic_hash": "8df9cdb586fe442c1f39d5461edc2641"
+    "mtime": 1788539455.2282977,
+    "seen": 1788539779.3159583,
+    "ast_hash": "eaf7111d3d31a80d40b29ae8e64b010d",
+    "semantic_hash": ""
   },
   "app/hubungi-kami/page.tsx": {
     "mtime": 1784097229.0639,
@@ -666,10 +666,10 @@
     "semantic_hash": "49b9e4cdd34518239128aee6cc1e90b8"
   },
   "app/login/LoginContent.tsx": {
-    "mtime": 1785289693.21784,
-    "seen": 1788252628.4636347,
-    "ast_hash": "8bd9c95deb3112e01c3ede14b8e01376",
-    "semantic_hash": "8bd9c95deb3112e01c3ede14b8e01376"
+    "mtime": 1788539484.4386628,
+    "seen": 1788539779.3159652,
+    "ast_hash": "f98c0fffce692a0b7fa46e08d7f9f3a6",
+    "semantic_hash": ""
   },
   "app/login/page.tsx": {
     "mtime": 1784094266.4434626,
@@ -822,10 +822,10 @@
     "semantic_hash": "6063edceac0e0ef07cbaa641ceb803dd"
   },
   "app/providers.tsx": {
-    "mtime": 1784094266.5750754,
-    "seen": 1788252628.463669,
-    "ast_hash": "b72520767fa16550f1c26cf51e95b1f5",
-    "semantic_hash": "b72520767fa16550f1c26cf51e95b1f5"
+    "mtime": 1788539472.38371,
+    "seen": 1788539779.3160088,
+    "ast_hash": "2b848bd5260f0c8fae795c88114a82f8",
+    "semantic_hash": ""
   },
   "app/pusat-bantuan/[...slug]/page.tsx": {
     "mtime": 1786208742.041804,
@@ -834,10 +834,10 @@
     "semantic_hash": "935ee688f71434c885f3f4150336d0b9"
   },
   "app/register/RegisterContent.tsx": {
-    "mtime": 1786495662.5846915,
-    "seen": 1788252628.463672,
-    "ast_hash": "a565a120254f115f120db98cc4b7aecf",
-    "semantic_hash": "a565a120254f115f120db98cc4b7aecf"
+    "mtime": 1788539472.3431354,
+    "seen": 1788539779.3160117,
+    "ast_hash": "1b723dc2ba50e425a215fce8d3d0d89b",
+    "semantic_hash": ""
   },
   "app/register/page.tsx": {
     "mtime": 1784094266.5791602,
@@ -846,10 +846,10 @@
     "semantic_hash": "c57b526d5ed8979a20335360ba712eac"
   },
   "app/reset-password/ResetPasswordContent.tsx": {
-    "mtime": 1784122844.66727,
-    "seen": 1788252628.4636745,
-    "ast_hash": "11bf74c0914160d006308b518306f24f",
-    "semantic_hash": "11bf74c0914160d006308b518306f24f"
+    "mtime": 1788539472.3598428,
+    "seen": 1788539779.316015,
+    "ast_hash": "507a8753469ced55f01ee295b924e5fe",
+    "semantic_hash": ""
   },
   "app/reset-password/page.tsx": {
     "mtime": 1784094266.598167,
@@ -948,10 +948,10 @@
     "semantic_hash": "59c69d36597ddd6fae3e8679a74b7ce3"
   },
   "components/dashboard/demografi-editor.tsx": {
-    "mtime": 1784122181.5229478,
-    "seen": 1788252628.4637086,
-    "ast_hash": "4a76c5985e0cf1007edfd89c6c54c015",
-    "semantic_hash": "4a76c5985e0cf1007edfd89c6c54c015"
+    "mtime": 1788586401.3384533,
+    "seen": 1788586681.3097205,
+    "ast_hash": "166f00dcb3b7549cce6b3de31054e648",
+    "semantic_hash": ""
   },
   "components/dashboard/export-statistik-button.tsx": {
     "mtime": 1786598482.0912073,
@@ -966,10 +966,10 @@
     "semantic_hash": "d4d6b520a59abf59e8a1190fbb403cbb"
   },
   "components/dashboard/pengaturan-pelayanan.tsx": {
-    "mtime": 1785206678.7223797,
-    "seen": 1788252628.463712,
-    "ast_hash": "2f20acc949649ee8a177462a921a10c2",
-    "semantic_hash": "2f20acc949649ee8a177462a921a10c2"
+    "mtime": 1788675976.8849225,
+    "seen": 1788678596.907972,
+    "ast_hash": "4bc489e4f77180d826419b6c4d69c916",
+    "semantic_hash": ""
   },
   "components/dashboard/staff-pengajuan-form.tsx": {
     "mtime": 1786594682.1964228,
@@ -1014,10 +1014,10 @@
     "semantic_hash": "e5bc8a52d305cf253bb1d4ab5f67eb7f"
   },
   "components/landingpage/demografi-view.tsx": {
-    "mtime": 1784122368.608688,
-    "seen": 1788252628.463722,
-    "ast_hash": "565451956aae51da22167b0f94babc37",
-    "semantic_hash": "565451956aae51da22167b0f94babc37"
+    "mtime": 1788513659.982488,
+    "seen": 1788513884.2095768,
+    "ast_hash": "e0e1c76e394ac635ba200128a107cb22",
+    "semantic_hash": ""
   },
   "components/landingpage/hero-section.tsx": {
     "mtime": 1786210342.3605754,
@@ -1032,10 +1032,10 @@
     "semantic_hash": "1617be697054fd9f1ef6ffc827e71b98"
   },
   "components/landingpage/office-map.tsx": {
-    "mtime": 1784096165.4597318,
-    "seen": 1788252628.4637253,
-    "ast_hash": "49c7deed7b7fd25a68c1991f384b0044",
-    "semantic_hash": "49c7deed7b7fd25a68c1991f384b0044"
+    "mtime": 1788587291.5329788,
+    "seen": 1788587680.1103566,
+    "ast_hash": "b7acf6aa3ad2796ea4f9827425fe6a8c",
+    "semantic_hash": ""
   },
   "components/landingpage/peta-demografi-loader.tsx": {
     "mtime": 1784094266.8386421,
@@ -1080,10 +1080,10 @@
     "semantic_hash": "7cdc2bdeeade4aaec1b25489127af961"
   },
   "components/landingpage/stats.tsx": {
-    "mtime": 1786207356.7919612,
-    "seen": 1788252628.4637344,
-    "ast_hash": "0f786a9cf7936d9908dbf2b5dae1c920",
-    "semantic_hash": "0f786a9cf7936d9908dbf2b5dae1c920"
+    "mtime": 1788513665.7061071,
+    "seen": 1788513884.2095919,
+    "ast_hash": "57183f278095f282fe7df0d3af70f884",
+    "semantic_hash": ""
   },
   "components/landingpage/struktur-chart.tsx": {
     "mtime": 1784921986.5507147,
@@ -1392,10 +1392,10 @@
     "semantic_hash": "557c8bb729908c9f8f113fe666e5113c"
   },
   "components/shared/navbar.tsx": {
-    "mtime": 1786208544.393423,
-    "seen": 1788252628.4638157,
-    "ast_hash": "258ff4a827869255f486ca074cc0670a",
-    "semantic_hash": "258ff4a827869255f486ca074cc0670a"
+    "mtime": 1788538344.1346164,
+    "seen": 1788538649.871686,
+    "ast_hash": "cd03c72cb7c6e21ae4a8a7f61831c756",
+    "semantic_hash": ""
   },
   "components/shared/notification-bell.tsx": {
     "mtime": 1784122845.8725114,
@@ -1554,10 +1554,10 @@
     "semantic_hash": "9c8c811acd87f88e7f7eb3c8587781f7"
   },
   "components/ui/select.tsx": {
-    "mtime": 1784094267.492381,
-    "seen": 1788252628.463845,
-    "ast_hash": "6a0e07cd58ac996abcb87ff5bb702c05",
-    "semantic_hash": "6a0e07cd58ac996abcb87ff5bb702c05"
+    "mtime": 1788675841.2003753,
+    "seen": 1788678596.9084532,
+    "ast_hash": "13be9c3be911f037548420bb21900600",
+    "semantic_hash": ""
   },
   "components/ui/sheet.tsx": {
     "mtime": 1784094267.4970002,
@@ -1620,10 +1620,10 @@
     "semantic_hash": "5f22767a7f11d160020d18f1c76ceca8"
   },
   "lib/beranda-statistik.ts": {
-    "mtime": 1784094400.8971817,
-    "seen": 1788252628.463864,
-    "ast_hash": "12e0e4b8dba527ab590e6c60e88c0209",
-    "semantic_hash": "12e0e4b8dba527ab590e6c60e88c0209"
+    "mtime": 1788460650.7436793,
+    "seen": 1788461375.7301347,
+    "ast_hash": "fc375117f597c5d86709e0da8cbccdca",
+    "semantic_hash": ""
   },
   "lib/demografi-data.ts": {
     "mtime": 1784096121.9244597,
@@ -1632,10 +1632,10 @@
     "semantic_hash": "3be601ece46690c3d768e36e2ba22f9a"
   },
   "lib/demografi-export.ts": {
-    "mtime": 1784121724.2958772,
-    "seen": 1788252628.463866,
-    "ast_hash": "870e9d7abb02f7b76b04c01b8beb7ade",
-    "semantic_hash": "870e9d7abb02f7b76b04c01b8beb7ade"
+    "mtime": 1788513681.6094153,
+    "seen": 1788513884.2097268,
+    "ast_hash": "e4308ebfa365dce23b9bef78316226df",
+    "semantic_hash": ""
   },
   "lib/demografi-import.ts": {
     "mtime": 1784094267.5322576,
@@ -1644,10 +1644,10 @@
     "semantic_hash": "dd556c88a04a0186ac1168b75851eecd"
   },
   "lib/demografi-kategori.ts": {
-    "mtime": 1784094267.5342577,
-    "seen": 1788252628.4638684,
-    "ast_hash": "d85f8bfd561e6a4e93fc149a13bfa6f4",
-    "semantic_hash": "d85f8bfd561e6a4e93fc149a13bfa6f4"
+    "mtime": 1788677325.4176004,
+    "seen": 1788678596.908522,
+    "ast_hash": "a388885032fa01b0371c1d8b10f97cdb",
+    "semantic_hash": ""
   },
   "lib/dokumen-registry.ts": {
     "mtime": 1786209896.233827,
@@ -1805,12 +1805,6 @@
     "ast_hash": "7faa46b9dc2d0c29d28a926404a046f6",
     "semantic_hash": "7faa46b9dc2d0c29d28a926404a046f6"
   },
-  "lib/recaptcha.ts": {
-    "mtime": 1784094267.6164722,
-    "seen": 1788252628.4638982,
-    "ast_hash": "aa69d2f00895eaee1f7840cf4fc83321",
-    "semantic_hash": "aa69d2f00895eaee1f7840cf4fc83321"
-  },
   "lib/relasi-content.ts": {
     "mtime": 1784559583.8451526,
     "seen": 1788252628.4638991,
@@ -1818,10 +1812,10 @@
     "semantic_hash": "c86cd0c69f9124e0157000878e80e524"
   },
   "lib/site-config.ts": {
-    "mtime": 1784120638.8301296,
-    "seen": 1788252628.4639003,
-    "ast_hash": "e0ed3fd560d60ccf13c249f6f04df03d",
-    "semantic_hash": "e0ed3fd560d60ccf13c249f6f04df03d"
+    "mtime": 1788539454.4045122,
+    "seen": 1788539779.3163233,
+    "ast_hash": "3e07aeb7871a7c5b39a108c3409177f9",
+    "semantic_hash": ""
   },
   "lib/skm.ts": {
     "mtime": 1784094267.6267858,
@@ -1902,9 +1896,9 @@
     "semantic_hash": "cbe1d72e43f8a3860312661b1b886cf3"
   },
   "package.json": {
-    "mtime": 1788363569.1701548,
-    "seen": 1788363708.1579578,
-    "ast_hash": "3b879e3f7a129ef3606f8935d2cff25c",
+    "mtime": 1788539485.5110385,
+    "seen": 1788539779.3163538,
+    "ast_hash": "c13ebed652eb63d049d0a314965f7324",
     "semantic_hash": ""
   },
   "postcss.config.mjs": {
@@ -1938,10 +1932,10 @@
     "semantic_hash": "07493ecf0d10116cfdeecdac1b8f9b2a"
   },
   "store/slices/authSlice.ts": {
-    "mtime": 1786453524.6294706,
-    "seen": 1788252628.4639406,
-    "ast_hash": "cd1536aa85988eb2c60ea6ec971d8cb3",
-    "semantic_hash": "cd1536aa85988eb2c60ea6ec971d8cb3"
+    "mtime": 1788539472.3990827,
+    "seen": 1788539779.316378,
+    "ast_hash": "e579ea6e7c19db413f42bbb295a97d4d",
+    "semantic_hash": ""
   },
   "store/store.ts": {
     "mtime": 1782714100.1389024,
@@ -2088,15 +2082,45 @@
     "semantic_hash": ""
   },
   "scripts/buat-akun-uji.ts": {
-    "mtime": 1788363561.6326792,
-    "seen": 1788363708.1579633,
-    "ast_hash": "78f370c46bd227570df6eb837503505f",
+    "mtime": 1788585454.532679,
+    "seen": 1788585537.5648563,
+    "ast_hash": "4cab89a34a0267c68a097e8f6a8543be",
     "semantic_hash": ""
   },
   "lib/kategori.ts": {
     "mtime": 1788363736.204893,
     "seen": 1788367032.4680467,
     "ast_hash": "5ac20170c5e2d30d7696adbab5410ee1",
+    "semantic_hash": ""
+  },
+  "components/shared/pemilih-periode.tsx": {
+    "mtime": 1788513659.4272842,
+    "seen": 1788513884.2096722,
+    "ast_hash": "15a9fede689a10062fef3b1fa7cdca07",
+    "semantic_hash": ""
+  },
+  "lib/demografi-periode.ts": {
+    "mtime": 1788513659.3724196,
+    "seen": 1788513884.2097425,
+    "ast_hash": "5a8159174fd3f6ddbefa65625d5ee7ec",
+    "semantic_hash": ""
+  },
+  "lib/periode-demografi.ts": {
+    "mtime": 1788676265.1500795,
+    "seen": 1788678596.9086435,
+    "ast_hash": "be1f9bcd3bf42b3ee925f55041ddb4c0",
+    "semantic_hash": ""
+  },
+  "scripts/migrasi-periode-demografi.ts": {
+    "mtime": 1788513659.4799304,
+    "seen": 1788513884.2098112,
+    "ast_hash": "9d4140eba36c35b4556b258d8b9efc1c",
+    "semantic_hash": ""
+  },
+  "scripts/uji-periode.ts": {
+    "mtime": 1788513659.5551364,
+    "seen": 1788513884.209814,
+    "ast_hash": "9f4833a9e986f859ccec0e3f127c25cc",
     "semantic_hash": ""
   }
 }
