@@ -2124,9 +2124,9 @@
     "semantic_hash": ""
   },
   "app/api/admin/demografi/kategori/route.ts": {
-    "mtime": 1788757940.02071,
-    "seen": 1788775113.957959,
-    "ast_hash": "b4abe5f666574eec007eb9487fd7bbdc",
+    "mtime": 1788802976.1191223,
+    "seen": 1788803194.3713713,
+    "ast_hash": "64100257e56f6a2833850966ae108ee6",
     "semantic_hash": ""
   },
   "app/api/demografi/kategori/route.ts": {
