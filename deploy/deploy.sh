@@ -14,7 +14,14 @@ set -euo pipefail
 # Target SSH: alias `tanatidung` (di ~/.ssh/config) atau REMOTE=root@IP.
 # ---------------------------------------------------------------------------
 
-REMOTE="${REMOTE:-tanatidung}"
+# IP langsung, bukan alias SSH. Alias `tanatidung` yang dulu jadi bawaan hanya
+# ada kalau seseorang menuliskannya di ~/.ssh/config; di laptop yang tidak
+# punya baris itu, deploy berhenti di "Could not resolve hostname tanatidung"
+# SETELAH build selesai — dan karena keluarannya biasa di-pipe, kode keluar 0
+# tetap terlihat seperti sukses. Terjadi 9 Sep 2026. deploy.sh DAGA memang
+# sudah memakai IP; sekarang keduanya sama. Alias tetap bisa dipakai lewat
+#   REMOTE=sidako bash deploy/deploy.sh
+REMOTE="${REMOTE:-root@76.13.19.247}"
 REMOTE_DIR="/root/ktt-platform"
 TUNNEL_PORT="${TUNNEL_PORT:-33061}"
 SHARP_VER="0.35.3"
