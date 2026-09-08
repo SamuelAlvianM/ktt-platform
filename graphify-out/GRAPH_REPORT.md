@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `5abd9118`
+- Built from commit: `f422f5fa`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -163,6 +163,8 @@
 10. `notifyError()` - 35 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `TeksTumbuh()` --calls--> `cn()`  [EXTRACTED]
+  components/dashboard/demografi-editor.tsx → lib/utils.ts
 - `ToolbarButton()` --calls--> `cn()`  [EXTRACTED]
   components/shared/rich-editor.tsx → lib/utils.ts
 - `MapCard()` --calls--> `cn()`  [EXTRACTED]
@@ -171,8 +173,6 @@
   components/landingpage/stats.tsx → lib/utils.ts
 - `TrendChart()` --calls--> `cn()`  [EXTRACTED]
   components/landingpage/stats.tsx → lib/utils.ts
-- `DashboardTiketPage()` --calls--> `getSession()`  [EXTRACTED]
-  app/dashboard/tiket/page.tsx → lib/auth.ts
 
 ## Import Cycles
 - None detected.
@@ -508,7 +508,7 @@ Cohesion: 0.40
 Nodes (4): AdminProduk(), DashboardProdukPage(), dynamic, getDokumenKategori()
 
 ## Knowledge Gaps
-- **601 isolated node(s):** `KategoriData`, `Kategori`, `Layanan`, `TitikLabel`, `Tabel` (+596 more)
+- **601 isolated node(s):** `EditRow`, `ParsedRow`, `Conflict`, `Kategori`, `Layanan` (+596 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 709 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **52 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -516,12 +516,12 @@ Nodes (4): AdminProduk(), DashboardProdukPage(), dynamic, getDokumenKategori()
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `cn()` connect `cn` to `button.tsx`, `inline-edit.tsx`, `image-upload-field.tsx`, `StaffPengajuanForm`, `PengajuanBaruClient.tsx`, `stats/route.ts`, `stats.tsx`, `AktaKelahiranNikAdaModal.tsx`, `demografi-editor.tsx`, `formulir-ppid/page.tsx`, `informasi-index.tsx`, `accessibility-widget.tsx`, `LoginContent.tsx`, `static-content-registry.ts`, `AdminDemografi.tsx`, `KIAModal.tsx`, `dashboard-sidebar.tsx`, `AdminPengaduan.tsx`, `KKPerubahanBiodataModal.tsx`, `profile-tabs.tsx`, `navigasi-tambahan.ts`, `utils.ts`, `jam-layanan.ts`, `useStaticContent`, `navbar.tsx`, `notification-bell.tsx`, `PilihLayananClient.tsx`?**
-  _High betweenness centrality (0.126) - this node is a cross-community bridge._
+  _High betweenness centrality (0.139) - this node is a cross-community bridge._
 - **Why does `getSession()` connect `ok` to `statistik-export.ts`, `navigasi/page.tsx`, `parse/route.ts`, `riwayat/[id]/page.tsx`, `produk/page.tsx`, `auth.ts`, `informasi-index.tsx`, `footer.tsx`, `tiket/[id]/route.ts`, `demografi-export.ts`, `berita/[id]/route.ts`, `prisma.ts`, `permohonan/[id]/route.ts`, `[layanan]/page.tsx`, `admin/demografi/route.ts`, `ktp/route.ts`, `import/route.ts`, `catatAktivitas`, `back-button.tsx`, `AdminPengaduan.tsx`, `navigasi-tambahan.ts`, `profil/page.tsx`, `skm/page.tsx`, `users/route.ts`, `dashboard/kritik-saran/page.tsx`, `media/page.tsx`?**
-  _High betweenness centrality (0.082) - this node is a cross-community bridge._
+  _High betweenness centrality (0.087) - this node is a cross-community bridge._
 - **Why does `prisma` connect `prisma.ts` to `statistik-export.ts`, `riwayat/[id]/page.tsx`, `parse/route.ts`, `stats/route.ts`, `auth.ts`, `demografi-registri.ts`, `informasi-index.tsx`, `tiket/[id]/route.ts`, `demografi-export.ts`, `berita/[id]/route.ts`, `permohonan/[id]/route.ts`, `admin/demografi/route.ts`, `static-content-registry.ts`, `import/route.ts`, `catatAktivitas`, `ppid/[...slug]/page.tsx`, `ok`, `jam-layanan.ts`, `profil/page.tsx`, `halaman/[slug]/page.tsx`, `cek-status/route.ts`, `users/route.ts`, `cek-pendaftaran/route.ts`?**
-  _High betweenness centrality (0.052) - this node is a cross-community bridge._
-- **What connects `KategoriData`, `Kategori`, `Layanan` to the rest of the system?**
+  _High betweenness centrality (0.050) - this node is a cross-community bridge._
+- **What connects `EditRow`, `ParsedRow`, `Conflict` to the rest of the system?**
   _601 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `statistik-export.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.056692242114237 - nodes in this community are weakly interconnected._
