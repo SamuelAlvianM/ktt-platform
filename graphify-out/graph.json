@@ -14216,17 +14216,6 @@
       "source_location": "L35"
     },
     {
-      "id": "sharp_sharp",
-      "label": "sharp",
-      "_origin": "ast",
-      "community": 127,
-      "community_name": "sharp",
-      "confidence": "EXTRACTED",
-      "file_type": "code",
-      "norm_label": "sharp",
-      "source_file": "sharp"
-    },
-    {
       "id": "components_shared_image_upload_field",
       "label": "image-upload-field.tsx",
       "_origin": "ast",
@@ -89677,5 +89666,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "6273aeb4a66eccf77e4aa53ad064a7d8a02edeb2"
+  "built_at_commit": "5abd91186559b7223052d987c6ac73421928fe84"
 }
