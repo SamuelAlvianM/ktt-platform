@@ -59,6 +59,20 @@ fi
 
 # ============================================================ ASSEMBLE BUNDLE
 log "Rakit bundle standalone (static + public + tessdata)..."
+# WAJIB: `next build` ikut menyalin folder DATA RUNTIME `storage/` ke dalam
+# standalone (outputFileTracingExcludes tidak mencegahnya - terukur 8 Sep 2026:
+# 26 berkas lampiran permohonan & WBS hasil uji lokal ikut terbawa).
+#
+# Dua akibatnya, dua-duanya buruk:
+#   1. lampiran uji lokal mendarat di server dinas, dan
+#   2. `tar x` menimpa `storage/permohonan` di server - kalau di sana ia symlink
+#      ke uploads warga, symlink-nya berubah jadi direktori nyata berisi salinan
+#      separuh, dan seluruh lampiran warga jadi 404.
+#
+# Insiden nomor 2 sudah pernah terjadi di portal DAGA (2026-08-01). Berkas warga
+# hidup di direktori uploads server dan HANYA ditunjuk symlink - jangan pernah
+# ikut dikirim.
+rm -rf .next/standalone/storage
 rm -rf .next/standalone/.next/static .next/standalone/public .next/standalone/tessdata
 mkdir -p .next/standalone/.next
 cp -r .next/static .next/standalone/.next/static
