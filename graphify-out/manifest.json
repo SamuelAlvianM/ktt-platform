@@ -1074,9 +1074,9 @@
     "semantic_hash": "3a39e6b73be2d9947a2227cbb27a2322"
   },
   "components/landingpage/statistik-kartu-editor.tsx": {
-    "mtime": 1788773451.1462874,
-    "seen": 1788775113.958231,
-    "ast_hash": "c54140d041c314a0c25c20f95f76352e",
+    "mtime": 1788834315.3899739,
+    "seen": 1788834632.041544,
+    "ast_hash": "f2a72cf3704c55a51fe223750565cac2",
     "semantic_hash": ""
   },
   "components/landingpage/stats.tsx": {
